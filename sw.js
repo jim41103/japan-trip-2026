@@ -1,5 +1,5 @@
-const CACHE = 'tokyo-trip-2026-v14';
-const STATIC = ['/', '/style.css?v=14', '/app.js?v=14', '/manifest.json', '/icon.svg'];
+const CACHE = 'tokyo-trip-2026-v15';
+const STATIC = ['/', '/style.css?v=15', '/app.js?v=15', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
