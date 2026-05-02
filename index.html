@@ -275,8 +275,7 @@
   <div class="header-actions">
     <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 同步中</span>
     <button id="btn-expense" class="btn btn-ghost">💴 記帳</button>
-    <button id="btn-notion"  class="btn btn-ghost">📄 Notion</button>
-    <button id="btn-export"  class="btn btn-accent">⬇ 匯出</button>
+    <button id="btn-export"  class="btn btn-accent">⬇ 儲存</button>
   </div>
 </header>
 
@@ -331,7 +330,6 @@
       <div class="itinerary-actions">
         <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
         <button id="btn-ai-suggest"  class="btn btn-outline btn-sm">✨ AI 建議</button>
-        <button id="btn-populate"    class="btn btn-outline btn-sm">📋 帶入 Notion</button>
         <button id="btn-save"        class="btn btn-save">💾 儲存</button>
       </div>
     </div>
@@ -572,17 +570,6 @@
 <!-- ════════════════════════════════════════════
      NOTION MODAL
 ════════════════════════════════════════════ -->
-<div id="notion-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-box">
-    <div class="modal-header">
-      <h2>📄 Notion 筆記</h2>
-      <button id="close-notion" class="btn-close">✕</button>
-    </div>
-    <div class="modal-nav" id="notion-tabs"></div>
-    <div class="modal-content" id="notion-content"></div>
-  </div>
-</div>
 
 <!-- ════════════════════════════════════════════
      EXPENSE MODAL
@@ -651,6 +638,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

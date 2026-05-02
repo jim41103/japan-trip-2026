@@ -817,23 +817,55 @@ document.getElementById('btn-ai-suggest').addEventListener('click', () => {
 document.getElementById('ai-close').addEventListener('click', () => {
   document.getElementById('ai-panel').classList.add('hidden');
 });
+function getAISuggestions(date, style) {
+  const dayPlaces = itinerary[date]?.places || [];
+  const allPresets = Object.values(AI_PRESETS).flat();
+  const existing = new Set(dayPlaces.map(p => p.name));
+
+  // 過濾掉已在行程中的地點
+  let pool = allPresets.filter(p => !existing.has(p.name));
+
+  if (dayPlaces.length > 0) {
+    // 計算當天行程中心座標
+    const centerLat = dayPlaces.reduce((s, p) => s + (p.lat || 35.68), 0) / dayPlaces.length;
+    const centerLng = dayPlaces.reduce((s, p) => s + (p.lng || 139.76), 0) / dayPlaces.length;
+    // 依距離排序，優先推薦附近地點（<15km）
+    pool = pool.map(p => ({
+      ...p,
+      dist: Math.hypot((p.lat - centerLat) * 111, (p.lng - centerLng) * 91),
+    })).sort((a, b) => a.dist - b.dist);
+    // 同風格優先，再補附近其他風格
+    const sameStyle = (AI_PRESETS[style] || []).filter(p => !existing.has(p.name));
+    const nearby = pool.filter(p => p.dist < 15);
+    const merged = [...new Map([...sameStyle, ...nearby].map(p => [p.name, p])).values()];
+    return merged.slice(0, 5);
+  }
+  // 行程為空時用風格 preset
+  return (AI_PRESETS[style] || AI_PRESETS.mix).filter(p => !existing.has(p.name)).slice(0, 5);
+}
+
 document.getElementById('ai-generate-btn').addEventListener('click', () => {
   const date  = document.getElementById('ai-date-sel').value;
   const style = document.getElementById('ai-style-sel').value;
-  const suggestions = AI_PRESETS[style] || AI_PRESETS.mix;
+  const suggestions = getAISuggestions(date, style);
+  const dayPlaces = itinerary[date]?.places || [];
+  const hasContext = dayPlaces.length > 0;
   const resultEl = document.getElementById('ai-result');
   resultEl.innerHTML = `
-    <div class="ai-result-title">建議加入 ${DAY_SHORT[date] || date} 的地點：</div>
-    ${suggestions.map((p, i) => `
+    <div class="ai-result-title">
+      ${hasContext ? `📍 基於 ${DAY_SHORT[date]} 現有行程附近推薦：` : `建議加入 ${DAY_SHORT[date] || date} 的地點：`}
+    </div>
+    ${suggestions.length === 0 ? '<div style="padding:12px;color:var(--text-muted)">此風格地點已全部加入行程</div>' :
+    suggestions.map((p, i) => `
       <div class="ai-suggestion-item">
         <div class="ai-sugg-info">
           <span class="ai-sugg-num">${i+1}</span>
           <div>
             <div class="ai-sugg-name">${escHtml(p.name)}</div>
-            <div class="ai-sugg-desc">${escHtml(p.description)}</div>
+            <div class="ai-sugg-desc">${escHtml(p.description)}${p.dist !== undefined ? ` · 距${Math.round(p.dist)}km` : ''}</div>
           </div>
         </div>
-        <button class="ai-add-btn" data-date="${date}" data-idx="${i}" data-style="${style}">＋ 加入</button>
+        <button class="ai-add-btn" data-date="${date}" data-name="${escHtml(p.name)}" data-lat="${p.lat}" data-lng="${p.lng}" data-type="${p.type}" data-desc="${escHtml(p.description)}">＋ 加入</button>
       </div>`).join('')}`;
 });
 
@@ -841,10 +873,14 @@ document.getElementById('ai-result').addEventListener('click', e => {
   const btn = e.target.closest('.ai-add-btn');
   if (!btn) return;
   const date  = btn.dataset.date;
-  const style = btn.dataset.style;
-  const idx   = +btn.dataset.idx;
-  const place = AI_PRESETS[style]?.[idx];
-  if (!place || !itinerary[date]) return;
+  const place = {
+    name: btn.dataset.name,
+    lat: parseFloat(btn.dataset.lat),
+    lng: parseFloat(btn.dataset.lng),
+    type: btn.dataset.type,
+    description: btn.dataset.desc,
+  };
+  if (!place.name || !itinerary[date]) return;
   if (!itinerary[date].places) itinerary[date].places = [];
   if (itinerary[date].places.some(p => p.name === place.name)) {
     showToast('此地點已在行程中'); return;
@@ -934,47 +970,7 @@ document.getElementById('btn-populate').addEventListener('click', async () => {
 // ════════════════════════════════════════════
 //  NOTION MODAL
 // ════════════════════════════════════════════
-async function loadNotion() {
-  notionPages = [];
-}
-
-document.getElementById('btn-notion').addEventListener('click', () => {
-  document.getElementById('notion-modal').classList.remove('hidden');
-  renderNotionTabs();
-});
-document.getElementById('close-notion').addEventListener('click', () => {
-  document.getElementById('notion-modal').classList.add('hidden');
-});
-document.querySelector('#notion-modal .modal-backdrop').addEventListener('click', () => {
-  document.getElementById('notion-modal').classList.add('hidden');
-});
-
-function renderNotionTabs() {
-  const tabBar = document.getElementById('notion-tabs');
-  const content = document.getElementById('notion-content');
-  if (notionPages.length === 0) {
-    tabBar.innerHTML = '';
-    content.innerHTML = `<div class="notion-empty"><p>尚未載入 Notion 資料</p><p style="margin-top:8px;font-size:12px;color:#999">請將 Notion 匯出的 Markdown 放入 <code>data/notion/</code> 後重整頁面</p></div>`;
-    return;
-  }
-  tabBar.innerHTML = notionPages.map((p,i) =>
-    `<button class="notion-tab ${i===activeNotionTab?'active':''}" data-i="${i}">${escHtml(p.title)}</button>`
-  ).join('');
-  tabBar.querySelectorAll('.notion-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      activeNotionTab = parseInt(tab.dataset.i);
-      tabBar.querySelectorAll('.notion-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      renderNotionContent();
-    });
-  });
-  renderNotionContent();
-}
-function renderNotionContent() {
-  const page = notionPages[activeNotionTab];
-  if (!page) return;
-  document.getElementById('notion-content').innerHTML = marked.parse(page.content);
-}
+async function loadNotion() { notionPages = []; }
 
 // ════════════════════════════════════════════
 //  EXPENSE TRACKER
@@ -1589,7 +1585,6 @@ setInterval(syncPull, 30000);
 (async () => {
   await loadItinerary();
   await loadPlaces();
-  await loadNotion();
   await loadExpenses();
   initPrepChecklists();
   renderShoppingList();
