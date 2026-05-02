@@ -1,5 +1,6 @@
 const CACHE = 'tokyo-trip-2026-v16';
-const STATIC = ['/', '/style.css?v=16', '/app.js?v=16', '/manifest.json', '/icon.svg'];
+// HTML 不放入快取，永遠從網路取最新版
+const STATIC = ['/style.css?v=16', '/app.js?v=16', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
@@ -16,15 +17,19 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (new URL(e.request.url).pathname.startsWith('/api/')) return;
+  const url = new URL(e.request.url);
+  if (url.pathname.startsWith('/api/')) return;
+  // HTML（含根目錄）：network-first，確保永遠拿最新版
+  if (e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+  // JS/CSS/圖示：cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(res => {
-        if (res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
+        if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
         return res;
       });
     })
