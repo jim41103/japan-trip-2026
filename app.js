@@ -676,17 +676,20 @@ function makePlaceCard(place, date, pIdx) {
   card.dataset.description = place.description || '';
   card.dataset.time = place.time || '';
   card.innerHTML = `
-    <select class="iplace-time" title="預計時間" onclick="event.stopPropagation()">
-      ${buildTimeOptions(place.time || '')}
-    </select>
-    <span class="iplace-icon">${icon}</span>
-    <div class="iplace-info">
-      <div class="iplace-name">${escHtml(place.name)}</div>
-      ${place.description ? `<div class="iplace-desc">${escHtml(place.description)}</div>` : ''}
+    <div class="iplace-top">
+      <span class="iplace-icon">${icon}</span>
+      <div class="iplace-info">
+        <div class="iplace-name" title="${escHtml(place.name)}">${escHtml(place.name)}</div>
+      </div>
+      <div class="iplace-actions">
+        <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
+        <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
+      </div>
     </div>
-    <div class="iplace-actions">
-      <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
-      <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
+    <div class="iplace-bottom">
+      <select class="iplace-time" title="預計時間" onclick="event.stopPropagation()">
+        ${buildTimeOptions(place.time || '')}
+      </select>
     </div>`;
   card.querySelector('.iplace-time').addEventListener('change', function() {
     card.dataset.time = this.value;

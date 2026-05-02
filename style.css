@@ -425,22 +425,26 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ── Itinerary Place Card ── */
 .itinerary-place {
   background: #fff; border: 1.5px solid var(--border); border-radius: 8px;
-  padding: 7px 9px; cursor: grab; display: flex; align-items: flex-start; gap: 6px;
+  padding: 6px 9px 5px; cursor: grab; display: flex; flex-direction: column; gap: 4px;
   transition: box-shadow .15s; user-select: none;
 }
 .itinerary-place:hover { box-shadow: 0 3px 10px rgba(0,0,0,.12); }
 .itinerary-place.sortable-ghost { opacity: .35; }
 .itinerary-place.sortable-chosen { box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+/* 上排：icon + 名稱 + 操作 */
+.iplace-top { display: flex; align-items: center; gap: 5px; min-width: 0; }
+/* 下排：時間選單 */
+.iplace-bottom { display: flex; align-items: center; }
 
 /* 時間下拉選單 */
 .iplace-time {
-  width: 68px; flex-shrink: 0; border: 1px solid var(--border); background: #f8f8f8;
-  border-radius: 5px; font-size: 11px; color: #444; padding: 2px 2px;
+  width: 86px; border: 1px solid var(--border); background: #f5f5f5;
+  border-radius: 5px; font-size: 11px; color: #444; padding: 2px 3px;
   cursor: pointer; font-family: inherit; font-weight: 600; outline: none;
   appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 4px center;
-  padding-right: 14px;
+  background-repeat: no-repeat; background-position: right 5px center;
+  padding-right: 16px;
 }
 .iplace-time:focus { border-color: #4A90E2; background-color: #EBF3FF; }
 .iplace-time option[value=""] { color: #aaa; }
@@ -474,10 +478,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .transit-yahoo-fallback:hover { text-decoration: underline; }
 .transit-no-stops { font-size: 11px; color: #aaa; padding: 4px 0; }
 
-.iplace-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.iplace-icon { font-size: 13px; flex-shrink: 0; }
 .iplace-info { flex: 1; min-width: 0; }
-.iplace-name { font-size: 12px; font-weight: 700; line-height: 1.3; }
-.iplace-desc { font-size: 10px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iplace-name { font-size: 12px; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iplace-desc { display: none; }
 .iplace-actions { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
 .iplace-gmaps { font-size: 13px; text-decoration: none; opacity: 0.6; transition: opacity .15s; }
 .iplace-gmaps:hover { opacity: 1; }
