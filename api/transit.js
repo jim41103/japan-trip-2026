@@ -67,11 +67,15 @@ function parseRoutes(html) {
       platforms.push(platMatch[1].replace(/<[^>]+>/g, '').trim());
     }
 
+    const dep = timeMatch ? timeMatch[1] : '';
+    const arr = timeMatch ? timeMatch[2] : '';
     routes.push({
+      index: idx + 1,
       id: routeId,
       priority: idx === 0 ? '推薦' : idx === 1 ? '最省錢' : '最快',
-      departure: timeMatch ? timeMatch[1] : '',
-      arrival: timeMatch ? timeMatch[2] : '',
+      depArr: dep && arr ? `${dep} → ${arr}` : '',
+      departure: dep,
+      arrival: arr,
       duration: durationMatch ? durationMatch[1] + '分' : '',
       fare: fareMatch ? fareMatch[1].replace(',', '') + '円' : '',
       transfers: transferMatch ? transferMatch[1] + '次換乘' : '',

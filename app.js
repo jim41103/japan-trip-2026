@@ -410,6 +410,7 @@ function renderPspResults(data, query) {
           <div class="psp-card-actions">
             <select class="psp-day-sel" id="psp-day-${idx}">${dayOptions}</select>
             <button class="psp-add-btn" data-idx="${idx}" data-name="${escHtml(name)}" data-lat="${lat}" data-lng="${lng}" data-type="${osmToType(item.extratags)}">＋ 加入行程</button>
+            <button class="psp-wish-btn" data-name="${escHtml(name)}" data-lat="${lat}" data-lng="${lng}" data-type="${osmToType(item.extratags)}">⭐ 候選</button>
             <a class="psp-gmap-btn" href="${gmapUrl}" target="_blank" rel="noopener">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
               Google Maps
@@ -444,6 +445,89 @@ document.getElementById('psp-results').addEventListener('click', e => {
   showToast(`✓ 已加入 ${DAY_SHORT[date]}`);
   btn.textContent = '✓ 已加入'; btn.disabled = true;
 });
+
+// ⭐ 加入候選清單（PSP 搜尋結果）
+document.getElementById('psp-results').addEventListener('click', e => {
+  const btn = e.target.closest('.psp-wish-btn');
+  if (!btn) return;
+  const place = {
+    name: btn.dataset.name,
+    lat: parseFloat(btn.dataset.lat),
+    lng: parseFloat(btn.dataset.lng),
+    type: btn.dataset.type || 'attraction',
+    description: '',
+  };
+  if (wishlist.some(p => p.name === place.name)) {
+    showToast('已在候選清單中'); return;
+  }
+  wishlist.push(place);
+  saveWishlist();
+  renderWishlist();
+  showToast(`⭐ 已加入候選清單：${place.name}`);
+  btn.textContent = '✓ 已加入'; btn.disabled = true;
+});
+
+// ════════════════════════════════════════════
+//  WISHLIST（候選清單 / 地標緩衝區）
+// ════════════════════════════════════════════
+let wishlist = JSON.parse(localStorage.getItem('japan_wishlist') || '[]');
+
+function saveWishlist() {
+  localStorage.setItem('japan_wishlist', JSON.stringify(wishlist));
+}
+
+function renderWishlist() {
+  const list   = document.getElementById('wishlist-list');
+  const empty  = document.getElementById('wishlist-empty');
+  const count  = document.getElementById('wishlist-count');
+  count.textContent = `${wishlist.length} 個`;
+  list.innerHTML = '';
+  if (!wishlist.length) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  wishlist.forEach((place, i) => {
+    const icon = place.type === 'restaurant' ? '🍽' : '🏯';
+    const li = document.createElement('li');
+    li.className = 'wishlist-item itinerary-place';
+    li.dataset.name        = place.name;
+    li.dataset.lat         = place.lat;
+    li.dataset.lng         = place.lng;
+    li.dataset.type        = place.type;
+    li.dataset.description = place.description || '';
+    li.dataset.time        = '';
+    li.innerHTML = `
+      <span class="wi-icon">${icon}</span>
+      <div class="wi-info"><div class="wi-name">${escHtml(place.name)}</div></div>
+      <button class="wi-remove" data-i="${i}" title="移除">✕</button>`;
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('wishlist-list').addEventListener('click', e => {
+  const btn = e.target.closest('.wi-remove');
+  if (!btn) return;
+  e.stopPropagation();
+  wishlist.splice(parseInt(btn.dataset.i), 1);
+  saveWishlist();
+  renderWishlist();
+});
+
+document.getElementById('wishlist-toggle').addEventListener('click', () => {
+  const body    = document.getElementById('wishlist-body');
+  const chevron = document.querySelector('.wishlist-chevron');
+  const hidden  = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  chevron.textContent = hidden ? '▲' : '▼';
+});
+
+// SortableJS：候選清單 → 拖入行程欄（clone，原件保留）
+Sortable.create(document.getElementById('wishlist-list'), {
+  group:       { name: 'itinerary', pull: 'clone', put: false },
+  animation:   150,
+  sort:        false,
+  ghostClass:  'sortable-ghost',
+});
+
+renderWishlist();
 
 // ════════════════════════════════════════════
 //  LOAD ITINERARY
@@ -516,7 +600,13 @@ function renderItinerary() {
     Sortable.create(placesList, {
       group: 'itinerary', animation: 150,
       ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-      onEnd: syncItineraryFromDOM,
+      onEnd: function(evt) {
+        syncItineraryFromDOM();
+        // 從候選清單拖入時，重新渲染以取得正確的移除按鈕
+        if (evt.from && evt.from.id === 'wishlist-list') {
+          renderDayPlaces(placesList, date);
+        }
+      },
     });
 
     // Notes auto-save
@@ -568,7 +658,9 @@ function makePlaceCard(place, date, pIdx) {
   card.dataset.lng  = place.lng;
   card.dataset.type = place.type;
   card.dataset.description = place.description || '';
+  card.dataset.time = place.time || '';
   card.innerHTML = `
+    <input class="iplace-time" type="time" value="${escHtml(place.time||'')}" title="預計時間" onclick="event.stopPropagation()">
     <span class="iplace-icon">${icon}</span>
     <div class="iplace-info">
       <div class="iplace-name">${escHtml(place.name)}</div>
@@ -578,6 +670,10 @@ function makePlaceCard(place, date, pIdx) {
       <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
       <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
     </div>`;
+  card.querySelector('.iplace-time').addEventListener('change', function() {
+    card.dataset.time = this.value;
+    syncItineraryFromDOM();
+  });
   card.querySelector('.iplace-remove').addEventListener('click', e => {
     e.stopPropagation();
     removeFromDay(date, pIdx);
@@ -599,6 +695,7 @@ function syncItineraryFromDOM() {
       lng: parseFloat(card.dataset.lng) || 0,
       type: card.dataset.type,
       description: card.dataset.description,
+      time: card.dataset.time || card.querySelector?.('.iplace-time')?.value || '',
     }));
     if (cards.length === 0) container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
   });
@@ -853,6 +950,7 @@ function renderTimelineView() {
       const emoji = p.type === 'restaurant' ? '🍽' : p.type === 'hotel' ? '🏨' : '🏯';
       return `
         <div class="tl-item${isLast ? ' tl-last' : ''}">
+          <div class="tl-time-col">${p.time ? `<span class="tl-time">${escHtml(p.time)}</span>` : '<span class="tl-time tl-time-empty">--:--</span>'}</div>
           <div class="tl-left">
             <div class="tl-dot" style="background:${color};border-color:${color}"><span style="color:#fff;font-size:9px;font-weight:800">${i+1}</span></div>
             <div class="tl-line" style="background:${color}"></div>
@@ -1500,6 +1598,70 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
     { zh:'西新宿', en:'nishishinjuku',    ja:'西新宿' },
     { zh:'新宿三丁目',en:'shinjukusanchome',ja:'新宿三丁目' },
     { zh:'明治神宮前',en:'meijijingumae', ja:'明治神宮前' },
+    // ── 橫濱・湘南 ──
+    { zh:'橫濱',   en:'yokohama',         ja:'横浜' },
+    { zh:'關內',   en:'kannai',           ja:'関内' },
+    { zh:'桜木町', en:'sakuragicho',      ja:'桜木町' },
+    { zh:'石川町', en:'ishikawacho',      ja:'石川町' },
+    { zh:'元町・中華街',en:'motomachi',   ja:'元町・中華街' },
+    { zh:'新横浜', en:'shinyokohama',     ja:'新横浜' },
+    { zh:'港未來', en:'minatomirai',      ja:'みなとみらい' },
+    { zh:'藤澤',   en:'fujisawa',         ja:'藤沢' },
+    { zh:'辻堂',   en:'tsujido',          ja:'辻堂' },
+    { zh:'茅崎',   en:'chigasaki',        ja:'茅ヶ崎' },
+    { zh:'平塚',   en:'hiratsuka',        ja:'平塚' },
+    { zh:'二宮',   en:'ninomiya',         ja:'二宮' },
+    { zh:'國府津', en:'kozu',             ja:'国府津' },
+    { zh:'小田原', en:'odawara',          ja:'小田原' },
+    { zh:'江之島', en:'enoshima',         ja:'江ノ島' },
+    { zh:'鵠沼海岸',en:'kugenuma',        ja:'鵠沼海岸' },
+    // ── 鎌倉・逗子 ──
+    { zh:'鎌倉',   en:'kamakura',         ja:'鎌倉' },
+    { zh:'北鎌倉', en:'kitakamakura',     ja:'北鎌倉' },
+    { zh:'長谷',   en:'hase',             ja:'長谷' },
+    { zh:'極樂寺', en:'gokurakuji',       ja:'極楽寺' },
+    { zh:'稻村崎', en:'inamuragasaki',    ja:'稲村ケ崎' },
+    { zh:'七里濱', en:'shichirigahama',   ja:'七里ヶ浜' },
+    { zh:'鎌倉高校前',en:'kamakurakokomae',ja:'鎌倉高校前' },
+    { zh:'腰越',   en:'koshigoe',         ja:'腰越' },
+    { zh:'逗子',   en:'zushi',            ja:'逗子' },
+    // ── 成田・千葉 ──
+    { zh:'成田機場第1航廈',en:'narita1',  ja:'成田空港' },
+    { zh:'成田機場第2航廈',en:'narita2',  ja:'第2ビル' },
+    { zh:'千葉',   en:'chiba',            ja:'千葉' },
+    { zh:'柏',     en:'kashiwa',          ja:'柏' },
+    { zh:'松戸',   en:'matsudo',          ja:'松戸' },
+    { zh:'船橋',   en:'funabashi',        ja:'船橋' },
+    { zh:'津田沼', en:'tsudanuma',        ja:'津田沼' },
+    // ── 埼玉・北方向 ──
+    { zh:'大宮',   en:'omiya',            ja:'大宮' },
+    { zh:'浦和',   en:'urawa',            ja:'浦和' },
+    { zh:'川越',   en:'kawagoe',          ja:'川越' },
+    { zh:'所澤',   en:'tokorozawa',       ja:'所沢' },
+    { zh:'飯能',   en:'hanno',            ja:'飯能' },
+    // ── 西方向・高尾・奧多摩 ──
+    { zh:'立川',   en:'tachikawa',        ja:'立川' },
+    { zh:'八王子', en:'hachioji',         ja:'八王子' },
+    { zh:'高尾',   en:'takao',            ja:'高尾' },
+    { zh:'高尾山口',en:'takaosanguchi',   ja:'高尾山口' },
+    { zh:'奧多摩', en:'okutama',          ja:'奥多摩' },
+    // ── 富士山周邊 ──
+    { zh:'大月',   en:'otsuki',           ja:'大月' },
+    { zh:'河口湖', en:'kawaguchiko',      ja:'河口湖' },
+    { zh:'富士急Highland',en:'fujiq',     ja:'富士急ハイランド' },
+    { zh:'山中湖', en:'yamanakako',       ja:'山中湖' },
+    { zh:'御殿場', en:'gotemba',          ja:'御殿場' },
+    { zh:'三島',   en:'mishima',          ja:'三島' },
+    { zh:'新富士', en:'shinfuji',         ja:'新富士' },
+    { zh:'富士宮', en:'fujinomiya',       ja:'富士宮' },
+    // ── 熱海・伊豆 ──
+    { zh:'熱海',   en:'atami',            ja:'熱海' },
+    { zh:'伊豆高原',en:'izukogen',        ja:'伊豆高原' },
+    { zh:'下田',   en:'shimoda',          ja:'下田' },
+    // ── 日光・宇都宮 ──
+    { zh:'宇都宮', en:'utsunomiya',       ja:'宇都宮' },
+    { zh:'日光',   en:'nikko',            ja:'日光' },
+    { zh:'東武日光',en:'tobunikkoy',      ja:'東武日光' },
   ];
 
   function matchStations(q) {
@@ -1599,12 +1761,13 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
   const PRIORITY_COLOR = { '早':'#E74C3C', '楽':'#27AE60', '安':'#2980B9', '':'#888' };
 
   function renderRoutes(data) {
+    const srcUrl = `https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(data.from)}&to=${encodeURIComponent(data.to)}`;
+    const yahooBtn = `<a class="transit-yahoo-link transit-yahoo-fallback" href="${escHtml(srcUrl)}" target="_blank" rel="noopener">🔗 在 Yahoo Japan Transit 開啟</a>`;
     if (!data.routes || !data.routes.length) {
-      resultsEl.innerHTML = '<div class="transit-no-result">查無路線，請確認站名是否正確</div>';
+      resultsEl.innerHTML = `<div class="transit-no-result">查無路線，請確認站名是否正確<br>${yahooBtn}</div>`;
       resultsEl.classList.remove('hidden');
       return;
     }
-    const srcUrl = `https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(data.from)}&to=${encodeURIComponent(data.to)}`;
     resultsEl.innerHTML = `
       <div class="transit-result-header">
         <span class="transit-result-title">${escHtml(data.from)} → ${escHtml(data.to)}</span>
@@ -1613,22 +1776,15 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
       ${data.routes.map(r => {
         const priColor = PRIORITY_COLOR[r.priority] || '#888';
         const priLabel = PRIORITY_LABEL[r.priority] || r.priority;
-        const stationsHtml = r.stations.map((st, si) => {
-          const isFirst = si === 0, isLast = si === r.stations.length - 1;
-          const timeStr = st.times.join(' / ');
-          const leg = r.legs[si];
+        const stops = r.stops || [];
+        const stationsHtml = stops.map((st, si) => {
+          const isFirst = si === 0, isLast = si === stops.length - 1;
           return `
             <div class="tr-station ${isFirst ? 'tr-dep' : isLast ? 'tr-arr' : 'tr-mid'}">
-              <div class="tr-st-time">${escHtml(timeStr)}</div>
+              <div class="tr-st-time">${escHtml(st.time || '')}</div>
               <div class="tr-st-dot"></div>
               <div class="tr-st-info">
                 <div class="tr-st-name">${escHtml(st.name)}</div>
-                ${leg ? `<div class="tr-leg">
-                  <span class="tr-leg-line">${escHtml(leg.line)}</span>
-                  ${leg.platform ? `<span class="tr-leg-platform">${escHtml(leg.platform)}</span>` : ''}
-                  ${leg.position ? `<span class="tr-leg-pos">${escHtml(leg.position)}</span>` : ''}
-                  ${leg.stops ? `<span class="tr-leg-stops">${escHtml(leg.stops)}</span>` : ''}
-                </div>` : ''}
               </div>
             </div>`;
         }).join('');
@@ -1637,12 +1793,12 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
             <div class="tr-card-header">
               <span class="tr-route-num">路線 ${r.index}</span>
               ${r.priority ? `<span class="tr-priority" style="background:${priColor}">${priLabel}</span>` : ''}
-              <span class="tr-time-range">${escHtml(r.depArr)}</span>
-              <span class="tr-duration">${escHtml(r.duration)}</span>
-              <span class="tr-transfers">${escHtml(r.transfers)}</span>
-              <span class="tr-fare">${escHtml(r.fare)}</span>
+              <span class="tr-time-range">${escHtml(r.depArr || '')}</span>
+              <span class="tr-duration">${escHtml(r.duration || '')}</span>
+              <span class="tr-transfers">${escHtml(r.transfers || '')}</span>
+              <span class="tr-fare">${escHtml(r.fare || '')}</span>
             </div>
-            <div class="tr-card-body">${stationsHtml}</div>
+            <div class="tr-card-body">${stationsHtml || '<div class="transit-no-stops">詳細站點請在 Yahoo 查看</div>'}</div>
           </div>`;
       }).join('')}`;
     resultsEl.classList.remove('hidden');
@@ -1670,7 +1826,8 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
       if (data.error) { resultsEl.innerHTML = `<div class="transit-no-result">錯誤：${escHtml(data.error)}</div>`; }
       else { renderRoutes(data); saveHistory(from, to); }
     } catch(e) {
-      resultsEl.innerHTML = '<div class="transit-no-result">連線失敗，請稍後再試</div>';
+      const fb = `https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(fromEl.value)}&to=${encodeURIComponent(toEl.value)}`;
+      resultsEl.innerHTML = `<div class="transit-no-result">連線失敗，請稍後再試<br><a class="transit-yahoo-fallback" href="${escHtml(fb)}" target="_blank" rel="noopener">🔗 直接在 Yahoo Japan Transit 搜尋</a></div>`;
     }
     searchBtn.disabled = false;
   });
