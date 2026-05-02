@@ -1,4 +1,4 @@
-// Vercel Serverless Function — Claude AI Japan Travel Assistant
+// Vercel Serverless Function — Gemini AI Japan Travel Assistant
 const https = require('https');
 
 const SYSTEM_PROMPT = `你是日本旅遊專家，正在協助規劃一趟 2026 年 8/3-8/8 的日本行程（東京為主，含鎌倉、富士山、成田機場周邊）。
@@ -7,27 +7,21 @@ const SYSTEM_PROMPT = `你是日本旅遊專家，正在協助規劃一趟 2026 
 - 若是推薦地點請用 JSON 格式回傳（見指示）
 - 繁體中文回答`;
 
-function callClaude(messages, maxTokens) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return Promise.reject(new Error('ANTHROPIC_API_KEY 未設定'));
+function callGemini(prompt) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return Promise.reject(new Error('GEMINI_API_KEY 未設定'));
 
   const payload = JSON.stringify({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: maxTokens || 800,
-    system: SYSTEM_PROMPT,
-    messages,
+    contents: [{ parts: [{ text: SYSTEM_PROMPT + '\n\n' + prompt }] }],
+    generationConfig: { maxOutputTokens: 1200, temperature: 0.7 },
   });
 
   return new Promise((resolve, reject) => {
     const req = https.request({
-      hostname: 'api.anthropic.com',
-      path: '/v1/messages',
+      hostname: 'generativelanguage.googleapis.com',
+      path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers: { 'Content-Type': 'application/json' },
     }, (res) => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -59,7 +53,6 @@ module.exports = async (req, res) => {
 
   try {
     if (type === 'recommend') {
-      // 結構化推薦：回傳 5 個地點 JSON
       const placeList = (places || []).map(p => p.name).join('、') || '尚無安排';
       const catName = catNames[category] || category || '綜合推薦';
       const prompt = `當天日期：${date || '未知'}
@@ -70,21 +63,19 @@ module.exports = async (req, res) => {
 只回傳 JSON 陣列，格式如下，不要加任何說明或 markdown：
 [{"name":"景點名稱","desc":"10字以內介紹","lat":緯度數字,"lng":經度數字}]`;
 
-      const data = await callClaude([{ role: 'user', content: prompt }], 600);
-      const text = data.content?.[0]?.text || '';
+      const data = await callGemini(prompt);
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       const match = text.match(/\[[\s\S]*?\]/);
       if (!match) return res.status(500).json({ error: '解析失敗', raw: text });
       const suggestions = JSON.parse(match[0]);
       return res.json({ suggestions });
 
     } else if (type === 'ask') {
-      // 自由問答
       const placeContext = (places || []).length
-        ? `（目前行程：${places.map(p=>p.name).join('、')}）`
+        ? `（目前行程：${places.map(p => p.name).join('、')}）`
         : '';
-      const prompt = question + placeContext;
-      const data = await callClaude([{ role: 'user', content: prompt }], 1000);
-      const answer = data.content?.[0]?.text || '';
+      const data = await callGemini(question + placeContext);
+      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       return res.json({ answer });
 
     } else {
