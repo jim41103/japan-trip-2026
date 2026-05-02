@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>東京行程 2026 🐾</title>
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="東京行程">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="style.css?v=14" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SPLASH — 富士山左右分裂動畫（冷色調）
+════════════════════════════════════════════ -->
+<div id="splash">
+  <!-- 左半（含史努比） -->
+  <div class="sh sh-left">
+    <svg class="splash-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="skyL" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#0D2B5E"/>
+          <stop offset="30%"  stop-color="#1E4D8C"/>
+          <stop offset="65%"  stop-color="#5A8CC8"/>
+          <stop offset="100%" stop-color="#A8C8E8"/>
+        </linearGradient>
+        <linearGradient id="fujiBodyL" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%"   stop-color="#6878B0"/>
+          <stop offset="60%"  stop-color="#5060A0"/>
+          <stop offset="100%" stop-color="#3A4878"/>
+        </linearGradient>
+        <linearGradient id="snowL" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#FFFFFF"/>
+          <stop offset="70%"  stop-color="#D8E8F8"/>
+          <stop offset="100%" stop-color="#B0C8E0"/>
+        </linearGradient>
+        <linearGradient id="lakeL" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#3A5A8A"/>
+          <stop offset="100%" stop-color="#1A2E50"/>
+        </linearGradient>
+        <radialGradient id="glowL" cx="0.1" cy="0.72" r="0.4">
+          <stop offset="0%"   stop-color="#E8A860" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#E8A860" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- 冷藍天空 -->
+      <rect width="800" height="500" fill="url(#skyL)"/>
+      <!-- 左側朝霞暖光 -->
+      <rect width="800" height="500" fill="url(#glowL)"/>
+      <!-- 細星點 -->
+      <circle cx="60"  cy="38"  r="1.4" fill="white" opacity="0.7"/>
+      <circle cx="180" cy="22"  r="1.0" fill="white" opacity="0.5"/>
+      <circle cx="290" cy="45"  r="1.2" fill="white" opacity="0.6"/>
+      <circle cx="80"  cy="95"  r="0.8" fill="white" opacity="0.4"/>
+      <!-- 遠景霞光層（水平柔光） -->
+      <rect x="0" y="285" width="800" height="50" fill="#A8BEDC" opacity="0.18"/>
+      <!-- 湖面 -->
+      <rect x="0" y="318" width="800" height="182" fill="url(#lakeL)"/>
+      <!-- 遠處群山輪廓（紫灰色） -->
+      <path d="M0,318 Q80,295 160,308 Q220,292 300,305 Q350,290 400,298 Q450,290 500,305 Q580,292 660,308 Q740,295 800,318 Z" fill="#4A5890" opacity="0.55"/>
+      <!-- 富士山左坡（主體） -->
+      <path d="M-120,350 L400,58 L408,68 L80,350 Z" fill="url(#fujiBodyL)"/>
+      <!-- 左坡明暗（左面光） -->
+      <path d="M-120,350 L400,58 L395,63 L20,350 Z" fill="#7888C0" opacity="0.3"/>
+      <!-- 左坡暗面（向山谷） -->
+      <path d="M120,350 L400,58 L404,65 L200,350 Z" fill="#2A3868" opacity="0.2"/>
+      <!-- 雪頂（左半，寬而真實） -->
+      <path d="M400,58 L344,162 Q358,155 370,165 Q380,170 390,162 Q395,158 400,160" fill="url(#snowL)" stroke="none"/>
+      <!-- 雪線紋理 -->
+      <path d="M344,162 Q362,152 378,160 Q388,167 400,160" stroke="#C0D8F0" stroke-width="1.2" fill="none" opacity="0.7"/>
+      <path d="M355,175 Q375,165 395,170" stroke="#C0D8F0" stroke-width="1.0" fill="none" opacity="0.5"/>
+      <!-- 積雪流紋（向左延伸） -->
+      <path d="M376,170 Q360,182 340,196 Q320,202 300,195" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+      <path d="M360,192 Q345,198 325,190" stroke="white" stroke-width="1.0" fill="none" opacity="0.3"/>
+      <!-- 樹線（山腳） -->
+      <path d="M0,318 Q30,306 60,314 Q90,303 125,312 Q155,300 190,310 Q215,300 250,308 Q280,298 315,306 Q340,298 370,305 Q390,300 400,302" fill="#1E3A20"/>
+      <!-- 個別松樹 -->
+      <polygon points="50,316 44,296 56,296"  fill="#1E3A20"/>
+      <polygon points="110,312 104,290 116,290" fill="#1E3A20"/>
+      <polygon points="175,308 169,288 181,288" fill="#1E3A20"/>
+      <polygon points="240,306 234,284 246,284" fill="#1E3A20"/>
+      <polygon points="305,304 299,282 311,282" fill="#1E3A20"/>
+      <!-- 湖面倒影（山體） -->
+      <path d="M-120,318 L400,178 L80,318 Z" fill="#4A5890" opacity="0.22"/>
+      <!-- 湖面雪頂倒影 -->
+      <ellipse cx="390" cy="340" rx="50" ry="8" fill="#B8D0E8" opacity="0.18"/>
+      <!-- 水面漣漪線 -->
+      <line x1="0" y1="326" x2="800" y2="326" stroke="white" stroke-width="0.6" opacity="0.12"/>
+      <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
+      <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
+      <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
+      <!-- ── SNOOPY（正版 Peanuts，3/4正面，兩眼） ── -->
+      <g transform="translate(148, 200)">
+        <!-- 尾巴 -->
+        <path d="M62,64 Q86,50 80,30" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- 身體（白色橢圓） -->
+        <ellipse cx="34" cy="76" rx="32" ry="36" fill="white" stroke="#1a1a1a" stroke-width="2.8"/>
+        <!-- 頭（圓形） -->
+        <circle cx="36" cy="26" r="30" fill="white" stroke="#1a1a1a" stroke-width="2.8"/>
+        <!-- 左耳（黑色大垂耳） -->
+        <path d="M10,20 Q-6,38 -2,68" stroke="#1a1a1a" stroke-width="15" fill="none" stroke-linecap="round"/>
+        <!-- 右耳（略短） -->
+        <path d="M58,20 Q72,36 68,60" stroke="#1a1a1a" stroke-width="13" fill="none" stroke-linecap="round"/>
+        <!-- 口吻部（米黃橢圓） -->
+        <ellipse cx="36" cy="40" rx="17" ry="12" fill="#F5D09A" stroke="#1a1a1a" stroke-width="2"/>
+        <!-- 鼻子（黑色大橢圓） -->
+        <ellipse cx="36" cy="29" rx="8" ry="6" fill="#1a1a1a"/>
+        <!-- 左眼（兩眼正面） -->
+        <circle cx="22" cy="18" r="4.5" fill="#1a1a1a"/>
+        <!-- 右眼 -->
+        <circle cx="44" cy="16" r="4"   fill="#1a1a1a"/>
+        <!-- 笑容 -->
+        <path d="M24,48 Q36,57 48,48" stroke="#1a1a1a" stroke-width="2.5" fill="none"/>
+        <!-- 紅圍巾 -->
+        <path d="M2,58 Q36,68 68,58"  stroke="#E63B2E" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M7,67 Q3,84 14,96"   stroke="#E63B2E" stroke-width="7"  fill="none" stroke-linecap="round"/>
+        <!-- 前腳掌 -->
+        <ellipse cx="10"  cy="108" rx="15" ry="8" fill="white" stroke="#1a1a1a" stroke-width="2.2"/>
+        <ellipse cx="54"  cy="108" rx="15" ry="8" fill="white" stroke="#1a1a1a" stroke-width="2.2"/>
+      </g>
+      <!-- 中央文字（左半部分可見） -->
+      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">東京行程規劃</text>
+      <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
+    </svg>
+  </div>
+
+  <!-- 右半（含歐拉夫） -->
+  <div class="sh sh-right">
+    <svg class="splash-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="skyR" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#0D2B5E"/>
+          <stop offset="30%"  stop-color="#1E4D8C"/>
+          <stop offset="65%"  stop-color="#5A8CC8"/>
+          <stop offset="100%" stop-color="#A8C8E8"/>
+        </linearGradient>
+        <linearGradient id="fujiBodyR" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%"   stop-color="#6878B0"/>
+          <stop offset="60%"  stop-color="#5060A0"/>
+          <stop offset="100%" stop-color="#3A4878"/>
+        </linearGradient>
+        <linearGradient id="snowR" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#FFFFFF"/>
+          <stop offset="70%"  stop-color="#D8E8F8"/>
+          <stop offset="100%" stop-color="#B0C8E0"/>
+        </linearGradient>
+        <linearGradient id="lakeR" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#3A5A8A"/>
+          <stop offset="100%" stop-color="#1A2E50"/>
+        </linearGradient>
+        <radialGradient id="glowR" cx="0.92" cy="0.68" r="0.38">
+          <stop offset="0%"   stop-color="#E8B870" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#E8B870" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- 冷藍天空 -->
+      <rect width="800" height="500" fill="url(#skyR)"/>
+      <!-- 右側暖光 -->
+      <rect width="800" height="500" fill="url(#glowR)"/>
+      <!-- 星點 -->
+      <circle cx="620" cy="30"  r="1.4" fill="white" opacity="0.7"/>
+      <circle cx="740" cy="55"  r="1.0" fill="white" opacity="0.5"/>
+      <circle cx="510" cy="18"  r="1.2" fill="white" opacity="0.6"/>
+      <circle cx="755" cy="100" r="0.8" fill="white" opacity="0.4"/>
+      <!-- 霞光層 -->
+      <rect x="0" y="285" width="800" height="50" fill="#A8BEDC" opacity="0.18"/>
+      <!-- 湖面 -->
+      <rect x="0" y="318" width="800" height="182" fill="url(#lakeR)"/>
+      <!-- 遠景群山 -->
+      <path d="M400,298 Q450,290 500,305 Q580,292 660,308 Q740,295 800,318 L800,318 L400,318 Z" fill="#4A5890" opacity="0.55"/>
+      <!-- 富士山右坡 -->
+      <path d="M920,350 L400,58 L392,68 L720,350 Z" fill="url(#fujiBodyR)"/>
+      <!-- 右坡明面 -->
+      <path d="M680,350 L400,58 L404,65 L780,350 Z" fill="#8898C8" opacity="0.22"/>
+      <!-- 右坡暗面 -->
+      <path d="M400,58 L396,63 L520,350 L600,350 Z" fill="#2A3868" opacity="0.18"/>
+      <!-- 雪頂（右半） -->
+      <path d="M400,58 L456,162 Q442,155 430,165 Q420,170 410,162 Q405,158 400,160" fill="url(#snowR)" stroke="none"/>
+      <!-- 雪線 -->
+      <path d="M456,162 Q438,152 422,160 Q412,167 400,160" stroke="#C0D8F0" stroke-width="1.2" fill="none" opacity="0.7"/>
+      <path d="M445,175 Q425,165 405,170" stroke="#C0D8F0" stroke-width="1.0" fill="none" opacity="0.5"/>
+      <!-- 積雪流紋（向右延伸） -->
+      <path d="M424,170 Q440,182 460,196 Q480,202 500,195" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+      <path d="M440,192 Q455,198 475,190" stroke="white" stroke-width="1.0" fill="none" opacity="0.3"/>
+      <!-- 樹線 -->
+      <path d="M400,302 Q410,300 430,305 Q460,298 490,308 Q520,300 550,310 Q580,302 615,312 Q650,304 690,314 Q730,306 770,315 Q790,310 800,318" fill="#1E3A20"/>
+      <!-- 個別松樹 -->
+      <polygon points="460,308 454,288 466,288" fill="#1E3A20"/>
+      <polygon points="520,305 514,283 526,283" fill="#1E3A20"/>
+      <polygon points="585,309 579,289 591,289" fill="#1E3A20"/>
+      <polygon points="650,313 644,291 656,291" fill="#1E3A20"/>
+      <polygon points="720,316 714,294 726,294" fill="#1E3A20"/>
+      <!-- 湖面倒影 -->
+      <path d="M920,318 L400,178 L720,318 Z" fill="#4A5890" opacity="0.22"/>
+      <ellipse cx="410" cy="340" rx="50" ry="8" fill="#B8D0E8" opacity="0.18"/>
+      <!-- 漣漪 -->
+      <line x1="0" y1="326" x2="800" y2="326" stroke="white" stroke-width="0.6" opacity="0.12"/>
+      <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
+      <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
+      <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
+      <!-- ── OLAF（史努比弟弟，藍棒球帽，兩眼正面） ── -->
+      <g transform="translate(548, 190)">
+        <!-- 尾巴 -->
+        <path d="M62,64 Q86,50 80,30" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- 身體 -->
+        <ellipse cx="34" cy="76" rx="32" ry="36" fill="white" stroke="#1a1a1a" stroke-width="2.8"/>
+        <!-- 頭 -->
+        <circle cx="36" cy="26" r="30" fill="white" stroke="#1a1a1a" stroke-width="2.8"/>
+        <!-- 藍色棒球帽（帽筒） -->
+        <path d="M6,20 Q6,-6 36,-8 Q66,-6 66,20" fill="#1E66B2" stroke="#1a1a1a" stroke-width="2.2"/>
+        <!-- 帽簷 -->
+        <path d="M4,21 Q36,30 68,21 L66,29 Q36,39 6,29 Z" fill="#1550A0" stroke="#1a1a1a" stroke-width="1.8"/>
+        <!-- 帽頂鈕扣 -->
+        <circle cx="36" cy="-6" r="4.5" fill="#1550A0" stroke="#1a1a1a" stroke-width="1.2"/>
+        <!-- 左耳 -->
+        <path d="M10,20 Q-6,38 -2,68" stroke="#1a1a1a" stroke-width="15" fill="none" stroke-linecap="round"/>
+        <!-- 右耳 -->
+        <path d="M58,20 Q74,36 70,62" stroke="#1a1a1a" stroke-width="13" fill="none" stroke-linecap="round"/>
+        <!-- 口吻部 -->
+        <ellipse cx="36" cy="40" rx="17" ry="12" fill="#F5D09A" stroke="#1a1a1a" stroke-width="2"/>
+        <!-- 鼻子 -->
+        <ellipse cx="36" cy="29" rx="8" ry="6" fill="#1a1a1a"/>
+        <!-- 左眼 -->
+        <circle cx="22" cy="18" r="4.5" fill="#1a1a1a"/>
+        <!-- 右眼 -->
+        <circle cx="44" cy="16" r="4"   fill="#1a1a1a"/>
+        <!-- 笑容 -->
+        <path d="M24,48 Q36,57 48,48" stroke="#1a1a1a" stroke-width="2.5" fill="none"/>
+        <!-- 前腳掌 -->
+        <ellipse cx="10"  cy="108" rx="15" ry="8" fill="white" stroke="#1a1a1a" stroke-width="2.2"/>
+        <ellipse cx="54"  cy="108" rx="15" ry="8" fill="white" stroke="#1a1a1a" stroke-width="2.2"/>
+      </g>
+      <!-- 中央文字（右半部分可見） -->
+      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">東京行程規劃</text>
+      <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
+    </svg>
+  </div>
+
+  <!-- 載入進度條 -->
+  <div class="splash-loader">
+    <div class="splash-loader-fill"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     WEATHER BAR
+════════════════════════════════════════════ -->
+<div id="weather-bar">
+  <span id="wb-icon">⏳</span>
+  <span id="wb-temp">偵測位置中…</span>
+  <span class="wb-divider">·</span>
+  <span id="wb-tomorrow"></span>
+  <span class="wb-loc" id="wb-loc"></span>
+</div>
+
+<!-- ════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════ -->
+<header>
+  <div class="header-title">
+    <span class="snoopy-badge">🐾</span>
+    <h1>東京行程規劃</h1>
+    <span class="date-range">2026 / 8/3—8/8</span>
+    <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
+  </div>
+  <div class="header-actions">
+    <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 同步中</span>
+    <button id="btn-expense" class="btn btn-ghost">💴 記帳</button>
+    <button id="btn-notion"  class="btn btn-ghost">📄 Notion</button>
+    <button id="btn-export"  class="btn btn-accent">⬇ 匯出</button>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════
+     PAGE TABS
+════════════════════════════════════════════ -->
+<nav id="page-tabs">
+  <button class="page-tab active" data-page="itinerary">🗺 行程</button>
+  <button class="page-tab" data-page="preparation">🎒 行前準備</button>
+  <button class="page-tab" data-page="shopping">🛍 購物清單</button>
+  <button class="page-tab" data-page="transit">🚃 交通</button>
+</nav>
+
+<!-- ════════════════════════════════════════════
+     PAGE: 行程
+════════════════════════════════════════════ -->
+<div id="page-itinerary" class="page active">
+
+  <!-- 左欄：地圖 -->
+  <section id="map-panel">
+    <div id="map-controls">
+      <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
+      <div id="filter-buttons">
+        <button class="filter-btn active" data-type="all">全部</button>
+        <button class="filter-btn" data-type="restaurant">🍽 餐廳</button>
+        <button class="filter-btn" data-type="attraction">🏯 景點</button>
+        <button id="btn-route-lines" class="filter-btn route-lines-btn active" title="顯示/隱藏路線連線">🗺 路線</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div id="places-resizer" title="拖拉調整清單高度"></div>
+    <div id="places-list-panel">
+      <div id="places-count"></div>
+      <ul id="places-list"></ul>
+    </div>
+    <div id="nearby-panel" class="hidden">
+      <div id="nearby-header">
+        <span id="nearby-title">附近地點</span>
+        <button id="close-nearby" class="btn-close">✕</button>
+      </div>
+      <ul id="nearby-list"></ul>
+    </div>
+  </section>
+
+  <!-- 水平拖拉分隔 -->
+  <div id="panel-resizer" title="拖拉調整地圖寬度"></div>
+
+  <!-- 右欄：行程 -->
+  <section id="itinerary-panel">
+    <div id="itinerary-header">
+      <h2>每日行程</h2>
+      <div class="itinerary-actions">
+        <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
+        <button id="btn-ai-suggest"  class="btn btn-outline btn-sm">✨ AI 建議</button>
+        <button id="btn-populate"    class="btn btn-outline btn-sm">📋 帶入 Notion</button>
+        <button id="btn-save"        class="btn btn-save">💾 儲存</button>
+      </div>
+    </div>
+    <div id="itinerary-days"></div>
+    <div id="timeline-view" class="hidden"></div>
+
+    <!-- AI 建議 Panel -->
+    <div id="ai-panel" class="ai-panel hidden">
+      <div class="ai-panel-header">
+        <span>✨ AI 行程建議</span>
+        <button id="ai-close" class="btn-close">✕</button>
+      </div>
+      <div class="ai-panel-form">
+        <select id="ai-date-sel" class="transit-select">
+          <option value="2026-08-03">8/3 (一)</option>
+          <option value="2026-08-04">8/4 (二)</option>
+          <option value="2026-08-05">8/5 (三)</option>
+          <option value="2026-08-06">8/6 (四)</option>
+          <option value="2026-08-07">8/7 (五)</option>
+          <option value="2026-08-08">8/8 (六)</option>
+        </select>
+        <select id="ai-style-sel" class="transit-select">
+          <option value="culture">文化景點</option>
+          <option value="food">美食為主</option>
+          <option value="shopping">購物血拚</option>
+          <option value="relax">輕鬆散步</option>
+          <option value="mix">綜合推薦</option>
+        </select>
+        <button id="ai-generate-btn" class="transit-search-btn" style="width:auto;padding:9px 20px;font-size:13px">🎲 產生建議</button>
+      </div>
+      <div id="ai-result" class="ai-result"></div>
+    </div>
+  </section>
+
+</div><!-- /page-itinerary -->
+
+<!-- ════════════════════════════════════════════
+     PAGE: 行前準備
+════════════════════════════════════════════ -->
+<div id="page-preparation" class="page">
+  <div class="prep-progress-wrap">
+    <div class="prep-progress-info">
+      <span class="prep-progress-label">行前準備完成度</span>
+      <span id="prep-progress-pct" class="prep-progress-pct">0%</span>
+    </div>
+    <div class="prep-progress-track"><div id="prep-progress-bar" class="prep-progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="prep-container">
+
+    <!-- Visit Japan Web -->
+    <div class="prep-card">
+      <div class="prep-card-header">
+        <span>🌐 Visit Japan Web</span>
+        <div class="prep-header-right">
+          <span class="prep-badge">出發前必做</span>
+          <button class="btn-add-prep" data-list="vjw">＋</button>
+        </div>
+      </div>
+      <div class="prep-checklist" id="vjw-list">
+        <label class="prep-item"><input type="checkbox" data-key="vjw0"> 訪日外客個人資料登錄完成</label>
+        <label class="prep-item"><input type="checkbox" data-key="vjw1"> 入境審查（Kansatsu）事前登錄</label>
+        <label class="prep-item"><input type="checkbox" data-key="vjw2"> 海關申報（Customs）事前申請</label>
+        <label class="prep-item"><input type="checkbox" data-key="vjw3"> 出發前 24h 確認 QR Code 可開啟</label>
+        <label class="prep-item"><input type="checkbox" data-key="vjw4"> QR Code 截圖存至相簿（備用）</label>
+      </div>
+    </div>
+
+    <!-- 行李箱清單 -->
+    <div class="prep-card">
+      <div class="prep-card-header">
+        <span>🧳 行李箱清單（託運）</span>
+        <button class="btn-add-prep" data-list="suitcase">＋</button>
+      </div>
+      <div class="prep-checklist" id="suitcase-list">
+        <label class="prep-item"><input type="checkbox" data-key="s0"> 護照（確認效期 3 個月以上）</label>
+        <label class="prep-item"><input type="checkbox" data-key="s1"> 換洗衣物（6套）</label>
+        <label class="prep-item"><input type="checkbox" data-key="s2"> 盥洗用品</label>
+        <label class="prep-item"><input type="checkbox" data-key="s3"> 藥品（腸胃藥、止痛藥、暈車藥）</label>
+        <label class="prep-item"><input type="checkbox" data-key="s4"> 充電器 + 行動電源</label>
+        <label class="prep-item"><input type="checkbox" data-key="s5"> 旅行轉接頭（日本 110V A型）</label>
+        <label class="prep-item"><input type="checkbox" data-key="s6"> 相機 + 充電器 + 記憶卡</label>
+        <label class="prep-item"><input type="checkbox" data-key="s7"> 雨傘</label>
+        <label class="prep-item"><input type="checkbox" data-key="s8"> 防曬乳 SPF50+</label>
+        <label class="prep-item"><input type="checkbox" data-key="s9"> 空間預留（購物用）</label>
+      </div>
+    </div>
+
+    <!-- 隨身行李 -->
+    <div class="prep-card">
+      <div class="prep-card-header">
+        <span>🎒 隨身行李清單</span>
+        <button class="btn-add-prep" data-list="carryon">＋</button>
+      </div>
+      <div class="prep-checklist" id="carryon-list">
+        <label class="prep-item"><input type="checkbox" data-key="c0"> 護照正本 + 影本（分開放）</label>
+        <label class="prep-item"><input type="checkbox" data-key="c1"> 信用卡（VISA/Master × 2張）</label>
+        <label class="prep-item"><input type="checkbox" data-key="c2"> 日幣現金（出發前換好）</label>
+        <label class="prep-item"><input type="checkbox" data-key="c3"> 手機 + 充電線 + 充電頭</label>
+        <label class="prep-item"><input type="checkbox" data-key="c4"> 耳機</label>
+        <label class="prep-item"><input type="checkbox" data-key="c5"> 頸枕 + 眼罩</label>
+        <label class="prep-item"><input type="checkbox" data-key="c6"> 即可拍底片相機</label>
+        <label class="prep-item"><input type="checkbox" data-key="c7"> Visit Japan Web QR Code（截圖）</label>
+        <label class="prep-item"><input type="checkbox" data-key="c8"> 零食 / 水</label>
+      </div>
+    </div>
+
+    <!-- 票券預約 -->
+    <div class="prep-card">
+      <div class="prep-card-header">
+        <span>🎫 票券預約狀態</span>
+        <button class="btn-add-prep" data-list="tickets">＋</button>
+      </div>
+      <div class="prep-checklist" id="tickets-list">
+        <label class="prep-item"><input type="checkbox" data-key="t0"> teamLab Planets TOKYO（沉浸式燈光秀）</label>
+        <label class="prep-item"><input type="checkbox" data-key="t1"> SHIBUYA SKY 展望台（夕陽時段）</label>
+        <label class="prep-item"><input type="checkbox" data-key="t2"> 史努比博物館手作課程</label>
+        <label class="prep-item"><input type="checkbox" data-key="t3"> 富士回遊號指定席（KKday / Navitime）</label>
+        <label class="prep-item"><input type="checkbox" data-key="t4"> 淺草今半（請飯店代訂或自行預約）</label>
+        <label class="prep-item"><input type="checkbox" data-key="t5"> 東京晴空塔（Skytree）</label>
+      </div>
+    </div>
+
+  </div><!-- /prep-container -->
+</div><!-- /page-preparation -->
+
+<!-- ════════════════════════════════════════════
+     PAGE: 購物清單
+════════════════════════════════════════════ -->
+<div id="page-shopping" class="page">
+  <div class="shop-container">
+    <div class="shop-header">
+      <h2>🛍 購物清單</h2>
+      <div class="shop-stats" id="shop-stats"></div>
+    </div>
+    <div id="shop-categories"></div>
+    <!-- 新增區 -->
+    <div class="shop-add-bar">
+      <select id="shop-new-cat">
+        <option value="medicine">💊 藥妝</option>
+        <option value="food">🍬 食品/零食</option>
+        <option value="fashion">👗 服飾</option>
+        <option value="souvenir">🎁 伴手禮</option>
+        <option value="other">📦 其他</option>
+      </select>
+      <input id="shop-new-name" type="text" placeholder="商品名稱" maxlength="40">
+      <button id="shop-add-btn" class="btn btn-accent">＋</button>
+    </div>
+  </div>
+</div><!-- /page-shopping -->
+
+<!-- ════════════════════════════════════════════
+     PAGE: 交通搜尋
+════════════════════════════════════════════ -->
+<div id="page-transit" class="page">
+  <div class="transit-wrap">
+    <div class="transit-header">
+      <span class="transit-icon">🚃</span>
+      <span class="transit-title-text">日本交通搜尋</span>
+      <span class="transit-sub">由乗換案内提供路線</span>
+    </div>
+
+    <!-- 出發地 / 目的地（含自動完成） -->
+    <div class="transit-route-row">
+      <div class="transit-field transit-ac-wrap">
+        <label class="transit-label">出發地</label>
+        <input id="transit-from" class="transit-input" type="text" placeholder="中文/日文/英文 站名" autocomplete="off">
+        <div id="transit-from-sugg" class="transit-sugg hidden"></div>
+      </div>
+      <button id="transit-swap" class="transit-swap-btn" title="交換">⇅</button>
+      <div class="transit-field transit-ac-wrap">
+        <label class="transit-label">目的地</label>
+        <input id="transit-to" class="transit-input" type="text" placeholder="中文/日文/英文 站名" autocomplete="off">
+        <div id="transit-to-sugg" class="transit-sugg hidden"></div>
+      </div>
+    </div>
+
+    <!-- 日期 / 時間 / 出發到著 -->
+    <div class="transit-dt-row">
+      <select id="transit-date" class="transit-select">
+        <option value="20260803">8/3 (一)</option>
+        <option value="20260804">8/4 (二)</option>
+        <option value="20260805">8/5 (三)</option>
+        <option value="20260806">8/6 (四)</option>
+        <option value="20260807">8/7 (五)</option>
+        <option value="20260808">8/8 (六)</option>
+      </select>
+      <input id="transit-time" class="transit-time-input" type="time" value="09:00">
+      <select id="transit-way" class="transit-select transit-way-sel">
+        <option value="1">出發</option>
+        <option value="2">到著</option>
+      </select>
+    </div>
+
+    <!-- 快選站點（改為日文名供 Yahoo 使用） -->
+    <div class="transit-quick-wrap">
+      <div class="transit-quick-label">常用站點</div>
+      <div class="transit-quick-grid" id="transit-quick-grid">
+        <button class="transit-q-btn" data-station="新宿">新宿</button>
+        <button class="transit-q-btn" data-station="渋谷">澀谷</button>
+        <button class="transit-q-btn" data-station="池袋">池袋</button>
+        <button class="transit-q-btn" data-station="浅草">淺草</button>
+        <button class="transit-q-btn" data-station="上野">上野</button>
+        <button class="transit-q-btn" data-station="秋葉原">秋葉原</button>
+        <button class="transit-q-btn" data-station="東京">東京駅</button>
+        <button class="transit-q-btn" data-station="原宿">原宿</button>
+        <button class="transit-q-btn" data-station="表参道">表參道</button>
+        <button class="transit-q-btn" data-station="銀座">銀座</button>
+        <button class="transit-q-btn" data-station="お台場海浜公園">台場</button>
+        <button class="transit-q-btn" data-station="築地">築地</button>
+        <button class="transit-q-btn" data-station="中目黒">中目黑</button>
+        <button class="transit-q-btn" data-station="下北沢">下北澤</button>
+        <button class="transit-q-btn" data-station="谷中">谷中</button>
+        <button class="transit-q-btn" data-station="高円寺">高圓寺</button>
+        <button class="transit-q-btn" data-station="吉祥寺">吉祥寺</button>
+        <button class="transit-q-btn" data-station="六本木">六本木</button>
+        <button class="transit-q-btn" data-station="品川">品川</button>
+        <button class="transit-q-btn" data-station="羽田空港第3ターミナル">羽田機場</button>
+      </div>
+    </div>
+
+    <!-- 說明 -->
+    <div class="transit-hint">支援中文/日文/英文輸入，點站名快速填入欄位</div>
+
+    <!-- 搜尋按鈕 -->
+    <button id="transit-search-btn" class="transit-search-btn">🔍 搜尋路線</button>
+
+    <!-- 結果區 -->
+    <div id="transit-results" class="transit-results hidden"></div>
+
+    <!-- 最近搜尋 -->
+    <div id="transit-history-wrap" class="transit-history-wrap hidden">
+      <div class="transit-quick-label">最近搜尋</div>
+      <div id="transit-history-list" class="transit-history-list"></div>
+    </div>
+  </div>
+</div><!-- /page-transit -->
+
+<!-- ════════════════════════════════════════════
+     NOTION MODAL
+════════════════════════════════════════════ -->
+<div id="notion-modal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>📄 Notion 筆記</h2>
+      <button id="close-notion" class="btn-close">✕</button>
+    </div>
+    <div class="modal-nav" id="notion-tabs"></div>
+    <div class="modal-content" id="notion-content"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     EXPENSE MODAL
+════════════════════════════════════════════ -->
+<div id="expense-modal" class="modal hidden">
+  <div class="modal-backdrop" id="expense-backdrop"></div>
+  <div class="modal-box expense-box">
+    <div class="modal-header">
+      <h2>💴 旅費記帳</h2>
+      <button id="close-expense" class="btn-close">✕</button>
+    </div>
+    <div class="expense-members">
+      <div class="member-field"><label>成員 A</label><input id="member-a" type="text" value="野狼" maxlength="8"></div>
+      <span class="member-sep">⇄</span>
+      <div class="member-field"><label>成員 B</label><input id="member-b" type="text" value="美珊" maxlength="8"></div>
+    </div>
+    <div class="expense-tabs">
+      <button class="exp-tab active" data-tab="list">📋 明細</button>
+      <button class="exp-tab" data-tab="settle">💰 拆賬</button>
+    </div>
+    <div id="exp-tab-list" class="exp-tab-pane">
+      <div id="expense-list-area"></div>
+      <div class="expense-add-form">
+        <div class="exp-form-title">＋ 新增支出</div>
+        <div class="exp-form-row">
+          <select id="exp-date">
+            <option value="2026-08-03">8/3 (一)</option>
+            <option value="2026-08-04">8/4 (二)</option>
+            <option value="2026-08-05">8/5 (三)</option>
+            <option value="2026-08-06">8/6 (四)</option>
+            <option value="2026-08-07">8/7 (五)</option>
+            <option value="2026-08-08">8/8 (六)</option>
+          </select>
+          <select id="exp-cat">
+            <option value="food">🍽 餐飲</option>
+            <option value="ticket">🎫 票券</option>
+            <option value="transport">🚌 交通</option>
+            <option value="shopping">🛍 購物</option>
+            <option value="hotel">🏨 住宿</option>
+            <option value="medicine">💊 藥妝</option>
+            <option value="other">📦 其他</option>
+          </select>
+        </div>
+        <input id="exp-desc" type="text" placeholder="說明（如：築地早餐）" maxlength="40">
+        <div class="exp-form-row">
+          <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
+          <select id="exp-paidby"><option value="a">Jim 付</option><option value="b">野珊 付</option></select>
+        </div>
+        <button id="btn-add-exp" class="btn btn-accent">＋ 加入</button>
+      </div>
+    </div>
+    <div id="exp-tab-settle" class="exp-tab-pane hidden">
+      <div id="settle-content"></div>
+      <button id="btn-export-settle" class="btn btn-outline" style="margin:16px auto;display:block">⬇ 匯出結算</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MOBILE NAV
+════════════════════════════════════════════ -->
+<nav id="mobile-nav">
+  <button class="mnav-btn active" data-panel="itinerary"><span class="mnav-icon">🗺</span><span class="mnav-label">行程</span></button>
+  <button class="mnav-btn" data-panel="preparation"><span class="mnav-icon">🎒</span><span class="mnav-label">準備</span></button>
+  <button class="mnav-btn" data-panel="shopping"><span class="mnav-icon">🛍</span><span class="mnav-label">購物</span></button>
+  <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
+</nav>
+
+<script src="app.js?v=14"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "東京行程 2026 夏",
+  "short_name": "東京行程",
+  "description": "2026 年 8 月東京六日五夜旅遊行程規劃",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#c62828",
+  "theme_color": "#e53935",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["travel", "lifestyle"]
+}
