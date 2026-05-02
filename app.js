@@ -420,19 +420,22 @@ document.getElementById('psp-results').addEventListener('click', e => {
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
-  // 先讀靜態基本行程
+  // 立刻用靜態檔渲染，不等 sync
   const res = await fetch('/itinerary.json');
   itinerary = await res.json();
-  // 再從 Gist 同步覆蓋已儲存的版本
-  try {
-    const syncRes = await fetch('/api/sync');
-    const syncData = await syncRes.json();
-    if (syncData.itinerary) {
-      itinerary = JSON.parse(syncData.itinerary);
-    }
-  } catch (_) {}
   renderItinerary();
   drawRouteLines();
+  // 背景從 Gist 拉最新版，有差異再重新渲染
+  fetch('/api/sync')
+    .then(r => r.json())
+    .then(syncData => {
+      if (!syncData.itinerary) return;
+      const remote = JSON.parse(syncData.itinerary);
+      itinerary = remote;
+      renderItinerary();
+      drawRouteLines();
+    })
+    .catch(() => {});
 }
 
 // ════════════════════════════════════════════
