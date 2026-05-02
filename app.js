@@ -813,34 +813,46 @@ const AI_PRESETS = {
 document.getElementById('btn-ai-suggest').addEventListener('click', () => {
   const panel = document.getElementById('ai-panel');
   panel.classList.toggle('hidden');
+  // 自動選取目前可見的第一個天欄
+  if (!panel.classList.contains('hidden')) {
+    const firstVisibleDay = document.querySelector('.day-column')?.dataset?.date;
+    const sel = document.getElementById('ai-date-sel');
+    if (sel && firstVisibleDay) sel.value = firstVisibleDay;
+  }
 });
 document.getElementById('ai-close').addEventListener('click', () => {
   document.getElementById('ai-panel').classList.add('hidden');
 });
 function getAISuggestions(date, style) {
-  const dayPlaces = itinerary[date]?.places || [];
+  // 優先從 itinerary 物件取，若尚未載入則從 DOM 讀取
+  let dayPlaces = itinerary[date]?.places || [];
+  if (dayPlaces.length === 0) {
+    const container = document.getElementById(`day-${date}`);
+    if (container) {
+      dayPlaces = Array.from(container.querySelectorAll('.itinerary-place')).map(el => ({
+        name: el.dataset.name,
+        lat: parseFloat(el.dataset.lat) || 0,
+        lng: parseFloat(el.dataset.lng) || 0,
+      })).filter(p => p.lat && p.lng);
+    }
+  }
+
   const allPresets = Object.values(AI_PRESETS).flat();
   const existing = new Set(dayPlaces.map(p => p.name));
-
-  // 過濾掉已在行程中的地點
   let pool = allPresets.filter(p => !existing.has(p.name));
 
   if (dayPlaces.length > 0) {
-    // 計算當天行程中心座標
-    const centerLat = dayPlaces.reduce((s, p) => s + (p.lat || 35.68), 0) / dayPlaces.length;
-    const centerLng = dayPlaces.reduce((s, p) => s + (p.lng || 139.76), 0) / dayPlaces.length;
-    // 依距離排序，優先推薦附近地點（<15km）
+    const centerLat = dayPlaces.reduce((s, p) => s + p.lat, 0) / dayPlaces.length;
+    const centerLng = dayPlaces.reduce((s, p) => s + p.lng, 0) / dayPlaces.length;
     pool = pool.map(p => ({
       ...p,
       dist: Math.hypot((p.lat - centerLat) * 111, (p.lng - centerLng) * 91),
     })).sort((a, b) => a.dist - b.dist);
-    // 同風格優先，再補附近其他風格
     const sameStyle = (AI_PRESETS[style] || []).filter(p => !existing.has(p.name));
     const nearby = pool.filter(p => p.dist < 15);
     const merged = [...new Map([...sameStyle, ...nearby].map(p => [p.name, p])).values()];
     return merged.slice(0, 5);
   }
-  // 行程為空時用風格 preset
   return (AI_PRESETS[style] || AI_PRESETS.mix).filter(p => !existing.has(p.name)).slice(0, 5);
 }
 
