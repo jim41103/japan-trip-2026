@@ -29,7 +29,7 @@ setTimeout(() => {
   const s = document.getElementById('splash');
   if (!s) return;
   s.classList.add('splitting');
-  setTimeout(() => s.remove(), 750);
+  setTimeout(() => { s.style.display = 'none'; }, 750);
 }, 2800);
 
 // ════════════════════════════════════════════
@@ -119,22 +119,33 @@ document.querySelectorAll('.page-tab').forEach(tab => {
   });
 });
 
-// 點擊 Header 標題 → 白色快閃動畫，切回行程主畫面
+// 點擊 Header 標題 → 重播 splash 動畫，結束後切回行程主畫面
 document.querySelector('.header-title').addEventListener('click', () => {
-  const overlay = document.getElementById('home-overlay');
-  overlay.classList.remove('flash');
-  void overlay.offsetWidth; // force reflow
-  overlay.classList.add('flash');
+  const s = document.getElementById('splash');
+  if (!s) return;
 
+  // 先切回行程 tab（在 splash 後面不可見）
+  document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector('[data-page="itinerary"]').classList.add('active');
+  document.getElementById('page-itinerary').classList.add('active');
+  if (window.MAP) window.MAP.invalidateSize();
+
+  // 重置並顯示 splash
+  s.classList.remove('splitting');
+  s.style.display = '';
+
+  // 重啟所有 CSS 動畫（強制 reflow）
+  const animated = s.querySelectorAll('.sh-left, .sh-right, .splash-loader, .splash-loader-fill');
+  animated.forEach(el => { el.style.animation = 'none'; });
+  void s.offsetWidth;
+  animated.forEach(el => { el.style.animation = ''; });
+
+  // 2.8 秒後 split 退場
   setTimeout(() => {
-    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelector('[data-page="itinerary"]').classList.add('active');
-    document.getElementById('page-itinerary').classList.add('active');
-    if (window.MAP) window.MAP.invalidateSize();
-  }, 165);
-
-  overlay.addEventListener('animationend', () => overlay.classList.remove('flash'), { once: true });
+    s.classList.add('splitting');
+    setTimeout(() => { s.style.display = 'none'; }, 750);
+  }, 2800);
 });
 
 // ════════════════════════════════════════════
