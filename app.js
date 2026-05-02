@@ -119,6 +119,24 @@ document.querySelectorAll('.page-tab').forEach(tab => {
   });
 });
 
+// 點擊 Header 標題 → 白色快閃動畫，切回行程主畫面
+document.querySelector('.header-title').addEventListener('click', () => {
+  const overlay = document.getElementById('home-overlay');
+  overlay.classList.remove('flash');
+  void overlay.offsetWidth; // force reflow
+  overlay.classList.add('flash');
+
+  setTimeout(() => {
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-page="itinerary"]').classList.add('active');
+    document.getElementById('page-itinerary').classList.add('active');
+    if (window.MAP) window.MAP.invalidateSize();
+  }, 165);
+
+  overlay.addEventListener('animationend', () => overlay.classList.remove('flash'), { once: true });
+});
+
 // ════════════════════════════════════════════
 //  MAP
 // ════════════════════════════════════════════
