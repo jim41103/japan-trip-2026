@@ -1038,9 +1038,6 @@ document.getElementById('btn-export').addEventListener('click', async () => {
   await saveItinerary();
   showToast('行程已儲存至雲端 ✓');
 });
-document.getElementById('btn-populate').addEventListener('click', async () => {
-  showToast('Notion 功能在雲端版暫不支援');
-});
 
 // ════════════════════════════════════════════
 //  PANEL RESIZE — horizontal (map ↔ itinerary)
