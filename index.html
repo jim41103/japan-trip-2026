@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>東京行程 2026 🐾</title>
+  <title>兩狼北漂 2026 🐾</title>
   <meta name="theme-color" content="#1a1a1a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="東京行程">
+  <meta name="apple-mobile-web-app-title" content="兩狼北漂">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=21" />
 </head>
 <body>
 
@@ -129,7 +129,7 @@
         <ellipse cx="60"  cy="118" rx="17" ry="9" fill="white" stroke="#111" stroke-width="2"/>
       </g>
       <!-- 中央文字（左半部分可見） -->
-      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">東京行程規劃</text>
+      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">兩狼北漂</text>
       <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
     </svg>
   </div>
@@ -246,7 +246,7 @@
         <ellipse cx="70"  cy="124" rx="20" ry="10" fill="white" stroke="#111" stroke-width="2"/>
       </g>
       <!-- 中央文字（右半部分可見） -->
-      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">東京行程規劃</text>
+      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">兩狼北漂</text>
       <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
     </svg>
   </div>
@@ -274,8 +274,8 @@
 <header>
   <div class="header-title">
     <span class="snoopy-badge">🐾</span>
-    <h1>東京行程規劃</h1>
-    <span class="date-range">2026 / 8/3—8/8</span>
+    <h1>兩狼北漂</h1>
+    <span class="date-range">2026/8/3-8/8</span>
     <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
   </div>
   <div class="header-actions">
@@ -375,22 +375,24 @@
         <button id="ai-close" class="btn-close">✕</button>
       </div>
       <div class="ai-panel-form">
-        <select id="ai-date-sel" class="transit-select">
-          <option value="2026-08-03">8/3 (一)</option>
-          <option value="2026-08-04">8/4 (二)</option>
-          <option value="2026-08-05">8/5 (三)</option>
-          <option value="2026-08-06">8/6 (四)</option>
-          <option value="2026-08-07">8/7 (五)</option>
-          <option value="2026-08-08">8/8 (六)</option>
-        </select>
-        <select id="ai-style-sel" class="transit-select">
-          <option value="culture">文化景點</option>
-          <option value="food">美食為主</option>
-          <option value="shopping">購物血拚</option>
-          <option value="relax">輕鬆散步</option>
-          <option value="mix">綜合推薦</option>
-        </select>
-        <button id="ai-generate-btn" class="transit-search-btn" style="width:auto;padding:9px 20px;font-size:13px">🎲 產生建議</button>
+        <div class="ai-panel-row1">
+          <select id="ai-date-sel" class="transit-select">
+            <option value="2026-08-03">8/3 (一)</option>
+            <option value="2026-08-04">8/4 (二)</option>
+            <option value="2026-08-05">8/5 (三)</option>
+            <option value="2026-08-06">8/6 (四)</option>
+            <option value="2026-08-07">8/7 (五)</option>
+            <option value="2026-08-08">8/8 (六)</option>
+          </select>
+          <button id="ai-generate-btn" class="transit-search-btn" style="width:auto;padding:8px 16px;font-size:13px">🔍 搜尋</button>
+        </div>
+        <div class="ai-cat-tabs">
+          <button class="ai-cat-tab active" data-cat="culture">🏯 文化</button>
+          <button class="ai-cat-tab" data-cat="food">🍽 美食</button>
+          <button class="ai-cat-tab" data-cat="shopping">🛍 購物</button>
+          <button class="ai-cat-tab" data-cat="relax">🌿 輕鬆</button>
+          <button class="ai-cat-tab" data-cat="mix">✨ 綜合</button>
+        </div>
       </div>
       <div id="ai-result" class="ai-result"></div>
     </div>
@@ -670,6 +672,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=20"></script>
+<script src="app.js?v=21"></script>
 </body>
 </html>

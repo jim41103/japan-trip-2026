@@ -941,26 +941,65 @@ document.getElementById('btn-route-lines').addEventListener('click', function() 
 let timelineMode = false;
 
 function renderTimelineView() {
+  const HOUR_START = 8;
+  const HOUR_END   = 22;
+  const HOUR_H     = 48; // px per hour
+  const TOTAL_H    = (HOUR_END - HOUR_START) * HOUR_H;
+
   const container = document.getElementById('timeline-view');
   container.innerHTML = Object.entries(itinerary).map(([date, day]) => {
     const places = day.places || [];
     const color  = DAY_COLORS[date] || '#888';
-    const placesHtml = places.length ? places.map((p, i) => {
-      const isLast = i === places.length - 1;
-      const emoji = p.type === 'restaurant' ? '🍽' : p.type === 'hotel' ? '🏨' : '🏯';
+
+    // 分類：有時間 vs 無時間
+    const timed   = places.filter(p => p.time && /^\d{1,2}:\d{2}$/.test(p.time));
+    const noTime  = places.filter(p => !p.time || !/^\d{1,2}:\d{2}$/.test(p.time));
+
+    // 時間格線
+    const rulerSlots = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => {
+      const h = HOUR_START + i;
+      return `<div class="tl-ruler-slot"><span class="tl-ruler-label">${String(h).padStart(2,'0')}:00</span></div>`;
+    }).join('');
+
+    // 背景格線（含最後一條）
+    const gridLines = Array.from({ length: HOUR_END - HOUR_START + 1 }, (_, i) => {
+      return `<div class="tl-grid-line" style="top:${i * HOUR_H}px"></div>`;
+    }).join('');
+
+    // 事件（絕對定位）
+    const eventsHtml = timed.map((p, idx) => {
+      const [hh, mm] = p.time.split(':').map(Number);
+      const topPx = (hh - HOUR_START) * HOUR_H + (mm / 60) * HOUR_H;
+      const clampTop = Math.max(0, Math.min(topPx, TOTAL_H - 26));
+      const emoji = p.type === 'restaurant' ? '🍽' : '🏯';
+      const borderColor = color;
+      const bg = color + '18';
       return `
-        <div class="tl-item${isLast ? ' tl-last' : ''}">
-          <div class="tl-time-col">${p.time ? `<span class="tl-time">${escHtml(p.time)}</span>` : '<span class="tl-time tl-time-empty">--:--</span>'}</div>
-          <div class="tl-left">
-            <div class="tl-dot" style="background:${color};border-color:${color}"><span style="color:#fff;font-size:9px;font-weight:800">${i+1}</span></div>
-            <div class="tl-line" style="background:${color}"></div>
-          </div>
-          <div class="tl-content">
-            <div class="tl-place-name">${emoji} ${escHtml(p.name)}</div>
-            ${p.description ? `<div class="tl-place-desc">${escHtml(p.description)}</div>` : ''}
-          </div>
+        <div class="tl-event" style="top:${clampTop}px;border-left-color:${borderColor};background:${bg}">
+          <div class="tl-event-time" style="color:${borderColor}">${escHtml(p.time)}</div>
+          <div class="tl-event-name">${emoji} ${escHtml(p.name)}</div>
+          ${p.description ? `<div class="tl-event-desc">${escHtml(p.description)}</div>` : ''}
         </div>`;
-    }).join('') : '<div class="tl-empty">尚無行程安排</div>';
+    }).join('');
+
+    // 無時間行程區塊
+    const noTimeHtml = noTime.length ? `
+      <div class="tl-notime-section">
+        <div class="tl-notime-label">⏱ 未排時間</div>
+        ${noTime.map((p, i) => {
+          const emoji = p.type === 'restaurant' ? '🍽' : '🏯';
+          return `<div class="tl-notime-item"><span class="tl-notime-num">${i+1}</span>${emoji} ${escHtml(p.name)}</div>`;
+        }).join('')}
+      </div>` : '';
+
+    const bodyHtml = places.length ? `
+      <div class="tl-body">
+        <div class="tl-ruler" style="height:${TOTAL_H}px">${rulerSlots}</div>
+        <div class="tl-events-wrap" style="height:${TOTAL_H}px">
+          ${gridLines}${eventsHtml}
+        </div>
+      </div>
+      ${noTimeHtml}` : '<div class="tl-empty">尚無行程安排</div>';
 
     return `
       <div class="tl-day">
@@ -968,7 +1007,7 @@ function renderTimelineView() {
           <span class="tl-day-label" style="color:${color}">${escHtml(day.label)}</span>
           <span class="tl-day-count">${places.length} 個地點</span>
         </div>
-        <div class="tl-places">${placesHtml}</div>
+        ${bodyHtml}
         <div class="tl-hotel">🏨 ${escHtml(HOTEL.name)}</div>
       </div>`;
   }).join('');
@@ -1025,48 +1064,30 @@ document.getElementById('page-preparation').addEventListener('change', updatePre
 // ════════════════════════════════════════════
 //  FEATURE 4: AI ITINERARY SUGGESTIONS
 // ════════════════════════════════════════════
-const AI_PRESETS = {
-  culture: [
-    { name:'淺草寺', type:'attraction', lat:35.7147, lng:139.7966, description:'雷門・仲見世通・人力車' },
-    { name:'上野公園', type:'attraction', lat:35.7143, lng:139.7731, description:'博物館・動物園・藝術館群' },
-    { name:'明治神宮', type:'attraction', lat:35.6763, lng:139.6993, description:'都心中的森林神社' },
-    { name:'東京晴空塔', type:'attraction', lat:35.7101, lng:139.8107, description:'登高俯瞰東京全景' },
-    { name:'根津神社', type:'attraction', lat:35.7203, lng:139.7619, description:'千本鳥居、季節花卉' },
-  ],
-  food: [
-    { name:'築地場外市場', type:'restaurant', lat:35.6655, lng:139.7705, description:'海鮮丼・壽司・炸物' },
-    { name:'上野阿美橫町', type:'attraction', lat:35.7073, lng:139.7750, description:'小吃攤位・零食採買' },
-    { name:'月島もんじゃ街', type:'restaurant', lat:35.6571, lng:139.7840, description:'文字燒發源地' },
-    { name:'門前仲町', type:'restaurant', lat:35.6715, lng:139.7978, description:'老街居酒屋・深川飯' },
-    { name:'中目黑',type:'restaurant', lat:35.6438, lng:139.6992, description:'目黑川沿岸咖啡廳' },
-  ],
-  shopping: [
-    { name:'原宿竹下通', type:'attraction', lat:35.6692, lng:139.7044, description:'潮流服飾・裏原宿' },
-    { name:'澀谷 109', type:'attraction', lat:35.6585, lng:139.6994, description:'女裝時尚百貨' },
-    { name:'秋葉原電器街', type:'attraction', lat:35.7023, lng:139.7745, description:'電器・動漫・模型' },
-    { name:'銀座三越', type:'attraction', lat:35.6715, lng:139.7631, description:'精品百貨・免稅購物' },
-    { name:'吉祥寺', type:'attraction', lat:35.7027, lng:139.5797, description:'復古雜貨・特色小店' },
-  ],
-  relax: [
-    { name:'代代木公園', type:'attraction', lat:35.6732, lng:139.6947, description:'遛狗・野餐・放鬆' },
-    { name:'谷中銀座商店街', type:'attraction', lat:35.7272, lng:139.7671, description:'昭和老街風情散步' },
-    { name:'清澄白河', type:'attraction', lat:35.6792, lng:139.8009, description:'下町咖啡文化聖地' },
-    { name:'自由之丘', type:'attraction', lat:35.6077, lng:139.6685, description:'歐風街道・甜點・散步' },
-    { name:'代官山蔦屋書店', type:'attraction', lat:35.6488, lng:139.7026, description:'設計感書店・選物店' },
-  ],
-  mix: [
-    { name:'淺草寺', type:'attraction', lat:35.7147, lng:139.7966, description:'雷門・仲見世通' },
-    { name:'上野阿美橫町', type:'restaurant', lat:35.7073, lng:139.7750, description:'午餐採買' },
-    { name:'秋葉原電器街', type:'attraction', lat:35.7023, lng:139.7745, description:'電器・動漫' },
-    { name:'東京晴空塔', type:'attraction', lat:35.7101, lng:139.8107, description:'夜景展望' },
-    { name:'押上商店街', type:'restaurant', lat:35.7100, lng:139.8119, description:'晚餐・在地氛圍' },
-  ],
+// ── AI 建議：每天預設中心座標
+const DAY_AI_CENTERS = {
+  '2026-08-03': { lat: 35.681, lng: 139.767, area: '東京' },
+  '2026-08-04': { lat: 35.362, lng: 138.728, area: '富士山 河口湖' },
+  '2026-08-05': { lat: 35.681, lng: 139.767, area: '東京' },
+  '2026-08-06': { lat: 35.681, lng: 139.767, area: '東京' },
+  '2026-08-07': { lat: 35.681, lng: 139.767, area: '東京' },
+  '2026-08-08': { lat: 35.681, lng: 139.767, area: '東京' },
 };
+
+// 每個分類對應的 Nominatim 關鍵字
+const AI_CAT_QUERIES = {
+  culture:  '観光 神社 寺 博物館',
+  food:     'レストラン 食堂 居酒屋',
+  shopping: 'ショッピング 百貨店 市場',
+  relax:    '公園 庭園',
+  mix:      '観光地 名所',
+};
+
+let aiActiveCat = 'culture';
 
 document.getElementById('btn-ai-suggest').addEventListener('click', () => {
   const panel = document.getElementById('ai-panel');
   panel.classList.toggle('hidden');
-  // 自動選取目前可見的第一個天欄
   if (!panel.classList.contains('hidden')) {
     const firstVisibleDay = document.querySelector('.day-column')?.dataset?.date;
     const sel = document.getElementById('ai-date-sel');
@@ -1076,67 +1097,110 @@ document.getElementById('btn-ai-suggest').addEventListener('click', () => {
 document.getElementById('ai-close').addEventListener('click', () => {
   document.getElementById('ai-panel').classList.add('hidden');
 });
-function getAISuggestions(date, style) {
-  // 優先從 itinerary 物件取，若尚未載入則從 DOM 讀取
-  let dayPlaces = itinerary[date]?.places || [];
-  if (dayPlaces.length === 0) {
-    const container = document.getElementById(`day-${date}`);
-    if (container) {
-      dayPlaces = Array.from(container.querySelectorAll('.itinerary-place')).map(el => ({
-        name: el.dataset.name,
-        lat: parseFloat(el.dataset.lat) || 0,
-        lng: parseFloat(el.dataset.lng) || 0,
-      })).filter(p => p.lat && p.lng);
+
+// 分類分頁切換
+document.querySelector('.ai-cat-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.ai-cat-tab');
+  if (!tab) return;
+  document.querySelectorAll('.ai-cat-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  aiActiveCat = tab.dataset.cat;
+});
+
+async function runAISearch() {
+  const date = document.getElementById('ai-date-sel').value;
+  const cat  = aiActiveCat;
+  const resultEl = document.getElementById('ai-result');
+  resultEl.innerHTML = '<div class="ai-loading">🔍 搜尋中，請稍候…</div>';
+
+  // 取得當天中心座標
+  let center = DAY_AI_CENTERS[date] || { lat: 35.681, lng: 139.767, area: '東京' };
+  const dayPlaces = itinerary[date]?.places || [];
+  if (dayPlaces.length > 0) {
+    const lats = dayPlaces.map(p => p.lat).filter(Boolean);
+    const lngs = dayPlaces.map(p => p.lng).filter(Boolean);
+    if (lats.length) {
+      center = {
+        lat: lats.reduce((s, v) => s + v, 0) / lats.length,
+        lng: lngs.reduce((s, v) => s + v, 0) / lngs.length,
+        area: center.area,
+      };
     }
   }
 
-  const allPresets = Object.values(AI_PRESETS).flat();
-  const existing = new Set(dayPlaces.map(p => p.name));
-  let pool = allPresets.filter(p => !existing.has(p.name));
+  const keyword = AI_CAT_QUERIES[cat] || '観光地';
+  const d = 0.18;
+  const viewbox = `${center.lng - d},${center.lat + d},${center.lng + d},${center.lat - d}`;
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(keyword + ' ' + center.area)}&format=json&addressdetails=1&extratags=1&limit=10&countrycodes=jp&accept-language=zh-TW,ja,en&viewbox=${viewbox}&bounded=0`;
 
-  if (dayPlaces.length > 0) {
-    const centerLat = dayPlaces.reduce((s, p) => s + p.lat, 0) / dayPlaces.length;
-    const centerLng = dayPlaces.reduce((s, p) => s + p.lng, 0) / dayPlaces.length;
-    pool = pool.map(p => ({
-      ...p,
-      dist: Math.hypot((p.lat - centerLat) * 111, (p.lng - centerLng) * 91),
-    })).sort((a, b) => a.dist - b.dist);
-    const sameStyle = (AI_PRESETS[style] || []).filter(p => !existing.has(p.name));
-    const nearby = pool.filter(p => p.dist < 15);
-    const merged = [...new Map([...sameStyle, ...nearby].map(p => [p.name, p])).values()];
-    return merged.slice(0, 5);
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,ja,en' } });
+    const data = await res.json();
+    renderAIResults(data, date, cat, center.area);
+  } catch (err) {
+    resultEl.innerHTML = '<div class="ai-loading" style="color:#E74C3C">搜尋失敗，請稍後再試</div>';
   }
-  return (AI_PRESETS[style] || AI_PRESETS.mix).filter(p => !existing.has(p.name)).slice(0, 5);
 }
 
-document.getElementById('ai-generate-btn').addEventListener('click', () => {
-  const date  = document.getElementById('ai-date-sel').value;
-  const style = document.getElementById('ai-style-sel').value;
-  const suggestions = getAISuggestions(date, style);
-  const dayPlaces = itinerary[date]?.places || [];
-  const hasContext = dayPlaces.length > 0;
+function renderAIResults(data, date, cat, area) {
   const resultEl = document.getElementById('ai-result');
+  const existing = new Set((itinerary[date]?.places || []).map(p => p.name));
+
+  if (!data || data.length === 0) {
+    resultEl.innerHTML = `<div class="ai-loading">找不到 ${area} 的${AI_CAT_QUERIES[cat]} 相關地點</div>`;
+    return;
+  }
+
+  // 去除重複 display_name，取前 8 筆
+  const seen = new Set();
+  const items = data.filter(item => {
+    const name = item.namedetails?.name || item.display_name.split(',')[0];
+    if (seen.has(name)) return false;
+    seen.add(name);
+    return true;
+  }).slice(0, 8);
+
   resultEl.innerHTML = `
-    <div class="ai-result-title">
-      ${hasContext ? `📍 基於 ${DAY_SHORT[date]} 現有行程附近推薦：` : `建議加入 ${DAY_SHORT[date] || date} 的地點：`}
-    </div>
-    ${suggestions.length === 0 ? '<div style="padding:12px;color:var(--text-muted)">此風格地點已全部加入行程</div>' :
-    suggestions.map((p, i) => `
-      <div class="ai-suggestion-item">
-        <div class="ai-sugg-info">
-          <span class="ai-sugg-num">${i+1}</span>
-          <div>
-            <div class="ai-sugg-name">${escHtml(p.name)}</div>
-            <div class="ai-sugg-desc">${escHtml(p.description)}${p.dist !== undefined ? ` · 距${Math.round(p.dist)}km` : ''}</div>
+    <div class="ai-result-title">📍 ${area}・${['文化景點','美食','購物','輕鬆','綜合'][['culture','food','shopping','relax','mix'].indexOf(cat)]} 推薦（來自 OpenStreetMap）</div>
+    ${items.map((item, i) => {
+      const name    = item.namedetails?.name || item.display_name.split(',')[0];
+      const addr    = item.display_name.split(',').slice(1, 4).join('、').trim();
+      const lat     = parseFloat(item.lat);
+      const lng     = parseFloat(item.lon);
+      const type    = osmToType(item.extratags);
+      const gmapUrl = googleMapsSearchUrl(name, lat, lng);
+      const inPlan  = existing.has(name);
+      return `
+        <div class="ai-suggestion-item">
+          <div class="ai-sugg-info">
+            <span class="ai-sugg-num">${i+1}</span>
+            <div>
+              <div class="ai-sugg-name">${escHtml(name)}</div>
+              <div class="ai-sugg-desc">${escHtml(addr)}</div>
+            </div>
           </div>
-        </div>
-        <button class="ai-add-btn" data-date="${date}" data-name="${escHtml(p.name)}" data-lat="${p.lat}" data-lng="${p.lng}" data-type="${p.type}" data-desc="${escHtml(p.description)}">＋ 加入</button>
-      </div>`).join('')}`;
-});
+          <div class="ai-sugg-actions">
+            <button class="ai-add-btn${inPlan ? ' disabled' : ''}"
+              data-date="${date}" data-name="${escHtml(name)}"
+              data-lat="${lat}" data-lng="${lng}"
+              data-type="${type}" data-desc=""
+              ${inPlan ? 'disabled' : ''}>
+              ${inPlan ? '✓ 已加入' : '＋ 加入'}
+            </button>
+            <a class="ai-gmap-btn" href="${gmapUrl}" target="_blank" rel="noopener">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              地圖
+            </a>
+          </div>
+        </div>`;
+    }).join('')}`;
+}
+
+document.getElementById('ai-generate-btn').addEventListener('click', runAISearch);
 
 document.getElementById('ai-result').addEventListener('click', e => {
   const btn = e.target.closest('.ai-add-btn');
-  if (!btn) return;
+  if (!btn || btn.disabled) return;
   const date  = btn.dataset.date;
   const place = {
     name: btn.dataset.name,
