@@ -177,7 +177,7 @@ function googleMapsUrl(place) {
 // ════════════════════════════════════════════
 async function loadPlaces() {
   try {
-    const res = await fetch('/api/places');
+    const res = await fetch('/places.json');
     allPlaces = await res.json();
     filteredPlaces = allPlaces;
     renderPlacesList();
@@ -297,8 +297,17 @@ document.getElementById('search-input').addEventListener('input', applyFilter);
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
-  const res = await fetch('/api/itinerary');
+  // 先讀靜態基本行程
+  const res = await fetch('/itinerary.json');
   itinerary = await res.json();
+  // 再從 Gist 同步覆蓋已儲存的版本
+  try {
+    const syncRes = await fetch('/api/sync');
+    const syncData = await syncRes.json();
+    if (syncData.itinerary) {
+      itinerary = JSON.parse(syncData.itinerary);
+    }
+  } catch (_) {}
   renderItinerary();
   drawRouteLines();
 }
@@ -617,9 +626,9 @@ async function saveItinerary() {
     }
   });
   try {
-    await fetch('/api/itinerary', {
+    await fetch('/api/sync', {
       method: 'POST', headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify(itinerary),
+      body: JSON.stringify({ itinerary: JSON.stringify(itinerary) }),
     });
     showToast('行程已儲存 ✓');
   } catch (e) { alert('儲存失敗：' + e.message); }
@@ -853,15 +862,10 @@ document.getElementById('btn-save').addEventListener('click', saveItinerary);
 document.getElementById('btn-export').addEventListener('click', async () => {
   syncItineraryFromDOM();
   await saveItinerary();
-  window.location.href = '/api/export';
+  showToast('行程已儲存至雲端 ✓');
 });
 document.getElementById('btn-populate').addEventListener('click', async () => {
-  if (!confirm('將根據 Notion 行程覆蓋現有行程安排，確定繼續？')) return;
-  try {
-    itinerary = await (await fetch('/api/itinerary/populate')).json();
-    renderItinerary();
-    showToast('已從 Notion 自動帶入行程 ✓');
-  } catch (e) { alert('帶入失敗：' + e.message); }
+  showToast('Notion 功能在雲端版暫不支援');
 });
 
 // ════════════════════════════════════════════
@@ -931,9 +935,7 @@ document.getElementById('btn-populate').addEventListener('click', async () => {
 //  NOTION MODAL
 // ════════════════════════════════════════════
 async function loadNotion() {
-  try {
-    notionPages = await (await fetch('/api/notion')).json();
-  } catch { notionPages = []; }
+  notionPages = [];
 }
 
 document.getElementById('btn-notion').addEventListener('click', () => {
