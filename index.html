@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=23" />
+  <link rel="stylesheet" href="style.css?v=24" />
 </head>
 <body>
 
@@ -98,35 +98,37 @@
       <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
       <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
       <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── SNOOPY（Peanuts 正版：大圓頭、長黑垂耳填色、黑色背斑、米黃鼻吻、黑項圈） ── -->
-      <g transform="translate(140, 185)">
-        <!-- 捲曲尾巴 -->
-        <path d="M70,72 Q98,54 90,26" stroke="#111" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <!-- 身體（白色橢圓） -->
-        <ellipse cx="36" cy="84" rx="32" ry="40" fill="white" stroke="#111" stroke-width="2.5"/>
-        <!-- 背部黑斑（Beagle 特徵，背右側） -->
-        <path d="M50,58 C68,62 72,80 68,96 C62,108 46,106 40,94 C36,82 38,64 50,58 Z" fill="#111"/>
-        <!-- 頭（大正圓） -->
-        <circle cx="38" cy="26" r="33" fill="white" stroke="#111" stroke-width="2.5"/>
-        <!-- 左耳（長黑填色垂耳，Snoopy 招牌） -->
-        <path d="M12,14 C-2,22 -8,46 -4,76 C-2,86 12,88 20,80 C28,72 26,46 18,24 Z" fill="#111"/>
-        <!-- 右耳（略短） -->
-        <path d="M60,12 C74,20 80,44 76,70 C74,80 60,82 52,74 C44,66 46,42 58,18 Z" fill="#111"/>
-        <!-- 鼻吻部（cream色，Peanuts 的長橢圓muzzle） -->
-        <ellipse cx="38" cy="44" rx="22" ry="15" fill="#F2DCA0" stroke="#111" stroke-width="2"/>
-        <!-- 黑色大鼻頭 -->
-        <ellipse cx="38" cy="30" rx="10" ry="7" fill="#111"/>
-        <!-- 左眼（圓點，Schulz 風格） -->
-        <circle cx="20" cy="17" r="4.5" fill="#111"/>
+      <!-- ── SNOOPY（Peanuts Schulz 風格：大圓頭、長黑垂耳、黑背斑） ── -->
+      <g id="snoopy-g">
+      <g transform="translate(90, 155)">
+        <!-- 尾巴（上捲） -->
+        <path d="M82,98 Q110,80 104,56" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <!-- 身體（白色橢圓，較小） -->
+        <ellipse cx="50" cy="118" rx="32" ry="38" fill="white" stroke="#111" stroke-width="3"/>
+        <!-- 背部黑斑 -->
+        <path d="M64,88 C80,94 84,116 78,136 C72,152 56,150 50,134 C44,118 48,90 64,88 Z" fill="#111"/>
+        <!-- 頭（大圓，Schulz 比例） -->
+        <circle cx="50" cy="44" r="40" fill="white" stroke="#111" stroke-width="3"/>
+        <!-- 左耳（長黑垂耳） -->
+        <path d="M17,26 C4,38 -2,66 2,92 C4,104 18,106 26,96 C34,86 32,58 22,28 Z" fill="#111"/>
+        <!-- 右耳（稍短） -->
+        <path d="M78,22 C92,34 96,60 90,84 C88,96 74,98 66,88 C58,76 62,50 76,24 Z" fill="#111"/>
+        <!-- 米黃鼻吻 -->
+        <ellipse cx="50" cy="60" rx="24" ry="16" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
+        <!-- 黑鼻頭 -->
+        <ellipse cx="50" cy="44" rx="10" ry="7" fill="#111"/>
+        <!-- 左眼（小圓點） -->
+        <circle cx="32" cy="30" r="4" fill="#111"/>
         <!-- 右眼 -->
-        <circle cx="50" cy="15" r="4"   fill="#111"/>
+        <circle cx="65" cy="28" r="4" fill="#111"/>
         <!-- 笑容 -->
-        <path d="M24,53 Q38,64 52,53" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <!-- 黑色項圈（原版 Snoopy 標誌） -->
-        <path d="M6,66 Q38,78 70,66" stroke="#111" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M34,67 Q50,80 66,67" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 黑色項圈 -->
+        <path d="M20,92 Q50,106 80,92" stroke="#111" stroke-width="9" fill="none" stroke-linecap="round"/>
         <!-- 前腳掌 -->
-        <ellipse cx="10"  cy="118" rx="17" ry="9" fill="white" stroke="#111" stroke-width="2"/>
-        <ellipse cx="60"  cy="118" rx="17" ry="9" fill="white" stroke="#111" stroke-width="2"/>
+        <ellipse cx="22" cy="149" rx="17" ry="9" fill="white" stroke="#111" stroke-width="2.5"/>
+        <ellipse cx="74" cy="149" rx="17" ry="9" fill="white" stroke="#111" stroke-width="2.5"/>
+      </g>
       </g>
       <!-- 中央文字（左半部分可見） -->
       <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">雙狼北漂</text>
@@ -208,42 +210,42 @@
       <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
       <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
       <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── OLAF（Peanuts 史努比的弟弟：矮胖圓潤、短耳、紅帽、伸舌頭） ── -->
-      <g transform="translate(555, 178)">
-        <!-- 尾巴（短捲，與 Snoopy 相似） -->
-        <path d="M76,68 Q98,56 92,34" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <!-- 身體（矮胖，比 Snoopy 更圓更寬） -->
-        <ellipse cx="38" cy="88" rx="42" ry="42" fill="white" stroke="#111" stroke-width="2.5"/>
+      <!-- ── OLAF（Peanuts Snoopy 的弟弟：超胖、紅扁帽、伸舌頭） ── -->
+      <g id="olaf-g">
+      <g transform="translate(510, 148)">
+        <!-- 尾巴 -->
+        <path d="M92,106 Q118,88 112,62" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <!-- 身體（超胖圓潤） -->
+        <ellipse cx="50" cy="130" rx="50" ry="52" fill="white" stroke="#111" stroke-width="3"/>
         <!-- 身體黑斑 -->
-        <path d="M56,60 C76,64 82,84 76,102 C68,116 50,114 44,100 C38,86 40,64 56,60 Z" fill="#111"/>
-        <!-- 頭（更圓更寬，Olaf 比 Snoopy 頭大身短） -->
-        <circle cx="38" cy="24" r="36" fill="white" stroke="#111" stroke-width="2.5"/>
-        <!-- 紅色帽子（扁平方帽，Olaf 招牌） -->
-        <rect x="2" y="-26" width="72" height="26" rx="4" fill="#CC1818" stroke="#111" stroke-width="2"/>
-        <rect x="-4" y="-2" width="84" height="10" rx="3" fill="#AA1010" stroke="#111" stroke-width="1.5"/>
-        <!-- 帽頂橫條紋（裝飾） -->
-        <rect x="2" y="-4" width="72" height="5" rx="2" fill="#EE2020" opacity="0.5"/>
-        <!-- 左耳（短圓，比 Snoopy 短且肥） -->
-        <path d="M10,16 C-4,24 -8,44 -4,68 C-2,78 12,80 20,72 C28,64 26,42 16,22 Z" fill="#111"/>
+        <path d="M68,96 C88,102 94,130 86,154 C78,172 58,170 52,150 C46,130 50,94 68,96 Z" fill="#111"/>
+        <!-- 頭（非常圓） -->
+        <circle cx="50" cy="46" r="44" fill="white" stroke="#111" stroke-width="3"/>
+        <!-- 紅色扁帽（Olaf 招牌） -->
+        <rect x="6" y="-20" width="88" height="26" rx="6" fill="#CC1818" stroke="#111" stroke-width="2.5"/>
+        <rect x="-2" y="4" width="104" height="12" rx="5" fill="#AA1010" stroke="#111" stroke-width="2"/>
+        <!-- 左耳（短胖） -->
+        <path d="M12,28 C-2,40 -4,62 0,82 C2,94 16,96 24,86 C32,76 30,50 16,28 Z" fill="#111"/>
         <!-- 右耳 -->
-        <path d="M62,14 C76,22 80,42 76,66 C74,76 60,78 52,70 C44,62 46,40 60,20 Z" fill="#111"/>
-        <!-- 鼻吻部（更寬更圓，Olaf 特徵：臉更豐滿） -->
-        <ellipse cx="38" cy="46" rx="27" ry="17" fill="#F2DCA0" stroke="#111" stroke-width="2"/>
-        <!-- 鼻頭 -->
-        <ellipse cx="38" cy="30" rx="11" ry="8" fill="#111"/>
-        <!-- 左眼（略寬距） -->
-        <circle cx="18" cy="16" r="5" fill="#111"/>
+        <path d="M82,26 C96,38 98,60 94,80 C92,92 78,94 70,84 C62,74 64,48 80,28 Z" fill="#111"/>
+        <!-- 米黃鼻吻（寬） -->
+        <ellipse cx="50" cy="62" rx="30" ry="20" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
+        <!-- 鼻頭（大） -->
+        <ellipse cx="50" cy="46" rx="12" ry="8" fill="#111"/>
+        <!-- 左眼（寬距） -->
+        <circle cx="28" cy="30" r="5" fill="#111"/>
         <!-- 右眼 -->
-        <circle cx="54" cy="14" r="4.5" fill="#111"/>
-        <!-- 嘴巴（微張） -->
-        <path d="M22,56 Q38,68 54,56" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <!-- 伸出的舌頭（Olaf 標誌，喜感） -->
-        <ellipse cx="38" cy="62" rx="10" ry="6" fill="#E84040" stroke="#111" stroke-width="1.2"/>
-        <!-- 黑色項圈 -->
-        <path d="M2,74 Q38,88 74,74" stroke="#111" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <!-- 前腳掌（更粗更圓，Olaf 特徵） -->
-        <ellipse cx="6"   cy="124" rx="20" ry="10" fill="white" stroke="#111" stroke-width="2"/>
-        <ellipse cx="70"  cy="124" rx="20" ry="10" fill="white" stroke="#111" stroke-width="2"/>
+        <circle cx="70" cy="28" r="5" fill="#111"/>
+        <!-- 嘴巴（開心張開） -->
+        <path d="M26,72 Q50,88 72,72" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 舌頭（Olaf 招牌） -->
+        <ellipse cx="50" cy="80" rx="14" ry="9" fill="#E84040" stroke="#111" stroke-width="2"/>
+        <!-- 項圈 -->
+        <path d="M6,104 Q50,120 94,104" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <!-- 胖前腳掌 -->
+        <ellipse cx="8"  cy="175" rx="22" ry="11" fill="white" stroke="#111" stroke-width="2.5"/>
+        <ellipse cx="90" cy="175" rx="22" ry="11" fill="white" stroke="#111" stroke-width="2.5"/>
+      </g>
       </g>
       <!-- 中央文字（右半部分可見） -->
       <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">雙狼北漂</text>
@@ -293,6 +295,7 @@
   <button class="page-tab" data-page="preparation">🎒 行前準備</button>
   <button class="page-tab" data-page="shopping">🛍 購物清單</button>
   <button class="page-tab" data-page="transit">🚃 交通</button>
+  <button class="page-tab" data-page="expense" id="tab-expense">💴 記帳</button>
 </nav>
 
 <!-- ════════════════════════════════════════════
@@ -307,6 +310,8 @@
         <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
         <button id="btn-place-search" title="搜尋新地標加入行程">🔍 新地標</button>
       </div>
+      <!-- 路線顏色圖例 -->
+      <div class="route-legend" id="route-legend"></div>
       <div id="filter-buttons">
         <button class="filter-btn active" data-type="all">全部</button>
         <button class="filter-btn" data-type="restaurant">🍽 餐廳</button>
@@ -360,6 +365,7 @@
     <div id="itinerary-header">
       <h2>每日行程</h2>
       <div class="itinerary-actions">
+        <button id="btn-map-toggle"  class="btn btn-outline btn-sm">🗺 地圖</button>
         <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
         <button id="btn-ai-suggest"  class="btn btn-outline btn-sm">✨ AI 建議</button>
         <button id="btn-save"        class="btn btn-save">💾 儲存</button>
@@ -393,6 +399,15 @@
           <button class="ai-cat-tab" data-cat="relax">🌿 輕鬆</button>
           <button class="ai-cat-tab" data-cat="mix">✨ 綜合</button>
         </div>
+      </div>
+      <!-- AI 問答輸入框 -->
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">💬 問 Claude 任何旅遊問題</div>
+        <div class="ai-ask-row">
+          <textarea id="ai-ask-input" class="ai-ask-input" placeholder="例：從淺草到秋葉原怎麼去？鎌倉有什麼好吃的？" rows="2"></textarea>
+          <button id="ai-ask-btn" class="ai-ask-btn">送出</button>
+        </div>
+        <div id="ai-ask-result" style="margin-top:8px"></div>
       </div>
       <div id="ai-result" class="ai-result"></div>
     </div>
@@ -659,6 +674,10 @@
       <div id="settle-content"></div>
       <button id="btn-export-settle" class="btn btn-outline" style="margin:16px auto;display:block">⬇ 匯出結算</button>
     </div>
+    <!-- 手機專用：底部關閉按鈕 -->
+    <div class="expense-close-footer">
+      <button class="btn-expense-close" id="expense-close-footer-btn">← 返回主畫面</button>
+    </div>
   </div>
 </div>
 
@@ -672,6 +691,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=23"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>

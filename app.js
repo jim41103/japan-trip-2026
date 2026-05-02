@@ -107,15 +107,24 @@ loadWeather();
 // ════════════════════════════════════════════
 document.querySelectorAll('.page-tab').forEach(tab => {
   tab.addEventListener('click', () => {
+    // 記帳分頁：開啟 modal，不切換頁面
+    if (tab.dataset.page === 'expense') { openExpenseModal(); return; }
+
     document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const targetPage = document.getElementById(`page-${tab.dataset.page}`);
+    if (!targetPage) return;
     targetPage.classList.remove('hidden');
     targetPage.classList.add('active');
     if (tab.dataset.page === 'shopping') renderShoppingList();
     if (tab.dataset.page === 'itinerary' && window.MAP) setTimeout(() => window.MAP.invalidateSize(), 50);
-
+    // 手機行程頁：確保 itinerary-panel 可見
+    if (tab.dataset.page === 'itinerary') {
+      document.getElementById('itinerary-panel')?.classList.add('mobile-active');
+      document.getElementById('map-panel')?.classList.remove('mobile-active');
+      document.getElementById('btn-map-toggle')?.classList.remove('active');
+    }
   });
 });
 
@@ -538,6 +547,7 @@ async function loadItinerary() {
   itinerary = await res.json();
   renderItinerary();
   drawRouteLines();
+  renderRouteLegend();
   // 背景從 Gist 拉最新版，有差異再重新渲染
   fetch('/api/sync')
     .then(r => r.json())
@@ -960,6 +970,33 @@ document.getElementById('btn-route-lines').addEventListener('click', function() 
   drawRouteLines();
 });
 
+// 路線顏色圖例
+function renderRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (!el) return;
+  el.innerHTML = Object.entries(DAY_COLORS).map(([date, color]) => {
+    const label = DAY_SHORT[date] || date;
+    return `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div><span>${label}</span></div>`;
+  }).join('');
+}
+
+// 手機地圖切換按鈕
+document.getElementById('btn-map-toggle')?.addEventListener('click', function() {
+  const mapPanel  = document.getElementById('map-panel');
+  const itiPanel  = document.getElementById('itinerary-panel');
+  const isMapMode = mapPanel?.classList.contains('mobile-active');
+  if (isMapMode) {
+    mapPanel?.classList.remove('mobile-active');
+    itiPanel?.classList.add('mobile-active');
+    this.classList.remove('active');
+  } else {
+    itiPanel?.classList.remove('mobile-active');
+    mapPanel?.classList.add('mobile-active');
+    this.classList.add('active');
+    setTimeout(() => map.invalidateSize(), 60);
+  }
+});
+
 // ════════════════════════════════════════════
 //  FEATURE 2: TIMELINE VIEW
 // ════════════════════════════════════════════
@@ -1136,63 +1173,41 @@ async function runAISearch() {
   const date = document.getElementById('ai-date-sel').value;
   const cat  = aiActiveCat;
   const resultEl = document.getElementById('ai-result');
-  resultEl.innerHTML = '<div class="ai-loading">🔍 搜尋中，請稍候…</div>';
+  resultEl.innerHTML = '<div class="ai-loading">🤖 AI 分析中，請稍候…</div>';
 
-  // 取得當天中心座標
-  let center = DAY_AI_CENTERS[date] || { lat: 35.681, lng: 139.767, area: '東京' };
   const dayPlaces = itinerary[date]?.places || [];
-  if (dayPlaces.length > 0) {
-    const lats = dayPlaces.map(p => p.lat).filter(Boolean);
-    const lngs = dayPlaces.map(p => p.lng).filter(Boolean);
-    if (lats.length) {
-      center = {
-        lat: lats.reduce((s, v) => s + v, 0) / lats.length,
-        lng: lngs.reduce((s, v) => s + v, 0) / lngs.length,
-        area: center.area,
-      };
-    }
-  }
-
-  const keyword = AI_CAT_QUERIES[cat] || '観光地';
-  const d = 0.18;
-  const viewbox = `${center.lng - d},${center.lat + d},${center.lng + d},${center.lat - d}`;
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(keyword + ' ' + center.area)}&format=json&addressdetails=1&extratags=1&limit=10&countrycodes=jp&accept-language=zh-TW,ja,en&viewbox=${viewbox}&bounded=0`;
 
   try {
-    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,ja,en' } });
+    const res = await fetch('/api/suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'recommend', date, places: dayPlaces, category: cat }),
+    });
     const data = await res.json();
-    renderAIResults(data, date, cat, center.area);
+    if (data.error) throw new Error(data.error);
+    renderAIResults(data.suggestions, date, cat);
   } catch (err) {
-    resultEl.innerHTML = '<div class="ai-loading" style="color:#E74C3C">搜尋失敗，請稍後再試</div>';
+    resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">建議失敗：${escHtml(err.message)}</div>`;
   }
 }
 
-function renderAIResults(data, date, cat, area) {
+function renderAIResults(data, date, cat) {
   const resultEl = document.getElementById('ai-result');
-  const existing = new Set((itinerary[date]?.places || []).map(p => p.name));
+  const catLabels = { culture:'文化景點', food:'美食', shopping:'購物', relax:'輕鬆', mix:'綜合' };
+  const existing  = new Set((itinerary[date]?.places || []).map(p => p.name));
 
   if (!data || data.length === 0) {
-    resultEl.innerHTML = `<div class="ai-loading">找不到 ${area} 的${AI_CAT_QUERIES[cat]} 相關地點</div>`;
+    resultEl.innerHTML = `<div class="ai-loading">找不到${catLabels[cat]}推薦</div>`;
     return;
   }
 
-  // 去除重複 display_name，取前 8 筆
-  const seen = new Set();
-  const items = data.filter(item => {
-    const name = item.namedetails?.name || item.display_name.split(',')[0];
-    if (seen.has(name)) return false;
-    seen.add(name);
-    return true;
-  }).slice(0, 8);
-
   resultEl.innerHTML = `
-    <div class="ai-result-title">📍 ${area}・${['文化景點','美食','購物','輕鬆','綜合'][['culture','food','shopping','relax','mix'].indexOf(cat)]} 推薦（來自 OpenStreetMap）</div>
-    ${items.map((item, i) => {
-      const name    = item.namedetails?.name || item.display_name.split(',')[0];
-      const addr    = item.display_name.split(',').slice(1, 4).join('、').trim();
-      const lat     = parseFloat(item.lat);
-      const lng     = parseFloat(item.lon);
-      const type    = osmToType(item.extratags);
+    <div class="ai-result-title">🤖 AI 推薦・${catLabels[cat] || cat}</div>
+    ${data.map((item, i) => {
+      const name    = item.name || '';
+      const desc    = item.desc || '';
+      const lat     = parseFloat(item.lat) || 0;
+      const lng     = parseFloat(item.lng) || 0;
       const gmapUrl = googleMapsSearchUrl(name, lat, lng);
       const inPlan  = existing.has(name);
       return `
@@ -1201,14 +1216,14 @@ function renderAIResults(data, date, cat, area) {
             <span class="ai-sugg-num">${i+1}</span>
             <div>
               <div class="ai-sugg-name">${escHtml(name)}</div>
-              <div class="ai-sugg-desc">${escHtml(addr)}</div>
+              <div class="ai-sugg-desc">${escHtml(desc)}</div>
             </div>
           </div>
           <div class="ai-sugg-actions">
             <button class="ai-add-btn${inPlan ? ' disabled' : ''}"
               data-date="${date}" data-name="${escHtml(name)}"
               data-lat="${lat}" data-lng="${lng}"
-              data-type="${type}" data-desc=""
+              data-type="attraction" data-desc="${escHtml(desc)}"
               ${inPlan ? 'disabled' : ''}>
               ${inPlan ? '✓ 已加入' : '＋ 加入'}
             </button>
@@ -1246,6 +1261,33 @@ document.getElementById('ai-result').addEventListener('click', e => {
   if (timelineMode) renderTimelineView();
   btn.textContent = '✓ 已加入'; btn.disabled = true;
   showToast(`${place.name} 已加入 ${DAY_SHORT[date]}`);
+});
+
+// AI 自由問答
+document.getElementById('ai-ask-btn')?.addEventListener('click', async () => {
+  const question = document.getElementById('ai-ask-input')?.value.trim();
+  const resultEl = document.getElementById('ai-ask-result');
+  if (!question || !resultEl) return;
+  const date = document.getElementById('ai-date-sel')?.value;
+  const dayPlaces = (date && itinerary[date]?.places) || [];
+  resultEl.innerHTML = '<div class="ai-loading">🤖 思考中…</div>';
+  try {
+    const res = await fetch('/api/suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'ask', question, places: dayPlaces }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    resultEl.innerHTML = `<div class="ai-answer">${escHtml(data.answer)}</div>`;
+  } catch (err) {
+    resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">回覆失敗：${escHtml(err.message)}</div>`;
+  }
+});
+
+// 記帳 modal 底部返回按鈕（手機版）
+document.getElementById('expense-close-footer-btn')?.addEventListener('click', () => {
+  document.getElementById('expense-modal').classList.add('hidden');
 });
 
 document.getElementById('btn-save').addEventListener('click', saveItinerary);
