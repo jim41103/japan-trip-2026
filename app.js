@@ -639,6 +639,17 @@ function renderItinerary() {
   });
 }
 
+function buildTimeOptions(selected) {
+  let html = '<option value="">-- 未定 --</option>';
+  for (let h = 6; h <= 23; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      html += `<option value="${val}"${val === selected ? ' selected' : ''}>${val}</option>`;
+    }
+  }
+  return html;
+}
+
 function renderDayPlaces(container, date) {
   container.innerHTML = '';
   const places = itinerary[date]?.places || [];
@@ -646,7 +657,12 @@ function renderDayPlaces(container, date) {
     container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
     return;
   }
-  places.forEach((place, pIdx) => container.appendChild(makePlaceCard(place, date, pIdx)));
+  // 有時間的依早→晚排序，無時間排最後（保持原有相對順序）
+  const timed   = places.filter(p => p.time).sort((a, b) => a.time.localeCompare(b.time));
+  const untimed = places.filter(p => !p.time);
+  const sorted  = [...timed, ...untimed];
+  itinerary[date].places = sorted;
+  sorted.forEach((place, pIdx) => container.appendChild(makePlaceCard(place, date, pIdx)));
 }
 
 function makePlaceCard(place, date, pIdx) {
@@ -660,7 +676,9 @@ function makePlaceCard(place, date, pIdx) {
   card.dataset.description = place.description || '';
   card.dataset.time = place.time || '';
   card.innerHTML = `
-    <input class="iplace-time" type="time" value="${escHtml(place.time||'')}" title="預計時間" onclick="event.stopPropagation()">
+    <select class="iplace-time" title="預計時間" onclick="event.stopPropagation()">
+      ${buildTimeOptions(place.time || '')}
+    </select>
     <span class="iplace-icon">${icon}</span>
     <div class="iplace-info">
       <div class="iplace-name">${escHtml(place.name)}</div>
@@ -673,6 +691,10 @@ function makePlaceCard(place, date, pIdx) {
   card.querySelector('.iplace-time').addEventListener('change', function() {
     card.dataset.time = this.value;
     syncItineraryFromDOM();
+    // 重新排序顯示
+    const col = document.getElementById(`day-${date}`);
+    if (col) renderDayPlaces(col, date);
+    if (timelineMode) renderTimelineView();
   });
   card.querySelector('.iplace-remove').addEventListener('click', e => {
     e.stopPropagation();
@@ -695,7 +717,7 @@ function syncItineraryFromDOM() {
       lng: parseFloat(card.dataset.lng) || 0,
       type: card.dataset.type,
       description: card.dataset.description,
-      time: card.dataset.time || card.querySelector?.('.iplace-time')?.value || '',
+      time: card.querySelector?.('.iplace-time')?.value || card.dataset.time || '',
     }));
     if (cards.length === 0) container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
   });
