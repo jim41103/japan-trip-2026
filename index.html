@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="stylesheet" href="style.css?v=16" />
 </head>
 <body>
 
@@ -297,12 +297,26 @@
   <!-- 左欄：地圖 -->
   <section id="map-panel">
     <div id="map-controls">
-      <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
+      <div class="search-row">
+        <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
+        <button id="btn-place-search" title="搜尋新地標加入行程">🔍 新地標</button>
+      </div>
       <div id="filter-buttons">
         <button class="filter-btn active" data-type="all">全部</button>
         <button class="filter-btn" data-type="restaurant">🍽 餐廳</button>
         <button class="filter-btn" data-type="attraction">🏯 景點</button>
         <button id="btn-route-lines" class="filter-btn route-lines-btn active" title="顯示/隱藏路線連線">🗺 路線</button>
+      </div>
+    </div>
+
+    <!-- 地標搜尋 Panel -->
+    <div id="place-search-panel" class="hidden">
+      <div class="psp-header">
+        <div class="psp-input-wrap">
+          <input id="psp-input" type="text" placeholder="搜尋日本地標（中文、英文、日文）…" autocomplete="off" />
+          <button id="psp-close">✕</button>
+        </div>
+        <div id="psp-results"></div>
       </div>
     </div>
     <div id="map"></div>
@@ -638,6 +652,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

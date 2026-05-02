@@ -294,6 +294,129 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 document.getElementById('search-input').addEventListener('input', applyFilter);
 
 // ════════════════════════════════════════════
+//  PLACE SEARCH (Nominatim + Google Maps link)
+// ════════════════════════════════════════════
+const OSM_TYPE_EMOJI = {
+  restaurant: '🍽', cafe: '☕', bar: '🍺', fast_food: '🍔',
+  attraction: '🏯', temple: '⛩', shrine: '⛩', museum: '🏛',
+  park: '🌳', garden: '🌸', theme_park: '🎢',
+  hotel: '🏨', hostel: '🏨',
+  shop: '🛍', mall: '🛍', supermarket: '🛒',
+  station: '🚉', subway: '🚇',
+  default: '📍',
+};
+
+function osmEmoji(tags) {
+  if (!tags) return '📍';
+  const t = tags.tourism || tags.amenity || tags.leisure || tags.shop || tags.railway || '';
+  return OSM_TYPE_EMOJI[t] || '📍';
+}
+
+function osmToType(tags) {
+  if (!tags) return 'attraction';
+  const a = tags.amenity || '';
+  if (['restaurant','cafe','bar','fast_food','food_court'].includes(a)) return 'restaurant';
+  return 'attraction';
+}
+
+function googleMapsSearchUrl(name, lat, lng) {
+  // 用名稱+座標組成搜尋連結，在手機上會開啟 Google Maps app
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&center=${lat},${lng}`;
+}
+
+let pspDebounce = null;
+
+document.getElementById('btn-place-search').addEventListener('click', () => {
+  document.getElementById('place-search-panel').classList.remove('hidden');
+  document.getElementById('psp-input').focus();
+});
+
+document.getElementById('psp-close').addEventListener('click', () => {
+  document.getElementById('place-search-panel').classList.add('hidden');
+  document.getElementById('psp-input').value = '';
+  document.getElementById('psp-results').innerHTML = '';
+});
+
+document.getElementById('psp-input').addEventListener('input', function() {
+  clearTimeout(pspDebounce);
+  const q = this.value.trim();
+  if (!q) { document.getElementById('psp-results').innerHTML = ''; return; }
+  document.getElementById('psp-results').innerHTML = '<div class="psp-loading">搜尋中…</div>';
+  pspDebounce = setTimeout(() => searchNominatim(q), 500);
+});
+
+async function searchNominatim(query) {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&extratags=1&limit=8&accept-language=zh-TW,ja,en&viewbox=138.0,35.0,141.5,36.8&bounded=0`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,ja,en' } });
+    const data = await res.json();
+    renderPspResults(data, query);
+  } catch (e) {
+    document.getElementById('psp-results').innerHTML = '<div class="psp-empty">搜尋失敗，請稍後再試</div>';
+  }
+}
+
+function renderPspResults(data, query) {
+  const el = document.getElementById('psp-results');
+  if (!data || data.length === 0) {
+    el.innerHTML = `<div class="psp-empty">找不到「${escHtml(query)}」的相關地點</div>`;
+    return;
+  }
+  const dayOptions = Object.entries(DAY_SHORT).map(([d, label]) =>
+    `<option value="${d}">${label}</option>`).join('');
+
+  el.innerHTML = data.map((item, idx) => {
+    const name = item.namedetails?.name || item.display_name.split(',')[0];
+    const addr = item.display_name.split(',').slice(1, 4).join('、').trim();
+    const lat  = parseFloat(item.lat);
+    const lng  = parseFloat(item.lon);
+    const emoji = osmEmoji(item.extratags);
+    const gmapUrl = googleMapsSearchUrl(name, lat, lng);
+    return `
+      <div class="psp-card">
+        <div class="psp-card-icon">${emoji}</div>
+        <div class="psp-card-body">
+          <div class="psp-card-name">${escHtml(name)}</div>
+          <div class="psp-card-addr">${escHtml(addr)}</div>
+          <div class="psp-card-actions">
+            <select class="psp-day-sel" id="psp-day-${idx}">${dayOptions}</select>
+            <button class="psp-add-btn" data-idx="${idx}" data-name="${escHtml(name)}" data-lat="${lat}" data-lng="${lng}" data-type="${osmToType(item.extratags)}">＋ 加入行程</button>
+            <a class="psp-gmap-btn" href="${gmapUrl}" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              Google Maps
+            </a>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('psp-results').addEventListener('click', e => {
+  const btn = e.target.closest('.psp-add-btn');
+  if (!btn) return;
+  const idx  = btn.dataset.idx;
+  const date = document.getElementById(`psp-day-${idx}`)?.value;
+  if (!date || !itinerary[date]) return;
+  const place = {
+    name: btn.dataset.name,
+    lat: parseFloat(btn.dataset.lat),
+    lng: parseFloat(btn.dataset.lng),
+    type: btn.dataset.type,
+    description: '',
+  };
+  if (!itinerary[date].places) itinerary[date].places = [];
+  if (itinerary[date].places.some(p => p.name === place.name)) {
+    showToast('此地點已在行程中'); return;
+  }
+  itinerary[date].places.push(place);
+  const container = document.getElementById(`day-${date}`);
+  if (container) renderDayPlaces(container, date);
+  drawRouteLines();
+  showToast(`✓ 已加入 ${DAY_SHORT[date]}`);
+  btn.textContent = '✓ 已加入'; btn.disabled = true;
+});
+
+// ════════════════════════════════════════════
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
