@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=30" />
+  <link rel="stylesheet" href="style.css?v=31" />
 </head>
 <body>
 
@@ -26,15 +26,17 @@
   <!-- 背景圖片（左半） -->
   <div class="sh sh-left">
     <div class="splash-img-bg"></div>
-    <div class="splash-overlay-text">
-      <div class="splash-title-main">雙狼北漂</div>
-      <div class="splash-title-sub">2026 夏 ✈ 6日5夜</div>
-    </div>
   </div>
 
   <!-- 背景圖片（右半） -->
   <div class="sh sh-right">
     <div class="splash-img-bg"></div>
+  </div>
+
+  <!-- 標題文字（在 .sh 之外，不受 clip-path 影響） -->
+  <div class="splash-overlay-text">
+    <div class="splash-title-main">雙狼北漂</div>
+    <div class="splash-title-sub">2026 夏 ✈ 6日5夜</div>
   </div>
 
   <!-- 載入進度條 -->
@@ -475,6 +477,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 </body>
 </html>

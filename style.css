@@ -74,10 +74,17 @@ body {
 .splash-overlay-text {
   position: absolute;
   bottom: 80px;
-  width: 100%;
+  left: 0; right: 0;
   text-align: center;
   pointer-events: none;
+  z-index: 2;
+  animation: fade-in 0.5s ease 0.4s both;
 }
+/* 分割退場時文字一起淡出 */
+#splash.splitting .splash-overlay-text {
+  animation: fade-out-text 0.4s ease both;
+}
+@keyframes fade-out-text { to { opacity: 0; } }
 .splash-title-main {
   font-size: 38px;
   font-weight: 800;
