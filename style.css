@@ -66,6 +66,33 @@ body {
   height: 100%;
   display: block;
 }
+.splash-img-bg {
+  position: absolute;
+  inset: 0;
+  background: url('splash-bg.jpg') center/cover no-repeat;
+}
+.splash-overlay-text {
+  position: absolute;
+  bottom: 80px;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+.splash-title-main {
+  font-size: 38px;
+  font-weight: 800;
+  color: white;
+  font-family: 'Hiragino Sans', 'Noto Sans CJK TC', sans-serif;
+  filter: drop-shadow(0 2px 10px rgba(0,0,0,.7));
+  letter-spacing: 4px;
+}
+.splash-title-sub {
+  font-size: 16px;
+  color: rgba(220,240,255,.95);
+  font-family: sans-serif;
+  margin-top: 6px;
+  filter: drop-shadow(0 1px 6px rgba(0,0,0,.6));
+}
 
 /* Entrance animations */
 .sh-left  { animation: splash-enter-l 0.6s ease-out both; }
@@ -862,9 +889,6 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   /* ─── Transit ─── */
   #page-transit { padding-bottom: env(safe-area-inset-bottom, 8px); }
 
-  /* ─── 角色在手機上移至可見區域（SVG 中心對齊各半） ─── */
-  #snoopy-g { transform: translateX(202px); }
-  #olaf-g   { transform: translateX(-103px); }
 }
 
 /* ════════════════════════════════════════════

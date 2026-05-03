@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=29" />
+  <link rel="stylesheet" href="style.css?v=30" />
 </head>
 <body>
 
@@ -23,234 +23,18 @@
      SPLASH — 富士山左右分裂動畫（冷色調）
 ════════════════════════════════════════════ -->
 <div id="splash">
-  <!-- 左半（含史努比） -->
+  <!-- 背景圖片（左半） -->
   <div class="sh sh-left">
-    <svg class="splash-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="skyL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#0D2B5E"/>
-          <stop offset="30%"  stop-color="#1E4D8C"/>
-          <stop offset="65%"  stop-color="#5A8CC8"/>
-          <stop offset="100%" stop-color="#A8C8E8"/>
-        </linearGradient>
-        <linearGradient id="fujiBodyL" x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0%"   stop-color="#6878B0"/>
-          <stop offset="60%"  stop-color="#5060A0"/>
-          <stop offset="100%" stop-color="#3A4878"/>
-        </linearGradient>
-        <linearGradient id="snowL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#FFFFFF"/>
-          <stop offset="70%"  stop-color="#D8E8F8"/>
-          <stop offset="100%" stop-color="#B0C8E0"/>
-        </linearGradient>
-        <linearGradient id="lakeL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#3A5A8A"/>
-          <stop offset="100%" stop-color="#1A2E50"/>
-        </linearGradient>
-        <radialGradient id="glowL" cx="0.1" cy="0.72" r="0.4">
-          <stop offset="0%"   stop-color="#E8A860" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="#E8A860" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <!-- 冷藍天空 -->
-      <rect width="800" height="500" fill="url(#skyL)"/>
-      <!-- 左側朝霞暖光 -->
-      <rect width="800" height="500" fill="url(#glowL)"/>
-      <!-- 細星點 -->
-      <circle cx="60"  cy="38"  r="1.4" fill="white" opacity="0.7"/>
-      <circle cx="180" cy="22"  r="1.0" fill="white" opacity="0.5"/>
-      <circle cx="290" cy="45"  r="1.2" fill="white" opacity="0.6"/>
-      <circle cx="80"  cy="95"  r="0.8" fill="white" opacity="0.4"/>
-      <!-- 遠景霞光層（水平柔光） -->
-      <rect x="0" y="285" width="800" height="50" fill="#A8BEDC" opacity="0.18"/>
-      <!-- 湖面 -->
-      <rect x="0" y="318" width="800" height="182" fill="url(#lakeL)"/>
-      <!-- 遠處群山輪廓（紫灰色） -->
-      <path d="M0,318 Q80,295 160,308 Q220,292 300,305 Q350,290 400,298 Q450,290 500,305 Q580,292 660,308 Q740,295 800,318 Z" fill="#4A5890" opacity="0.55"/>
-      <!-- 富士山左坡（主體） -->
-      <path d="M-120,350 L400,58 L408,68 L80,350 Z" fill="url(#fujiBodyL)"/>
-      <!-- 左坡明暗（左面光） -->
-      <path d="M-120,350 L400,58 L395,63 L20,350 Z" fill="#7888C0" opacity="0.3"/>
-      <!-- 左坡暗面（向山谷） -->
-      <path d="M120,350 L400,58 L404,65 L200,350 Z" fill="#2A3868" opacity="0.2"/>
-      <!-- 雪頂（左半，寬而真實） -->
-      <path d="M400,58 L344,162 Q358,155 370,165 Q380,170 390,162 Q395,158 400,160" fill="url(#snowL)" stroke="none"/>
-      <!-- 雪線紋理 -->
-      <path d="M344,162 Q362,152 378,160 Q388,167 400,160" stroke="#C0D8F0" stroke-width="1.2" fill="none" opacity="0.7"/>
-      <path d="M355,175 Q375,165 395,170" stroke="#C0D8F0" stroke-width="1.0" fill="none" opacity="0.5"/>
-      <!-- 積雪流紋（向左延伸） -->
-      <path d="M376,170 Q360,182 340,196 Q320,202 300,195" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
-      <path d="M360,192 Q345,198 325,190" stroke="white" stroke-width="1.0" fill="none" opacity="0.3"/>
-      <!-- 樹線（山腳） -->
-      <path d="M0,318 Q30,306 60,314 Q90,303 125,312 Q155,300 190,310 Q215,300 250,308 Q280,298 315,306 Q340,298 370,305 Q390,300 400,302" fill="#1E3A20"/>
-      <!-- 個別松樹 -->
-      <polygon points="50,316 44,296 56,296"  fill="#1E3A20"/>
-      <polygon points="110,312 104,290 116,290" fill="#1E3A20"/>
-      <polygon points="175,308 169,288 181,288" fill="#1E3A20"/>
-      <polygon points="240,306 234,284 246,284" fill="#1E3A20"/>
-      <polygon points="305,304 299,282 311,282" fill="#1E3A20"/>
-      <!-- 湖面倒影（山體） -->
-      <path d="M-120,318 L400,178 L80,318 Z" fill="#4A5890" opacity="0.22"/>
-      <!-- 湖面雪頂倒影 -->
-      <ellipse cx="390" cy="340" rx="50" ry="8" fill="#B8D0E8" opacity="0.18"/>
-      <!-- 水面漣漪線 -->
-      <line x1="0" y1="326" x2="800" y2="326" stroke="white" stroke-width="0.6" opacity="0.12"/>
-      <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
-      <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
-      <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── SNOOPY（快樂舞蹈姿勢：左耳朝上、手臂展開） ── -->
-      <g id="snoopy-g">
-      <g transform="translate(72, 130)">
-        <!-- 尾巴（上捲） -->
-        <path d="M84,128 Q112,108 106,82" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <!-- 身體 -->
-        <ellipse cx="55" cy="158" rx="30" ry="36" fill="white" stroke="#111" stroke-width="3.5"/>
-        <!-- 右臂（向右展開） -->
-        <path d="M82,148 Q110,132 116,118" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <ellipse cx="118" cy="112" rx="11" ry="8" fill="white" stroke="#111" stroke-width="3" transform="rotate(30,118,112)"/>
-        <!-- 左臂（向左展開） -->
-        <path d="M28,144 Q2,128 -4,114" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <ellipse cx="-6" cy="108" rx="11" ry="8" fill="white" stroke="#111" stroke-width="3" transform="rotate(-30,-6,108)"/>
-        <!-- 右腿 -->
-        <path d="M70,190 Q82,210 88,220" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <ellipse cx="92" cy="225" rx="17" ry="10" fill="white" stroke="#111" stroke-width="3" transform="rotate(15,92,225)"/>
-        <!-- 左腿（抬起，跳舞） -->
-        <path d="M40,188 Q28,208 20,218" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <ellipse cx="14" cy="223" rx="17" ry="10" fill="white" stroke="#111" stroke-width="3" transform="rotate(-15,14,223)"/>
-        <!-- 頭（大圓） -->
-        <circle cx="55" cy="60" r="52" fill="white" stroke="#111" stroke-width="3.5"/>
-        <!-- 左耳（朝上！快樂舞蹈標誌） -->
-        <path d="M26,18 C16,2 2,-8 4,4 C6,16 18,26 26,20 Z" fill="#111"/>
-        <!-- 右耳（長垂下） -->
-        <path d="M82,22 C98,38 102,70 100,100 C98,114 84,116 76,104 C68,92 70,60 78,18 Z" fill="#111"/>
-        <!-- 吻部（米黃） -->
-        <ellipse cx="55" cy="84" rx="30" ry="23" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
-        <!-- 鼻頭（吻部上方） -->
-        <ellipse cx="55" cy="70" rx="14" ry="10" fill="#111"/>
-        <!-- 左眼 -->
-        <circle cx="35" cy="46" r="5.5" fill="#111"/>
-        <!-- 右眼 -->
-        <circle cx="72" cy="44" r="5" fill="#111"/>
-        <!-- 開心大笑 -->
-        <path d="M34,94 Q55,110 76,94" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      </g>
-      </g>
-      <!-- 中央文字（左半部分可見） -->
-      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">雙狼北漂</text>
-      <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
-    </svg>
+    <div class="splash-img-bg"></div>
+    <div class="splash-overlay-text">
+      <div class="splash-title-main">雙狼北漂</div>
+      <div class="splash-title-sub">2026 夏 ✈ 6日5夜</div>
+    </div>
   </div>
 
-  <!-- 右半（含歐拉夫） -->
+  <!-- 背景圖片（右半） -->
   <div class="sh sh-right">
-    <svg class="splash-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="skyR" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#0D2B5E"/>
-          <stop offset="30%"  stop-color="#1E4D8C"/>
-          <stop offset="65%"  stop-color="#5A8CC8"/>
-          <stop offset="100%" stop-color="#A8C8E8"/>
-        </linearGradient>
-        <linearGradient id="fujiBodyR" x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0%"   stop-color="#6878B0"/>
-          <stop offset="60%"  stop-color="#5060A0"/>
-          <stop offset="100%" stop-color="#3A4878"/>
-        </linearGradient>
-        <linearGradient id="snowR" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#FFFFFF"/>
-          <stop offset="70%"  stop-color="#D8E8F8"/>
-          <stop offset="100%" stop-color="#B0C8E0"/>
-        </linearGradient>
-        <linearGradient id="lakeR" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#3A5A8A"/>
-          <stop offset="100%" stop-color="#1A2E50"/>
-        </linearGradient>
-        <radialGradient id="glowR" cx="0.92" cy="0.68" r="0.38">
-          <stop offset="0%"   stop-color="#E8B870" stop-opacity="0.35"/>
-          <stop offset="100%" stop-color="#E8B870" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <!-- 冷藍天空 -->
-      <rect width="800" height="500" fill="url(#skyR)"/>
-      <!-- 右側暖光 -->
-      <rect width="800" height="500" fill="url(#glowR)"/>
-      <!-- 星點 -->
-      <circle cx="620" cy="30"  r="1.4" fill="white" opacity="0.7"/>
-      <circle cx="740" cy="55"  r="1.0" fill="white" opacity="0.5"/>
-      <circle cx="510" cy="18"  r="1.2" fill="white" opacity="0.6"/>
-      <circle cx="755" cy="100" r="0.8" fill="white" opacity="0.4"/>
-      <!-- 霞光層 -->
-      <rect x="0" y="285" width="800" height="50" fill="#A8BEDC" opacity="0.18"/>
-      <!-- 湖面 -->
-      <rect x="0" y="318" width="800" height="182" fill="url(#lakeR)"/>
-      <!-- 遠景群山 -->
-      <path d="M400,298 Q450,290 500,305 Q580,292 660,308 Q740,295 800,318 L800,318 L400,318 Z" fill="#4A5890" opacity="0.55"/>
-      <!-- 富士山右坡 -->
-      <path d="M920,350 L400,58 L392,68 L720,350 Z" fill="url(#fujiBodyR)"/>
-      <!-- 右坡明面 -->
-      <path d="M680,350 L400,58 L404,65 L780,350 Z" fill="#8898C8" opacity="0.22"/>
-      <!-- 右坡暗面 -->
-      <path d="M400,58 L396,63 L520,350 L600,350 Z" fill="#2A3868" opacity="0.18"/>
-      <!-- 雪頂（右半） -->
-      <path d="M400,58 L456,162 Q442,155 430,165 Q420,170 410,162 Q405,158 400,160" fill="url(#snowR)" stroke="none"/>
-      <!-- 雪線 -->
-      <path d="M456,162 Q438,152 422,160 Q412,167 400,160" stroke="#C0D8F0" stroke-width="1.2" fill="none" opacity="0.7"/>
-      <path d="M445,175 Q425,165 405,170" stroke="#C0D8F0" stroke-width="1.0" fill="none" opacity="0.5"/>
-      <!-- 積雪流紋（向右延伸） -->
-      <path d="M424,170 Q440,182 460,196 Q480,202 500,195" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
-      <path d="M440,192 Q455,198 475,190" stroke="white" stroke-width="1.0" fill="none" opacity="0.3"/>
-      <!-- 樹線 -->
-      <path d="M400,302 Q410,300 430,305 Q460,298 490,308 Q520,300 550,310 Q580,302 615,312 Q650,304 690,314 Q730,306 770,315 Q790,310 800,318" fill="#1E3A20"/>
-      <!-- 個別松樹 -->
-      <polygon points="460,308 454,288 466,288" fill="#1E3A20"/>
-      <polygon points="520,305 514,283 526,283" fill="#1E3A20"/>
-      <polygon points="585,309 579,289 591,289" fill="#1E3A20"/>
-      <polygon points="650,313 644,291 656,291" fill="#1E3A20"/>
-      <polygon points="720,316 714,294 726,294" fill="#1E3A20"/>
-      <!-- 湖面倒影 -->
-      <path d="M920,318 L400,178 L720,318 Z" fill="#4A5890" opacity="0.22"/>
-      <ellipse cx="410" cy="340" rx="50" ry="8" fill="#B8D0E8" opacity="0.18"/>
-      <!-- 漣漪 -->
-      <line x1="0" y1="326" x2="800" y2="326" stroke="white" stroke-width="0.6" opacity="0.12"/>
-      <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
-      <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
-      <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── OLAF（Peanuts：超圓胖坐姿、藍色貝雷帽） ── -->
-      <g id="olaf-g">
-      <g transform="translate(498, 132)">
-        <!-- 身體（超圓，坐姿幾乎是球形） -->
-        <ellipse cx="62" cy="170" rx="60" ry="56" fill="white" stroke="#111" stroke-width="3.5"/>
-        <!-- 背部黑斑 -->
-        <path d="M84,122 C112,132 116,166 106,192 C98,210 78,212 72,192 C66,172 68,124 84,122 Z" fill="#111"/>
-        <!-- 前腳（坐姿往前伸） -->
-        <ellipse cx="14" cy="216" rx="26" ry="14" fill="white" stroke="#111" stroke-width="3" transform="rotate(-18,14,216)"/>
-        <ellipse cx="110" cy="216" rx="26" ry="14" fill="white" stroke="#111" stroke-width="3" transform="rotate(18,110,216)"/>
-        <!-- 頭（融入身體，幾乎無頸） -->
-        <circle cx="62" cy="96" r="56" fill="white" stroke="#111" stroke-width="3.5"/>
-        <!-- 藍色貝雷帽（Olaf 招牌）-->
-        <path d="M6,54 Q62,28 118,54 Q110,14 62,10 Q14,14 6,54 Z" fill="#5A90CC" stroke="#111" stroke-width="2.5"/>
-        <ellipse cx="62" cy="54" rx="56" ry="16" fill="#4878B8" stroke="#111" stroke-width="2.5"/>
-        <circle cx="62" cy="10" r="7" fill="#4878B8" stroke="#111" stroke-width="2"/>
-        <!-- 帽邊向左壓（微微歪戴） -->
-        <!-- 左耳（小，幾乎被帽子遮） -->
-        <path d="M12,80 C2,92 0,110 2,126 C4,136 14,138 20,130 C26,120 24,96 14,76 Z" fill="#111"/>
-        <!-- 右耳 -->
-        <path d="M108,78 C120,92 120,112 118,128 C116,138 106,140 100,130 C94,120 94,96 106,74 Z" fill="#111"/>
-        <!-- 吻部（非常寬） -->
-        <ellipse cx="62" cy="116" rx="38" ry="28" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
-        <!-- 鼻頭（大，吻部上方） -->
-        <ellipse cx="62" cy="100" rx="18" ry="13" fill="#111"/>
-        <!-- 眼睛（小，距鼻近） -->
-        <circle cx="38" cy="82" r="7" fill="#111"/>
-        <circle cx="84" cy="80" r="7" fill="#111"/>
-        <!-- 嘴 -->
-        <path d="M36,128 Q62,144 88,128" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      </g>
-      </g>
-      <!-- 中央文字（右半部分可見） -->
-      <text x="400" y="400" text-anchor="middle" font-size="36" font-family="'Hiragino Sans','Noto Sans CJK TC',sans-serif" fill="white" font-weight="800" opacity="0.95" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">雙狼北漂</text>
-      <text x="400" y="432" text-anchor="middle" font-size="16" font-family="sans-serif" fill="rgba(200,225,255,.9)">2026 夏 ✈ 6日5夜</text>
-    </svg>
+    <div class="splash-img-bg"></div>
   </div>
 
   <!-- 載入進度條 -->
@@ -691,6 +475,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=29"></script>
+<script src="app.js?v=30"></script>
 </body>
 </html>
