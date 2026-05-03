@@ -171,6 +171,20 @@ function escHtml(str) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function formatAIText(str) {
+  return String(str)
+    .replace(/```[\s\S]*?```/g, '')  // 移除 code block
+    .replace(/`[^`]*`/g, '')         // 移除 inline code
+    .replace(/\*+/g, '')             // 移除 markdown 星號
+    .replace(/#+ /g, '')             // 移除 markdown 標題符號
+    .trim()
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => escHtml(line))
+    .join('<br>');
+}
+
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
@@ -1283,7 +1297,7 @@ document.getElementById('ai-ask-btn')?.addEventListener('click', async () => {
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    resultEl.innerHTML = `<div class="ai-answer">${escHtml(data.answer)}</div>`;
+    resultEl.innerHTML = `<div class="ai-answer">${formatAIText(data.answer)}</div>`;
     const panel = document.getElementById('ai-panel');
     if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
   } catch (err) {

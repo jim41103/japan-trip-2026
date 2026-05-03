@@ -96,7 +96,11 @@ module.exports = async (req, res) => {
       const placeContext = (places || []).length
         ? `（目前行程：${places.map(p => p.name).join('、')}）`
         : '';
-      const data = await callGroq(question + placeContext);
+      const askPrompt = `${question}${placeContext}
+
+請用自然、口語的繁體中文回答，像在跟朋友聊天一樣。
+不要使用 JSON、程式碼、markdown 格式或任何符號標記，直接用白話文回答即可。`;
+      const data = await callGroq(askPrompt);
       const answer = data.choices?.[0]?.message?.content || '';
 
       if (!answer) return res.status(500).json({ error: 'AI 未回傳文字，請確認 GROQ_API_KEY 是否正確' });
