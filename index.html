@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=25" />
+  <link rel="stylesheet" href="style.css?v=26" />
 </head>
 <body>
 
@@ -98,36 +98,41 @@
       <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
       <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
       <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── SNOOPY（Peanuts Schulz 正確比例） ── -->
+      <!-- ── SNOOPY（快樂舞蹈姿勢：左耳朝上、手臂展開） ── -->
       <g id="snoopy-g">
-      <g transform="translate(90, 148)">
+      <g transform="translate(72, 130)">
         <!-- 尾巴（上捲） -->
-        <path d="M80,102 Q108,84 102,58" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M84,128 Q112,108 106,82" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
         <!-- 身體 -->
-        <ellipse cx="50" cy="148" rx="32" ry="40" fill="white" stroke="#111" stroke-width="3"/>
-        <!-- 背部黑斑 -->
-        <path d="M64,114 C84,122 86,148 78,168 C72,182 58,182 52,166 C46,150 48,118 64,114 Z" fill="#111"/>
-        <!-- 項圈 -->
-        <path d="M22,108 Q50,120 78,108" stroke="#111" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <ellipse cx="55" cy="158" rx="30" ry="36" fill="white" stroke="#111" stroke-width="3.5"/>
+        <!-- 右臂（向右展開） -->
+        <path d="M82,148 Q110,132 116,118" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="118" cy="112" rx="11" ry="8" fill="white" stroke="#111" stroke-width="3" transform="rotate(30,118,112)"/>
+        <!-- 左臂（向左展開） -->
+        <path d="M28,144 Q2,128 -4,114" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="-6" cy="108" rx="11" ry="8" fill="white" stroke="#111" stroke-width="3" transform="rotate(-30,-6,108)"/>
+        <!-- 右腿 -->
+        <path d="M70,190 Q82,210 88,220" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <ellipse cx="92" cy="225" rx="17" ry="10" fill="white" stroke="#111" stroke-width="3" transform="rotate(15,92,225)"/>
+        <!-- 左腿（抬起，跳舞） -->
+        <path d="M40,188 Q28,208 20,218" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <ellipse cx="14" cy="223" rx="17" ry="10" fill="white" stroke="#111" stroke-width="3" transform="rotate(-15,14,223)"/>
         <!-- 頭（大圓） -->
-        <circle cx="50" cy="54" r="46" fill="white" stroke="#111" stroke-width="3"/>
-        <!-- 左耳（長黑垂耳） -->
-        <path d="M16,22 C2,36 -4,68 -2,98 C0,112 14,114 22,104 C30,92 28,62 18,18 Z" fill="#111"/>
-        <!-- 右耳 -->
-        <path d="M84,20 C98,34 104,66 102,96 C100,110 86,112 78,102 C70,90 72,60 82,16 Z" fill="#111"/>
-        <!-- 鼻吻（米黃，下臉1/3突出） -->
-        <ellipse cx="50" cy="76" rx="26" ry="20" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
-        <!-- 黑鼻頭（在吻部上方，正確位置） -->
-        <ellipse cx="50" cy="62" rx="12" ry="8" fill="#111"/>
+        <circle cx="55" cy="60" r="52" fill="white" stroke="#111" stroke-width="3.5"/>
+        <!-- 左耳（朝上！快樂舞蹈標誌） -->
+        <path d="M26,18 C16,2 2,-8 4,4 C6,16 18,26 26,20 Z" fill="#111"/>
+        <!-- 右耳（長垂下） -->
+        <path d="M82,22 C98,38 102,70 100,100 C98,114 84,116 76,104 C68,92 70,60 78,18 Z" fill="#111"/>
+        <!-- 吻部（米黃） -->
+        <ellipse cx="55" cy="84" rx="30" ry="23" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
+        <!-- 鼻頭（吻部上方） -->
+        <ellipse cx="55" cy="70" rx="14" ry="10" fill="#111"/>
         <!-- 左眼 -->
-        <circle cx="31" cy="40" r="5" fill="#111"/>
+        <circle cx="35" cy="46" r="5.5" fill="#111"/>
         <!-- 右眼 -->
-        <circle cx="67" cy="38" r="5" fill="#111"/>
-        <!-- 笑容 -->
-        <path d="M32,84 Q50,96 68,84" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- 前腳掌 -->
-        <ellipse cx="22" cy="184" rx="18" ry="10" fill="white" stroke="#111" stroke-width="2.5"/>
-        <ellipse cx="76" cy="184" rx="18" ry="10" fill="white" stroke="#111" stroke-width="2.5"/>
+        <circle cx="72" cy="44" r="5" fill="#111"/>
+        <!-- 開心大笑 -->
+        <path d="M34,94 Q55,110 76,94" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>
       </g>
       </g>
       <!-- 中央文字（左半部分可見） -->
@@ -210,38 +215,36 @@
       <line x1="0" y1="338" x2="800" y2="338" stroke="white" stroke-width="0.5" opacity="0.09"/>
       <line x1="0" y1="354" x2="800" y2="354" stroke="white" stroke-width="0.4" opacity="0.07"/>
       <line x1="0" y1="374" x2="800" y2="374" stroke="white" stroke-width="0.4" opacity="0.05"/>
-      <!-- ── OLAF（Peanuts Snoopy 弟弟：超圓胖比格犬，無帽子） ── -->
+      <!-- ── OLAF（Peanuts：超圓胖坐姿、藍色貝雷帽） ── -->
       <g id="olaf-g">
-      <g transform="translate(510, 148)">
-        <!-- 尾巴 -->
-        <path d="M96,108 Q124,88 116,62" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <!-- 身體（超胖，比史努比大很多） -->
-        <ellipse cx="50" cy="152" rx="52" ry="54" fill="white" stroke="#111" stroke-width="3"/>
+      <g transform="translate(498, 132)">
+        <!-- 身體（超圓，坐姿幾乎是球形） -->
+        <ellipse cx="62" cy="170" rx="60" ry="56" fill="white" stroke="#111" stroke-width="3.5"/>
         <!-- 背部黑斑 -->
-        <path d="M72,106 C96,114 100,146 90,170 C82,188 64,188 58,170 C52,152 54,108 72,106 Z" fill="#111"/>
-        <!-- 項圈 -->
-        <path d="M4,112 Q50,126 96,112" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>
-        <!-- 頭（大圓，跟身體比例相近） -->
-        <circle cx="50" cy="52" r="48" fill="white" stroke="#111" stroke-width="3"/>
-        <!-- 左耳（長黑垂耳，比史努比略短） -->
-        <path d="M14,20 C0,34 -4,66 -2,94 C0,108 14,110 22,100 C30,88 28,58 18,16 Z" fill="#111"/>
+        <path d="M84,122 C112,132 116,166 106,192 C98,210 78,212 72,192 C66,172 68,124 84,122 Z" fill="#111"/>
+        <!-- 前腳（坐姿往前伸） -->
+        <ellipse cx="14" cy="216" rx="26" ry="14" fill="white" stroke="#111" stroke-width="3" transform="rotate(-18,14,216)"/>
+        <ellipse cx="110" cy="216" rx="26" ry="14" fill="white" stroke="#111" stroke-width="3" transform="rotate(18,110,216)"/>
+        <!-- 頭（融入身體，幾乎無頸） -->
+        <circle cx="62" cy="96" r="56" fill="white" stroke="#111" stroke-width="3.5"/>
+        <!-- 藍色貝雷帽（Olaf 招牌）-->
+        <path d="M6,54 Q62,28 118,54 Q110,14 62,10 Q14,14 6,54 Z" fill="#5A90CC" stroke="#111" stroke-width="2.5"/>
+        <ellipse cx="62" cy="54" rx="56" ry="16" fill="#4878B8" stroke="#111" stroke-width="2.5"/>
+        <circle cx="62" cy="10" r="7" fill="#4878B8" stroke="#111" stroke-width="2"/>
+        <!-- 帽邊向左壓（微微歪戴） -->
+        <!-- 左耳（小，幾乎被帽子遮） -->
+        <path d="M12,80 C2,92 0,110 2,126 C4,136 14,138 20,130 C26,120 24,96 14,76 Z" fill="#111"/>
         <!-- 右耳 -->
-        <path d="M86,18 C100,32 104,64 102,92 C100,106 86,108 78,98 C70,86 72,56 82,14 Z" fill="#111"/>
-        <!-- 鼻吻（更寬更胖） -->
-        <ellipse cx="50" cy="76" rx="32" ry="24" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
-        <!-- 黑鼻頭（正確位置：吻部上方） -->
-        <ellipse cx="50" cy="60" rx="14" ry="10" fill="#111"/>
-        <!-- 左眼（寬距） -->
-        <circle cx="28" cy="36" r="6" fill="#111"/>
-        <!-- 右眼 -->
-        <circle cx="70" cy="34" r="6" fill="#111"/>
-        <!-- 嘴（開心） -->
-        <path d="M28,88 Q50,102 72,88" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- 舌頭（伸出來，可愛） -->
-        <ellipse cx="50" cy="96" rx="14" ry="9" fill="#E84040" stroke="#111" stroke-width="2"/>
-        <!-- 胖前腳掌 -->
-        <ellipse cx="6"  cy="198" rx="24" ry="12" fill="white" stroke="#111" stroke-width="2.5"/>
-        <ellipse cx="94" cy="198" rx="24" ry="12" fill="white" stroke="#111" stroke-width="2.5"/>
+        <path d="M108,78 C120,92 120,112 118,128 C116,138 106,140 100,130 C94,120 94,96 106,74 Z" fill="#111"/>
+        <!-- 吻部（非常寬） -->
+        <ellipse cx="62" cy="116" rx="38" ry="28" fill="#F5E5B0" stroke="#111" stroke-width="2.5"/>
+        <!-- 鼻頭（大，吻部上方） -->
+        <ellipse cx="62" cy="100" rx="18" ry="13" fill="#111"/>
+        <!-- 眼睛（小，距鼻近） -->
+        <circle cx="38" cy="82" r="7" fill="#111"/>
+        <circle cx="84" cy="80" r="7" fill="#111"/>
+        <!-- 嘴 -->
+        <path d="M36,128 Q62,144 88,128" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>
       </g>
       </g>
       <!-- 中央文字（右半部分可見） -->
@@ -399,7 +402,7 @@
       </div>
       <!-- AI 問答輸入框 -->
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">💬 問 Claude 任何旅遊問題</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">💬 問 Gemini 任何旅遊問題</div>
         <div class="ai-ask-row">
           <textarea id="ai-ask-input" class="ai-ask-input" placeholder="例：從淺草到秋葉原怎麼去？鎌倉有什麼好吃的？" rows="2"></textarea>
           <button id="ai-ask-btn" class="ai-ask-btn">送出</button>
@@ -688,6 +691,6 @@
   <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

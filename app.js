@@ -1186,10 +1186,12 @@ async function runAISearch() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     renderAIResults(data.suggestions, date, cat);
-    document.getElementById('ai-result')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const panel = document.getElementById('ai-panel');
+    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
   } catch (err) {
     resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">建議失敗：${escHtml(err.message)}</div>`;
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const panel = document.getElementById('ai-panel');
+    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
   }
 }
 
@@ -1282,10 +1284,12 @@ document.getElementById('ai-ask-btn')?.addEventListener('click', async () => {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     resultEl.innerHTML = `<div class="ai-answer">${escHtml(data.answer)}</div>`;
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const panel = document.getElementById('ai-panel');
+    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
   } catch (err) {
     resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">回覆失敗：${escHtml(err.message)}</div>`;
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const panel = document.getElementById('ai-panel');
+    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
   }
 });
 

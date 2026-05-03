@@ -998,7 +998,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .prep-progress-bar { height:100%; border-radius:6px; background:#27AE60; transition:width .4s ease, background .3s; }
 
 /* ── AI Suggest Panel ── */
-.ai-panel { border-top:1px solid var(--border); background:var(--bg-card); padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+.ai-panel { border-top:1px solid var(--border); background:var(--bg-card); padding:14px 16px; display:flex; flex-direction:column; gap:10px; max-height:75vh; overflow-y:auto; }
 .ai-panel-header { display:flex; align-items:center; justify-content:space-between; font-weight:800; font-size:14px; }
 .ai-panel-form { display:flex; flex-direction:column; gap:8px; }
 .ai-panel-row1 { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
