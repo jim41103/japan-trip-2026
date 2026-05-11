@@ -23,14 +23,90 @@ let markers = {}, activeFilter = 'all', activeNotionTab = 0;
 let shopItems = JSON.parse(localStorage.getItem('shopItems') || 'null') || defaultShopItems();
 
 // ════════════════════════════════════════════
-//  SPLASH
+//  SPLASH → LANDING
 // ════════════════════════════════════════════
 setTimeout(() => {
   const s = document.getElementById('splash');
   if (!s) return;
   s.classList.add('splitting');
-  setTimeout(() => { s.style.display = 'none'; }, 750);
+  setTimeout(() => {
+    s.style.display = 'none';
+    showLanding();
+  }, 750);
 }, 2800);
+
+function showLanding() {
+  const landing = document.getElementById('landing');
+  if (!landing) return;
+  landing.style.display = 'flex';
+  showFloatingButtons(false);
+  const cd = document.getElementById('landingCountdown');
+  const daysLeft = Math.ceil((new Date('2026-08-03') - new Date()) / 86400000);
+  if (cd) cd.textContent = daysLeft > 0 ? `✈ 還有 ${daysLeft} 天出發！` : '🎉 旅程進行中！';
+  document.querySelectorAll('.landing-card').forEach(card => {
+    card.onclick = () => {
+      const tab = card.dataset.tab;
+      landing.classList.add('landing-exit');
+      setTimeout(() => {
+        landing.style.display = 'none';
+        landing.classList.remove('landing-exit');
+        switchTab(tab);
+        showFloatingButtons(true);
+      }, 300);
+    };
+  });
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const target = document.getElementById('section-' + tabName);
+  if (!target) return;
+  target.style.display = '';
+  target.classList.add('active');
+  target.classList.add('section-enter');
+  target.addEventListener('animationend', () => target.classList.remove('section-enter'), { once: true });
+  if (tabName === 'itinerary') {
+    document.getElementById('itinerary-panel')?.classList.add('mobile-active');
+    document.getElementById('map-panel')?.classList.remove('mobile-active');
+    setTimeout(() => map.invalidateSize(), 50);
+  }
+  if (tabName === 'shopping') renderShoppingList();
+  if (tabName === 'ledger') {
+    syncPaidByOptions(); renderExpenseList(); renderSettle();
+    drawSpendingChart(expenses); updateCurrencyConvert();
+  }
+  if (tabName === 'prep') updatePrepRing();
+  if (tabName === 'diary') renderDiary();
+}
+
+function showFloatingButtons(show) {
+  document.getElementById('floatAIBtn').style.display = show ? 'flex' : 'none';
+  document.getElementById('homeBtn').style.display    = show ? 'flex' : 'none';
+}
+
+// Home button → back to landing
+document.getElementById('homeBtn').addEventListener('click', () => {
+  document.querySelectorAll('.tab-section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  showLanding();
+});
+
+// Floating AI button → scroll to AI panel in itinerary tab
+document.getElementById('floatAIBtn').addEventListener('click', () => {
+  switchTab('itinerary');
+  setTimeout(() => {
+    const panel = document.getElementById('ai-panel');
+    if (panel) {
+      panel.classList.remove('hidden');
+      panel.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, 400);
+});
 
 // ════════════════════════════════════════════
 //  SERVICE WORKER
@@ -107,54 +183,20 @@ loadWeather();
 // ════════════════════════════════════════════
 document.querySelectorAll('.page-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    // 記帳分頁：開啟 modal，不切換頁面
-    if (tab.dataset.page === 'expense') { openExpenseModal(); return; }
-
+    const page = tab.dataset.page;
     document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const targetPage = document.getElementById(`page-${tab.dataset.page}`);
-    if (!targetPage) return;
-    targetPage.classList.remove('hidden');
-    targetPage.classList.add('active');
-    if (tab.dataset.page === 'shopping') renderShoppingList();
-    if (tab.dataset.page === 'itinerary' && window.MAP) setTimeout(() => window.MAP.invalidateSize(), 50);
-    // 手機行程頁：確保 itinerary-panel 可見
-    if (tab.dataset.page === 'itinerary') {
-      document.getElementById('itinerary-panel')?.classList.add('mobile-active');
-      document.getElementById('map-panel')?.classList.remove('mobile-active');
-      document.getElementById('btn-map-toggle')?.classList.remove('active');
-    }
+    switchTab(page);
   });
 });
 
-// 點擊 Header 標題 → 重播 splash 動畫，結束後切回行程主畫面
+// 點擊 Header 標題 → 返回 Landing
 document.querySelector('.header-title').addEventListener('click', () => {
-  const s = document.getElementById('splash');
-  if (!s) return;
-
-  // 先切回行程 tab（在 splash 後面不可見）
-  document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelector('[data-page="itinerary"]').classList.add('active');
-  document.getElementById('page-itinerary').classList.add('active');
-  if (window.MAP) window.MAP.invalidateSize();
-
-  // 重置並顯示 splash
-  s.classList.remove('splitting');
-  s.style.display = '';
-
-  // 重啟所有 CSS 動畫（強制 reflow）
-  const animated = s.querySelectorAll('.sh-left, .sh-right, .splash-loader, .splash-loader-fill');
-  animated.forEach(el => { el.style.animation = 'none'; });
-  void s.offsetWidth;
-  animated.forEach(el => { el.style.animation = ''; });
-
-  // 2.8 秒後 split 退場
-  setTimeout(() => {
-    s.classList.add('splitting');
-    setTimeout(() => { s.style.display = 'none'; }, 750);
-  }, 2800);
+  document.querySelectorAll('.tab-section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  showLanding();
 });
 
 // ════════════════════════════════════════════
@@ -585,10 +627,11 @@ function renderItinerary() {
     const col = document.createElement('div');
     col.className = 'day-column';
     col.dataset.date = date;
+    const density = getDayDensity(day.places || []);
     col.innerHTML = `
       <div class="day-header">
-        <span>${day.label}</span>
-        <button class="btn-optimize" onclick="optimizeDay('${date}')">🗺 最佳化</button>
+        <span>${day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
+        <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺 最佳化</button>
       </div>
       <div class="day-places" id="day-${date}"></div>
       <div class="day-notes-wrap">
@@ -661,6 +704,13 @@ function renderItinerary() {
 
     renderReviewPhotos(date);
   });
+}
+
+function getDayDensity(places) {
+  const count = (places || []).filter(p => p.time && p.time !== '--未定--').length;
+  if (count >= 5) return { label: '密', cls: 'density-full' };
+  if (count >= 3) return { label: '適', cls: 'density-mid' };
+  return { label: '鬆', cls: 'density-light' };
 }
 
 function buildTimeOptions(selected) {
@@ -984,6 +1034,19 @@ document.getElementById('btn-route-lines').addEventListener('click', function() 
   drawRouteLines();
 });
 
+// 地圖自動 fit 到當日地點
+function fitMapToDay(dayKey) {
+  const places = (itinerary[dayKey]?.places || []).filter(p => p.lat && p.lng);
+  if (!places.length) return;
+  const group = L.featureGroup(places.map(p => L.marker([p.lat, p.lng])));
+  map.fitBounds(group.getBounds().pad(0.25), { animate: true, duration: 0.8 });
+}
+
+// 全圖按鈕
+document.getElementById('mapResetBtn')?.addEventListener('click', () => {
+  map.setView([36.5, 137.5], 7, { animate: true });
+});
+
 // 路線顏色圖例
 function renderRouteLegend() {
   const el = document.getElementById('route-legend');
@@ -1121,21 +1184,33 @@ function updateCountdown() {
 }
 
 function updatePrepProgress() {
-  const all     = document.querySelectorAll('#page-preparation .prep-item input[type=checkbox]');
-  const checked = document.querySelectorAll('#page-preparation .prep-item input[type=checkbox]:checked');
+  const all     = document.querySelectorAll('#section-prep .prep-item input[type=checkbox]');
+  const checked = document.querySelectorAll('#section-prep .prep-item input[type=checkbox]:checked');
   const pct = all.length ? Math.round(checked.length / all.length * 100) : 0;
-  const bar = document.getElementById('prep-progress-bar');
-  const txt = document.getElementById('prep-progress-pct');
-  if (bar) bar.style.width = pct + '%';
-  if (txt) txt.textContent = pct + '%';
-  if (bar) bar.style.background = pct === 100 ? '#27AE60' : pct >= 60 ? '#F39C12' : '#E74C3C';
   if (pct === 100 && !sessionStorage.getItem('prep_complete_toast')) {
     showToast('🎉 行前準備 100% 完成！');
     sessionStorage.setItem('prep_complete_toast', '1');
   }
+  updatePrepRing(pct);
 }
 
-document.getElementById('page-preparation').addEventListener('change', updatePrepProgress);
+function updatePrepRing(pct) {
+  if (pct === undefined) {
+    const all     = document.querySelectorAll('#section-prep .prep-item input[type=checkbox]');
+    const checked = document.querySelectorAll('#section-prep .prep-item input[type=checkbox]:checked');
+    pct = all.length ? Math.round(checked.length / all.length * 100) : 0;
+  }
+  const circumference = 2 * Math.PI * 34; // ~213.6
+  const offset = circumference * (1 - pct / 100);
+  const fill = document.getElementById('prepRingFill');
+  const pctEl = document.getElementById('prepPercent');
+  if (fill) fill.style.strokeDashoffset = offset;
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+document.getElementById('section-prep').addEventListener('change', e => {
+  if (e.target.type === 'checkbox') updatePrepProgress();
+});
 
 // ════════════════════════════════════════════
 //  FEATURE 4: AI ITINERARY SUGGESTIONS
@@ -1307,10 +1382,8 @@ document.getElementById('ai-ask-btn')?.addEventListener('click', async () => {
   }
 });
 
-// 記帳 modal 底部返回按鈕（手機版）
-document.getElementById('expense-close-footer-btn')?.addEventListener('click', () => {
-  document.getElementById('expense-modal').classList.add('hidden');
-});
+// Currency converter change handler
+document.getElementById('twd2jpy')?.addEventListener('input', updateCurrencyConvert);
 
 document.getElementById('btn-save').addEventListener('click', saveItinerary);
 document.getElementById('btn-export').addEventListener('click', async () => {
@@ -1438,7 +1511,7 @@ function renderExpenseList() {
     group.querySelectorAll('.exp-del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         expenses.splice(parseInt(btn.dataset.idx), 1);
-        saveExpenses(); renderExpenseList(); renderSettle();
+        saveExpenses(); renderExpenseList(); renderSettle(); drawSpendingChart(expenses); updateCurrencyConvert();
       });
     });
     area.appendChild(group);
@@ -1480,17 +1553,14 @@ function addExpense() {
   if (!desc) { showToast('請輸入說明'); return; }
   if (!amount||amount<=0) { showToast('請輸入有效金額'); return; }
   expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy });
-  saveExpenses(); renderExpenseList();
+  saveExpenses(); renderExpenseList(); drawSpendingChart(expenses); updateCurrencyConvert();
   document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
   showToast('已加入記帳 ✓');
 }
 function openExpenseModal() {
-  document.getElementById('expense-modal').classList.remove('hidden');
-  syncPaidByOptions(); renderExpenseList(); renderSettle();
+  switchTab('ledger');
+  showFloatingButtons(true);
 }
-document.getElementById('btn-expense').addEventListener('click', openExpenseModal);
-document.getElementById('close-expense').addEventListener('click', () => document.getElementById('expense-modal').classList.add('hidden'));
-document.getElementById('expense-backdrop').addEventListener('click', () => document.getElementById('expense-modal').classList.add('hidden'));
 document.getElementById('btn-add-exp').addEventListener('click', addExpense);
 document.getElementById('exp-amount').addEventListener('keydown', e => { if(e.key==='Enter') addExpense(); });
 document.querySelectorAll('.exp-tab').forEach(tab => {
@@ -1535,7 +1605,7 @@ document.getElementById('btn-export-settle').addEventListener('click', () => {
 //  行前準備 CHECKLIST (localStorage)
 // ════════════════════════════════════════════
 function initPrepChecklists() {
-  document.querySelectorAll('.prep-item input[type="checkbox"]').forEach(cb => {
+  document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]').forEach(cb => {
     const key = cb.dataset.key;
     cb.checked = localStorage.getItem(`prep_${key}`) === '1';
     cb.closest('.prep-item').classList.toggle('checked', cb.checked);
@@ -1618,14 +1688,19 @@ function renderShoppingList() {
         <div class="shop-item ${item.bought?'bought':''}" data-id="${item.id}">
           <input type="checkbox" ${item.bought?'checked':''}>
           <span class="shop-item-name">${escHtml(item.name)}</span>
+          <input type="number" class="shop-price-input" placeholder="¥" min="0" step="100" value="${item.price||''}" style="width:68px;font-size:11px;padding:2px 5px;border:1px solid var(--border);border-radius:8px;background:#fff;outline:none">
           <button class="shop-item-del">×</button>
         </div>`).join('')}`;
 
     block.querySelectorAll('.shop-item').forEach(row => {
       const id = parseInt(row.dataset.id);
-      row.querySelector('input').addEventListener('change', e => {
+      row.querySelector('input[type=checkbox]').addEventListener('change', e => {
         const it = shopItems.find(i=>i.id===id);
         if (it) { it.bought = e.target.checked; saveShopItems(); renderShoppingList(); }
+      });
+      row.querySelector('.shop-price-input').addEventListener('input', e => {
+        const it = shopItems.find(i=>i.id===id);
+        if (it) { it.price = parseFloat(e.target.value) || 0; saveShopItems(); recalcShopBudget(); }
       });
       row.querySelector('.shop-item-del').addEventListener('click', () => {
         if (confirm('刪除此項目？')) {
@@ -1636,6 +1711,7 @@ function renderShoppingList() {
     });
     container.appendChild(block);
   });
+  recalcShopBudget();
 }
 
 document.getElementById('shop-add-btn').addEventListener('click', () => {
@@ -1657,32 +1733,14 @@ document.getElementById('shop-new-name').addEventListener('keydown', e => {
 (function initMobileNav() {
   const nav = document.getElementById('mobile-nav');
   if (!nav) return;
-  // 預設顯示行程
-  document.getElementById('itinerary-panel').classList.add('mobile-active');
-
+  document.getElementById('itinerary-panel')?.classList.add('mobile-active');
   nav.querySelectorAll('.mnav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const panel = btn.dataset.panel;
-      if (panel === 'expense') { openExpenseModal(); return; }
-
-      // Page tab 切換
-      document.querySelectorAll('.page-tab').forEach(t => {
-        if (t.dataset.page === panel) t.click();
-      });
-
-      if (panel === 'itinerary') {
-        nav.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('map-panel').classList.remove('mobile-active');
-        document.getElementById('itinerary-panel').classList.add('mobile-active');
-      }
-      if (panel === 'map') {
-        nav.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('itinerary-panel').classList.remove('mobile-active');
-        document.getElementById('map-panel').classList.add('mobile-active');
-        setTimeout(() => map.invalidateSize(), 60);
-      }
+      nav.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      switchTab(panel);
+      showFloatingButtons(true);
     });
   });
 })();
@@ -2054,15 +2112,220 @@ localStorage.setItem = function(key, value) {
 setInterval(syncPull, 30000);
 
 // ════════════════════════════════════════════
+//  WEATHER TRIP FORECAST (Open-Meteo)
+// ════════════════════════════════════════════
+async function loadTripForecast() {
+  const startDate = '2026-08-03', endDate = '2026-08-08';
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=139.69&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${startDate}&end_date=${endDate}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const bar = document.getElementById('forecastBar');
+    if (!bar || !data.daily) return;
+    bar.innerHTML = data.daily.time.map((date, i) => {
+      const [emoji] = wmo(data.daily.weathercode[i]);
+      const hi  = Math.round(data.daily.temperature_2m_max[i]);
+      const lo  = Math.round(data.daily.temperature_2m_min[i]);
+      const rain = data.daily.precipitation_probability_max[i];
+      const dayLabel = DAY_SHORT[date] || date.slice(5);
+      return `<div class="forecast-day">
+        <div class="fc-date">${dayLabel}</div>
+        <div class="fc-icon">${emoji}</div>
+        <div class="fc-temp">${hi}°/${lo}°</div>
+        <div class="fc-rain">💧${rain}%</div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Forecast fetch failed', e); }
+}
+
+// ════════════════════════════════════════════
+//  SPENDING CHART + CURRENCY CONVERTER
+// ════════════════════════════════════════════
+function drawSpendingChart(expArr) {
+  const canvas = document.getElementById('spendingChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const totals = {};
+  (expArr || []).forEach(e => { totals[e.cat] = (totals[e.cat] || 0) + e.amount; });
+  const entries = Object.entries(totals).filter(([, v]) => v > 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!entries.length) return;
+  const colors = ['#E74C3C','#F39C12','#27AE60','#2980B9','#8E44AD','#16A085','#E67E22'];
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  let startAngle = -Math.PI / 2;
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 10;
+  entries.forEach(([cat, val], i) => {
+    const slice = (val / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    const mid = startAngle + slice / 2;
+    const lx = cx + (r * 0.65) * Math.cos(mid);
+    const ly = cy + (r * 0.65) * Math.sin(mid);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(CAT_EMOJI[cat] || cat, lx, ly + 4);
+    startAngle += slice;
+  });
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.42, 0, 2 * Math.PI);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-card') || '#fff';
+  ctx.fill();
+  ctx.fillStyle = '#1A1A1A';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('¥' + total.toLocaleString(), cx, cy + 5);
+}
+
+function updateCurrencyConvert() {
+  const rate = parseFloat(document.getElementById('twd2jpy')?.value) || 4.55;
+  const totalJPY = (expenses || []).reduce((s, e) => s + e.amount, 0);
+  const totalTWD = Math.round(totalJPY / rate);
+  const el = document.getElementById('totalTWD');
+  if (el) el.textContent = `≈ NT$ ${totalTWD.toLocaleString()}`;
+}
+
+// ════════════════════════════════════════════
+//  SHOPPING: SEARCH + BUDGET
+// ════════════════════════════════════════════
+document.getElementById('shopSearch')?.addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.shop-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+function recalcShopBudget() {
+  let total = 0, spent = 0;
+  document.querySelectorAll('.shop-item').forEach(item => {
+    const price  = parseFloat(item.querySelector('.shop-price-input')?.value) || 0;
+    const checked = item.querySelector('input[type=checkbox]')?.checked;
+    total += price;
+    if (checked) spent += price;
+  });
+  const estEl = document.getElementById('shopTotalEstimate');
+  const spentEl = document.getElementById('shopTotalSpent');
+  if (estEl) estEl.textContent = '¥ ' + total.toLocaleString();
+  if (spentEl) spentEl.textContent = '¥ ' + spent.toLocaleString();
+}
+
+// ════════════════════════════════════════════
+//  TRANSPORT: FILL FROM ITINERARY
+// ════════════════════════════════════════════
+document.getElementById('fillFromItinerary')?.addEventListener('click', () => {
+  const todayKey = Object.keys(DAY_SHORT).find(k => {
+    return new Date(k).toDateString() === new Date().toDateString();
+  }) || Object.keys(DAY_SHORT)[0];
+  const firstActivity = itinerary[todayKey]?.places?.[0];
+  if (firstActivity?.name) {
+    const fromEl = document.getElementById('transit-from');
+    if (fromEl) { fromEl.value = firstActivity.name; showToast('已自動填入出發地 ✓'); }
+  } else {
+    showToast('今日行程尚無地點');
+  }
+});
+
+// ════════════════════════════════════════════
+//  DIARY
+// ════════════════════════════════════════════
+const DIARY_DAYS = ['2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08'];
+let activeDiaryDay = DIARY_DAYS[0];
+
+function renderDiaryDayTabs() {
+  const container = document.getElementById('diaryDayTabs');
+  if (!container) return;
+  container.innerHTML = DIARY_DAYS.map(d =>
+    `<button class="diary-day-tab${d === activeDiaryDay ? ' active' : ''}" data-day="${d}">${DAY_SHORT[d] || d}</button>`
+  ).join('');
+  container.querySelectorAll('.diary-day-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeDiaryDay = btn.dataset.day;
+      renderDiaryDayTabs();
+      renderDiaryContent();
+    });
+  });
+}
+
+function renderDiaryContent() {
+  const container = document.getElementById('diaryContent');
+  if (!container) return;
+  const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
+  const dayData   = diaryData[activeDiaryDay] || { text: '', photos: [] };
+  container.innerHTML = `
+    <h3 class="diary-day-heading">${DAY_SHORT[activeDiaryDay] || activeDiaryDay} 的日記</h3>
+    <div class="diary-photo-upload" id="photoDropzone">
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+      <label for="photoInput" style="cursor:pointer">📷 點擊上傳照片</label>
+    </div>
+    <div class="diary-photos" id="diaryPhotoGrid"></div>
+    <textarea id="diaryText" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="8">${escHtml(dayData.text || '')}</textarea>
+    <button id="saveDiary" class="diary-save-btn">💾 儲存日記</button>`;
+  renderDiaryPhotos(dayData.photos || []);
+  document.getElementById('photoInput').addEventListener('change', e => {
+    [...e.target.files].forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => addDiaryPhoto(ev.target.result);
+      reader.readAsDataURL(file);
+    });
+  });
+  document.getElementById('saveDiary').addEventListener('click', () => {
+    const text = document.getElementById('diaryText').value;
+    const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
+    if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
+    data[activeDiaryDay].text = text;
+    localStorage.setItem('diaryData', JSON.stringify(data));
+    const btn = document.getElementById('saveDiary');
+    btn.textContent = '✅ 已儲存';
+    setTimeout(() => btn.textContent = '💾 儲存日記', 1500);
+  });
+}
+
+function renderDiary() {
+  renderDiaryDayTabs();
+  renderDiaryContent();
+}
+
+function addDiaryPhoto(base64) {
+  const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
+  if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
+  data[activeDiaryDay].photos.push(base64);
+  localStorage.setItem('diaryData', JSON.stringify(data));
+  renderDiaryPhotos(data[activeDiaryDay].photos);
+}
+
+function renderDiaryPhotos(photos) {
+  const grid = document.getElementById('diaryPhotoGrid');
+  if (!grid) return;
+  grid.innerHTML = (photos || []).map((src, i) => `
+    <div class="diary-photo-item">
+      <img src="${src}" alt="照片 ${i+1}">
+      <button class="photo-delete" data-idx="${i}">✕</button>
+    </div>`).join('');
+  grid.querySelectorAll('.photo-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
+      data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
+      localStorage.setItem('diaryData', JSON.stringify(data));
+      renderDiaryContent();
+    });
+  });
+}
+
+// ════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════
 (async () => {
   await loadItinerary();
+  loadTripForecast();
   await loadPlaces();
   await loadExpenses();
   initPrepChecklists();
   renderShoppingList();
   updateCountdown();
-  updatePrepProgress();
+  updatePrepRing();
   await syncPull();
 })();

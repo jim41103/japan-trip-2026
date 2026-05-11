@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=31" />
+  <link rel="stylesheet" href="style.css?v=32" />
 </head>
 <body>
 
@@ -46,6 +46,49 @@
 </div>
 
 <!-- ════════════════════════════════════════════
+     LANDING HUB — shown after splash animation
+════════════════════════════════════════════ -->
+<div id="landing" style="display:none">
+  <div class="landing-header">
+    <div class="landing-logo">🐾 雙狼北漂</div>
+    <div class="landing-subtitle">2026 · 8/3–8/8 · 東京</div>
+    <div class="landing-countdown" id="landingCountdown"></div>
+  </div>
+  <div class="landing-cards">
+    <button class="landing-card" data-tab="itinerary">
+      <span class="landing-card-icon">🗺</span>
+      <span class="landing-card-title">行程</span>
+      <span class="landing-card-desc">每日行程 · 地圖 · AI建議</span>
+    </button>
+    <button class="landing-card" data-tab="prep">
+      <span class="landing-card-icon">🎒</span>
+      <span class="landing-card-title">行前準備</span>
+      <span class="landing-card-desc">待辦清單 · 票券預訂</span>
+    </button>
+    <button class="landing-card" data-tab="shopping">
+      <span class="landing-card-icon">🛍</span>
+      <span class="landing-card-title">購物清單</span>
+      <span class="landing-card-desc">藥妝 · 零食 · 伴手禮</span>
+    </button>
+    <button class="landing-card" data-tab="transport">
+      <span class="landing-card-icon">🚃</span>
+      <span class="landing-card-title">交通</span>
+      <span class="landing-card-desc">搜尋路線 · 乗換案内</span>
+    </button>
+    <button class="landing-card" data-tab="ledger">
+      <span class="landing-card-icon">💴</span>
+      <span class="landing-card-title">記帳</span>
+      <span class="landing-card-desc">旅費拆帳 · 消費統計</span>
+    </button>
+    <button class="landing-card" data-tab="diary">
+      <span class="landing-card-icon">📷</span>
+      <span class="landing-card-title">日記</span>
+      <span class="landing-card-desc">照片上傳 · 旅遊日記</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      WEATHER BAR
 ════════════════════════════════════════════ -->
 <div id="weather-bar">
@@ -68,26 +111,25 @@
   </div>
   <div class="header-actions">
     <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 同步中</span>
-    <button id="btn-expense" class="btn btn-ghost">💴 記帳</button>
-    <button id="btn-export"  class="btn btn-accent">⬇ 儲存</button>
+    <button id="btn-export" class="btn btn-accent">⬇ 儲存</button>
   </div>
 </header>
 
 <!-- ════════════════════════════════════════════
-     PAGE TABS
+     PAGE TABS (hidden — replaced by landing hub)
 ════════════════════════════════════════════ -->
-<nav id="page-tabs">
+<nav id="page-tabs" class="tab-nav">
   <button class="page-tab active" data-page="itinerary">🗺 行程</button>
-  <button class="page-tab" data-page="preparation">🎒 行前準備</button>
+  <button class="page-tab" data-page="prep">🎒 行前準備</button>
   <button class="page-tab" data-page="shopping">🛍 購物清單</button>
-  <button class="page-tab" data-page="transit">🚃 交通</button>
-  <button class="page-tab" data-page="expense" id="tab-expense">💴 記帳</button>
+  <button class="page-tab" data-page="transport">🚃 交通</button>
+  <button class="page-tab" data-page="ledger" id="tab-expense">💴 記帳</button>
 </nav>
 
 <!-- ════════════════════════════════════════════
-     PAGE: 行程
+     SECTION: 行程
 ════════════════════════════════════════════ -->
-<div id="page-itinerary" class="page active">
+<div id="section-itinerary" class="tab-section page" style="display:none">
 
   <!-- 左欄：地圖 -->
   <section id="map-panel">
@@ -95,6 +137,7 @@
       <div class="search-row">
         <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
         <button id="btn-place-search" title="搜尋新地標加入行程">🔍 新地標</button>
+        <button id="mapResetBtn" title="顯示全部地點" style="flex-shrink:0;padding:6px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:13px;cursor:pointer">🗾</button>
       </div>
       <!-- 路線顏色圖例 -->
       <div class="route-legend" id="route-legend"></div>
@@ -157,6 +200,10 @@
         <button id="btn-save"        class="btn btn-save">💾 儲存</button>
       </div>
     </div>
+
+    <!-- 7日天氣預報 -->
+    <div id="forecastBar" class="forecast-bar"></div>
+
     <div id="itinerary-days"></div>
     <div id="timeline-view" class="hidden"></div>
 
@@ -199,18 +246,26 @@
     </div>
   </section>
 
-</div><!-- /page-itinerary -->
+</div><!-- /section-itinerary -->
 
 <!-- ════════════════════════════════════════════
-     PAGE: 行前準備
+     SECTION: 行前準備
 ════════════════════════════════════════════ -->
-<div id="page-preparation" class="page">
-  <div class="prep-progress-wrap">
-    <div class="prep-progress-info">
-      <span class="prep-progress-label">行前準備完成度</span>
-      <span id="prep-progress-pct" class="prep-progress-pct">0%</span>
+<div id="section-prep" class="tab-section page" style="display:none">
+  <!-- 環形進度圖 -->
+  <div class="prep-ring-wrap">
+    <div class="prep-progress-ring-container">
+      <svg class="prep-ring" viewBox="0 0 80 80">
+        <circle class="prep-ring-bg" cx="40" cy="40" r="34"/>
+        <circle class="prep-ring-fill" id="prepRingFill" cx="40" cy="40" r="34"
+                stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+      </svg>
+      <div class="prep-ring-text">
+        <span id="prepPercent">0%</span>
+        <small>完成</small>
+      </div>
     </div>
-    <div class="prep-progress-track"><div id="prep-progress-bar" class="prep-progress-bar" style="width:0%"></div></div>
+    <div class="prep-ring-label">行前準備完成度</div>
   </div>
   <div class="prep-container">
 
@@ -288,16 +343,25 @@
     </div>
 
   </div><!-- /prep-container -->
-</div><!-- /page-preparation -->
+</div><!-- /section-prep -->
 
 <!-- ════════════════════════════════════════════
-     PAGE: 購物清單
+     SECTION: 購物清單
 ════════════════════════════════════════════ -->
-<div id="page-shopping" class="page">
+<div id="section-shopping" class="tab-section page" style="display:none">
   <div class="shop-container">
     <div class="shop-header">
       <h2>🛍 購物清單</h2>
       <div class="shop-stats" id="shop-stats"></div>
+    </div>
+    <!-- 搜尋欄 -->
+    <input id="shopSearch" type="text" placeholder="🔍 搜尋商品…" class="shop-search-input">
+    <!-- 預算統計列 -->
+    <div class="shop-budget-bar">
+      <span>預計總花費：</span>
+      <span id="shopTotalEstimate">¥ 0</span>
+      <span style="margin-left:1rem">已購花費：</span>
+      <span id="shopTotalSpent">¥ 0</span>
     </div>
     <div id="shop-categories"></div>
     <!-- 新增區 -->
@@ -313,18 +377,23 @@
       <button id="shop-add-btn" class="btn btn-accent">＋</button>
     </div>
   </div>
-</div><!-- /page-shopping -->
+</div><!-- /section-shopping -->
 
 <!-- ════════════════════════════════════════════
-     PAGE: 交通搜尋
+     SECTION: 交通搜尋
 ════════════════════════════════════════════ -->
-<div id="page-transit" class="page">
+<div id="section-transport" class="tab-section page" style="display:none">
   <div class="transit-wrap">
     <div class="transit-header">
       <span class="transit-icon">🚃</span>
       <span class="transit-title-text">日本交通搜尋</span>
       <span class="transit-sub">由乗換案内提供路線</span>
     </div>
+
+    <!-- 自動填入按鈕 -->
+    <button id="fillFromItinerary" class="fill-from-itinerary-btn" title="從今日行程第一個地點自動填入出發站">
+      📍 從今日行程自動填入出發地
+    </button>
 
     <!-- 出發地 / 目的地（含自動完成） -->
     <div class="transit-route-row">
@@ -394,33 +463,49 @@
     <!-- 結果區 -->
     <div id="transit-results" class="transit-results hidden"></div>
 
+    <!-- 內嵌結果面板 -->
+    <div id="transitResultPanel" style="display:none;margin-top:1rem;"></div>
+
     <!-- 最近搜尋 -->
     <div id="transit-history-wrap" class="transit-history-wrap hidden">
       <div class="transit-quick-label">最近搜尋</div>
       <div id="transit-history-list" class="transit-history-list"></div>
     </div>
   </div>
-</div><!-- /page-transit -->
+</div><!-- /section-transport -->
 
 <!-- ════════════════════════════════════════════
-     NOTION MODAL
+     SECTION: 記帳（原 expense modal → section）
 ════════════════════════════════════════════ -->
-
-<!-- ════════════════════════════════════════════
-     EXPENSE MODAL
-════════════════════════════════════════════ -->
-<div id="expense-modal" class="modal hidden">
-  <div class="modal-backdrop" id="expense-backdrop"></div>
-  <div class="modal-box expense-box">
-    <div class="modal-header">
+<div id="section-ledger" class="tab-section page" style="display:none">
+  <div class="ledger-wrap">
+    <!-- 標題 -->
+    <div class="ledger-header">
       <h2>💴 旅費記帳</h2>
-      <button id="close-expense" class="btn-close">✕</button>
     </div>
+
+    <!-- 成員名稱 -->
     <div class="expense-members">
       <div class="member-field"><label>成員 A</label><input id="member-a" type="text" value="野狼" maxlength="8"></div>
       <span class="member-sep">⇄</span>
       <div class="member-field"><label>成員 B</label><input id="member-b" type="text" value="美珊" maxlength="8"></div>
     </div>
+
+    <!-- 匯率換算 -->
+    <div class="currency-row">
+      <span>TWD/JPY 換算：</span>
+      <span>1 TWD = </span>
+      <input id="twd2jpy" type="number" value="4.55" step="0.01" style="width:65px;padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+      <span> JPY</span>
+      <span id="totalTWD" style="margin-left:8px;font-weight:700;color:var(--primary)"></span>
+    </div>
+
+    <!-- 消費圓餅圖 -->
+    <div id="spendingChartWrap" style="max-width:280px;margin:0.75rem auto 0">
+      <canvas id="spendingChart" width="280" height="280"></canvas>
+    </div>
+
+    <!-- 明細/拆帳 tabs -->
     <div class="expense-tabs">
       <button class="exp-tab active" data-tab="list">📋 明細</button>
       <button class="exp-tab" data-tab="settle">💰 拆賬</button>
@@ -460,23 +545,38 @@
       <div id="settle-content"></div>
       <button id="btn-export-settle" class="btn btn-outline" style="margin:16px auto;display:block">⬇ 匯出結算</button>
     </div>
-    <!-- 手機專用：底部關閉按鈕 -->
-    <div class="expense-close-footer">
-      <button class="btn-expense-close" id="expense-close-footer-btn">← 返回主畫面</button>
-    </div>
   </div>
-</div>
+</div><!-- /section-ledger -->
+
+<!-- ════════════════════════════════════════════
+     SECTION: 日記
+════════════════════════════════════════════ -->
+<section id="section-diary" class="tab-section page" style="display:none">
+  <div class="diary-wrap">
+    <div class="diary-day-tabs" id="diaryDayTabs"></div>
+    <div class="diary-content" id="diaryContent"></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     FLOATING BUTTONS
+════════════════════════════════════════════ -->
+<button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
+<button id="floatAIBtn" title="AI 旅遊助手" style="display:none">
+  <span>✨</span>
+  <small>AI助手</small>
+</button>
 
 <!-- ════════════════════════════════════════════
      MOBILE NAV
 ════════════════════════════════════════════ -->
-<nav id="mobile-nav">
+<nav id="mobile-nav" style="display:none">
   <button class="mnav-btn active" data-panel="itinerary"><span class="mnav-icon">🗺</span><span class="mnav-label">行程</span></button>
-  <button class="mnav-btn" data-panel="preparation"><span class="mnav-icon">🎒</span><span class="mnav-label">準備</span></button>
+  <button class="mnav-btn" data-panel="prep"><span class="mnav-icon">🎒</span><span class="mnav-label">準備</span></button>
   <button class="mnav-btn" data-panel="shopping"><span class="mnav-icon">🛍</span><span class="mnav-label">購物</span></button>
-  <button class="mnav-btn" data-panel="expense"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
+  <button class="mnav-btn" data-panel="ledger"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>
