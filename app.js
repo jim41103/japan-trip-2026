@@ -622,6 +622,14 @@ const FLIGHT_RETURN = {
   lat: 0, lng: 0, description: '',
 };
 
+function ensureDays() {
+  Object.keys(DAY_SHORT).forEach(date => {
+    if (!itinerary[date]) {
+      itinerary[date] = { label: DAY_SHORT[date], places: [] };
+    }
+  });
+}
+
 function ensureFlights() {
   if (itinerary['2026-08-03']) {
     const places = itinerary['2026-08-03'].places || [];
@@ -644,6 +652,7 @@ async function loadItinerary() {
   // 立刻用靜態檔渲染，不等 sync
   const res = await fetch('/itinerary.json');
   itinerary = await res.json();
+  ensureDays();
   ensureFlights();
   renderItinerary();
   drawRouteLines();
@@ -655,6 +664,7 @@ async function loadItinerary() {
       if (!syncData.itinerary) return;
       const remote = JSON.parse(syncData.itinerary);
       itinerary = remote;
+      ensureDays();
       ensureFlights();
       renderItinerary();
       drawRouteLines();

@@ -1,4 +1,4 @@
-const CACHE = 'tokyo-trip-2026-v35';
+const CACHE = 'tokyo-trip-2026-v36';
 // HTML 不放入快取，永遠從網路取最新版
 const STATIC = ['/style.css?v=35', '/app.js?v=35', '/manifest.json', '/icon.svg'];
 
