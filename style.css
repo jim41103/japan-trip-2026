@@ -1040,9 +1040,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #landing {
   position: fixed;
   inset: 0;
-  background: #1a0a00;
-  background-image: radial-gradient(ellipse at 20% 50%, #3d1a00 0%, transparent 60%),
-                    radial-gradient(ellipse at 80% 20%, #1a0030 0%, transparent 50%);
+  background: linear-gradient(180deg, #080f24 0%, #12244e 30%, #7a3a5a 55%, #c8705a 70%, #c8dde8 100%);
+  overflow: hidden;
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -1055,6 +1054,11 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 @keyframes landingFadeIn {
   from { opacity: 0; transform: scale(0.97); }
   to   { opacity: 1; transform: scale(1); }
+}
+.landing-header,
+.landing-cards {
+  position: relative;
+  z-index: 1;
 }
 .landing-header { text-align: center; }
 .landing-logo { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; }
@@ -1452,3 +1456,107 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   transition: opacity 0.15s;
 }
 .ai-send-btn:hover { opacity: 0.85; }
+
+/* ════════════════════════════════════════════
+   DAY COLUMN: header buttons + inline add form
+════════════════════════════════════════════ */
+.day-header-btns {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.btn-add-activity {
+  font-size: 10px;
+  padding: 2px 7px;
+  background: rgba(255,180,50,.22);
+  color: #ffe080;
+  border: 1px solid rgba(255,180,50,.5);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.btn-add-activity:hover { background: rgba(255,180,50,.38); color: #fff; }
+
+.day-add-form {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.add-form-time {
+  width: 80px;
+  padding: 3px 5px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+.add-form-name {
+  flex: 1;
+  padding: 3px 7px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+}
+.add-form-name:focus, .add-form-time:focus { outline: none; border-color: #4A90E2; }
+.add-form-confirm {
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: none;
+  background: #27AE60;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.add-form-confirm:hover { background: #1e9152; }
+.add-form-cancel {
+  padding: 3px 7px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.add-form-cancel:hover { background: var(--border); }
+
+/* ── Locked flight card ── */
+.iplace-locked {
+  background: linear-gradient(135deg, #0a1528 0%, #1a2a4e 100%);
+  border: 1.5px solid rgba(255,180,50,.45);
+  border-radius: 8px;
+  padding: 7px 9px 6px;
+  cursor: default;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.iplace-locked .iplace-name { color: #ffe080; }
+.iplace-locked-note {
+  font-size: 9.5px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+.iplace-time-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,180,50,.9);
+  background: rgba(255,180,50,.1);
+  border-radius: 6px;
+  padding: 1px 6px;
+}

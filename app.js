@@ -599,12 +599,52 @@ Sortable.create(document.getElementById('wishlist-list'), {
 renderWishlist();
 
 // ════════════════════════════════════════════
+//  LOCKED FLIGHT DATA
+// ════════════════════════════════════════════
+const FLIGHT_OUTBOUND = {
+  id: 'flight-outbound',
+  name: '✈ 捷星 GK12 出發 — 桃園T1 02:40 → 成田T2 07:00',
+  time: '02:40',
+  type: 'transport',
+  locked: true,
+  note: '捷星日本 GK12 | 桃園國際機場第1航站 02:40 起飛 → 東京成田國際機場第2航站 07:00 抵達 | 飛行時間 3小時20分 | 訂位號：YQETNT | 野狼 + 美珊 | 手提7kg 寄艙20kg',
+  icon: '✈',
+  lat: 0, lng: 0, description: '',
+};
+const FLIGHT_RETURN = {
+  id: 'flight-return',
+  name: '✈ 捷星 GK11 返台 — 成田T3 22:40 → 桃園T1 01:30(+1)',
+  time: '22:40',
+  type: 'transport',
+  locked: true,
+  note: '捷星日本 GK11 | 東京成田國際機場第3航站 22:40 起飛 → 台北桃園國際機場第1航站 08/10 01:30 抵達 | 飛行時間 3小時50分 | 訂位號：ZPNERW | 野狼座位11F、美珊座位11E | 手提7kg 寄艙20kg',
+  icon: '✈',
+  lat: 0, lng: 0, description: '',
+};
+
+function ensureFlights() {
+  if (itinerary['2026-08-03']) {
+    const places = itinerary['2026-08-03'].places || [];
+    if (!places.some(p => p.id === 'flight-outbound')) {
+      itinerary['2026-08-03'].places = [FLIGHT_OUTBOUND, ...places];
+    }
+  }
+  if (itinerary['2026-08-09']) {
+    const places = itinerary['2026-08-09'].places || [];
+    if (!places.some(p => p.id === 'flight-return')) {
+      itinerary['2026-08-09'].places = [...places, FLIGHT_RETURN];
+    }
+  }
+}
+
+// ════════════════════════════════════════════
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
   // 立刻用靜態檔渲染，不等 sync
   const res = await fetch('/itinerary.json');
   itinerary = await res.json();
+  ensureFlights();
   renderItinerary();
   drawRouteLines();
   renderRouteLegend();
@@ -615,6 +655,7 @@ async function loadItinerary() {
       if (!syncData.itinerary) return;
       const remote = JSON.parse(syncData.itinerary);
       itinerary = remote;
+      ensureFlights();
       renderItinerary();
       drawRouteLines();
     })
@@ -634,8 +675,17 @@ function renderItinerary() {
     const density = getDayDensity(day.places || []);
     col.innerHTML = `
       <div class="day-header">
-        <span>${day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
-        <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺 最佳化</button>
+        <span>${DAY_SHORT[date] || day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
+        <div class="day-header-btns">
+          <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺</button>
+          <button class="btn-add-activity" data-date="${date}" title="新增行程">＋ 新增</button>
+        </div>
+      </div>
+      <div class="day-add-form" id="add-form-${date}" style="display:none">
+        <input type="time" class="add-form-time" value="09:00">
+        <input type="text" class="add-form-name" placeholder="活動名稱…" maxlength="40">
+        <button class="add-form-confirm" data-date="${date}">✓</button>
+        <button class="add-form-cancel" data-date="${date}">✕</button>
       </div>
       <div class="day-places" id="day-${date}"></div>
       <div class="day-notes-wrap">
@@ -656,6 +706,7 @@ function renderItinerary() {
     renderDayPlaces(placesList, date);
     Sortable.create(placesList, {
       group: 'itinerary', animation: 150,
+      filter: '.iplace-locked',
       ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
       onEnd: function(evt) {
         syncItineraryFromDOM();
@@ -670,6 +721,34 @@ function renderItinerary() {
     col.querySelector('.day-notes').addEventListener('blur', () => {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
       if (itinerary[date]) itinerary[date].notes = txt;
+    });
+
+    // 新增行程 inline form
+    col.querySelector('.btn-add-activity').addEventListener('click', () => {
+      const form = document.getElementById(`add-form-${date}`);
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+      if (form.style.display === 'flex') form.querySelector('.add-form-name').focus();
+    });
+    col.querySelector('.add-form-cancel').addEventListener('click', () => {
+      document.getElementById(`add-form-${date}`).style.display = 'none';
+    });
+    col.querySelector('.add-form-confirm').addEventListener('click', () => {
+      const form = document.getElementById(`add-form-${date}`);
+      const time = form.querySelector('.add-form-time').value;
+      const name = form.querySelector('.add-form-name').value.trim();
+      if (!name) { form.querySelector('.add-form-name').focus(); return; }
+      if (!itinerary[date].places) itinerary[date].places = [];
+      itinerary[date].places.push({ name, time, type: 'other', description: '', lat: 0, lng: 0 });
+      renderDayPlaces(placesList, date);
+      drawRouteLines();
+      if (typeof renderTimelineView === 'function' && timelineMode) renderTimelineView();
+      form.querySelector('.add-form-name').value = '';
+      form.style.display = 'none';
+      showToast(`已新增「${name}」✓`);
+    });
+    col.querySelector('.add-form-name').addEventListener('keydown', e => {
+      if (e.key === 'Enter') col.querySelector(`.add-form-confirm[data-date="${date}"]`).click();
+      if (e.key === 'Escape') col.querySelector(`.add-form-cancel[data-date="${date}"]`).click();
     });
 
   });
@@ -709,15 +788,37 @@ function renderDayPlaces(container, date) {
 }
 
 function makePlaceCard(place, date, pIdx) {
-  const icon = place.type==='restaurant' ? '🍽' : place.type==='hotel' ? '🏨' : '🏯';
   const card = document.createElement('div');
-  card.className = 'itinerary-place';
   card.dataset.name = place.name;
-  card.dataset.lat  = place.lat;
-  card.dataset.lng  = place.lng;
+  card.dataset.lat  = place.lat || 0;
+  card.dataset.lng  = place.lng || 0;
   card.dataset.type = place.type;
   card.dataset.description = place.description || '';
   card.dataset.time = place.time || '';
+
+  // 鎖定的航班卡片（不可拖曳、不可刪除）
+  if (place.locked) {
+    card.className = 'itinerary-place iplace-locked';
+    card.dataset.locked = 'true';
+    card.dataset.id   = place.id || '';
+    card.dataset.note = place.note || '';
+    card.dataset.icon = place.icon || '✈';
+    card.innerHTML = `
+      <div class="iplace-top">
+        <span class="iplace-icon">${place.icon || '✈'}</span>
+        <div class="iplace-info" style="min-width:0">
+          <div class="iplace-name" style="font-size:11px;white-space:normal;line-height:1.3">${escHtml(place.name)}</div>
+        </div>
+      </div>
+      ${place.note ? `<div class="iplace-locked-note">${escHtml(place.note)}</div>` : ''}
+      <div class="iplace-bottom">
+        <span class="iplace-time-badge">${escHtml(place.time || '')}</span>
+      </div>`;
+    return card;
+  }
+
+  const icon = place.type==='restaurant' ? '🍽' : place.type==='hotel' ? '🏨' : place.type==='transport' ? '🚌' : '🏯';
+  card.className = 'itinerary-place';
   card.innerHTML = `
     <div class="iplace-top">
       <span class="iplace-icon">${icon}</span>
@@ -757,14 +858,25 @@ function syncItineraryFromDOM() {
     const container = document.getElementById(`day-${date}`);
     if (!container) return;
     const cards = container.querySelectorAll('.itinerary-place');
-    itinerary[date].places = Array.from(cards).map(card => ({
-      name: card.dataset.name,
-      lat: parseFloat(card.dataset.lat) || 0,
-      lng: parseFloat(card.dataset.lng) || 0,
-      type: card.dataset.type,
-      description: card.dataset.description,
-      time: card.querySelector?.('.iplace-time')?.value || card.dataset.time || '',
-    }));
+    itinerary[date].places = Array.from(cards).map(card => {
+      const base = {
+        name: card.dataset.name,
+        lat: parseFloat(card.dataset.lat) || 0,
+        lng: parseFloat(card.dataset.lng) || 0,
+        type: card.dataset.type,
+        description: card.dataset.description || '',
+        time: card.querySelector?.('.iplace-time')?.value || card.dataset.time || '',
+      };
+      if (card.dataset.locked === 'true') {
+        Object.assign(base, {
+          locked: true,
+          id:   card.dataset.id   || '',
+          note: card.dataset.note || '',
+          icon: card.dataset.icon || '',
+        });
+      }
+      return base;
+    });
     if (cards.length === 0) container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
   });
   drawRouteLines();
