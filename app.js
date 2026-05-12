@@ -10,6 +10,7 @@ const DAY_SHORT = {
   '2026-08-03': '8/3 (一)', '2026-08-04': '8/4 (二)',
   '2026-08-05': '8/5 (三)', '2026-08-06': '8/6 (四)',
   '2026-08-07': '8/7 (五)', '2026-08-08': '8/8 (六)',
+  '2026-08-09': '8/9 (日)',
 };
 const CAT_EMOJI  = { food:'🍽', ticket:'🎫', transport:'🚌', shopping:'🛍', hotel:'🏨', medicine:'💊', other:'📦' };
 const CAT_LABEL  = { food:'餐飲', ticket:'票券', transport:'交通', shopping:'購物', hotel:'住宿', medicine:'藥妝', other:'其他' };
@@ -57,7 +58,10 @@ function showLanding() {
   });
 }
 
+let activeSection = 'itinerary';
+
 function switchTab(tabName) {
+  activeSection = tabName;
   document.querySelectorAll('.tab-section').forEach(s => {
     s.classList.remove('active');
     s.style.display = 'none';
@@ -80,6 +84,9 @@ function switchTab(tabName) {
   }
   if (tabName === 'prep') updatePrepRing();
   if (tabName === 'diary') renderDiary();
+  // 如 AI 抽屜開著，同步更新快捷提示
+  const drawer = document.getElementById('aiDrawer');
+  if (drawer && drawer.style.display !== 'none') renderAIQuickPrompts(tabName);
 }
 
 function showFloatingButtons(show) {
@@ -96,16 +103,13 @@ document.getElementById('homeBtn').addEventListener('click', () => {
   showLanding();
 });
 
-// Floating AI button → scroll to AI panel in itinerary tab
+// Floating AI button → open global AI drawer
 document.getElementById('floatAIBtn').addEventListener('click', () => {
-  switchTab('itinerary');
-  setTimeout(() => {
-    const panel = document.getElementById('ai-panel');
-    if (panel) {
-      panel.classList.remove('hidden');
-      panel.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, 400);
+  const drawer = document.getElementById('aiDrawer');
+  drawer.style.display = 'flex';
+  requestAnimationFrame(() => drawer.classList.add('ai-drawer-open'));
+  renderAIQuickPrompts(activeSection);
+  document.getElementById('aiInput').focus();
 });
 
 // ════════════════════════════════════════════
@@ -645,20 +649,6 @@ function renderItinerary() {
           <a class="hotel-gmaps" href="${googleMapsUrl(HOTEL)}" target="_blank" rel="noopener" title="在 Google Maps 查看">📍</a>
           <span class="hotel-badge">住宿</span>
         </div>
-      </div>
-      <div class="day-review-wrap">
-        <button class="day-review-toggle" data-date="${date}">
-          <span>📸 回顧</span>
-          <span class="review-toggle-arrow">▼</span>
-        </button>
-        <div class="day-review-body" id="review-body-${date}" style="display:none">
-          <textarea class="day-review-text" data-date="${date}" placeholder="記錄今天的精彩…" rows="3">${escHtml(day.review?.text||'')}</textarea>
-          <div class="day-review-photos" id="review-photos-${date}"></div>
-          <label class="review-add-photo" title="上傳照片">
-            📷 新增照片
-            <input type="file" accept="image/*" multiple style="display:none" data-date="${date}">
-          </label>
-        </div>
       </div>`;
     container.appendChild(col);
 
@@ -682,27 +672,6 @@ function renderItinerary() {
       if (itinerary[date]) itinerary[date].notes = txt;
     });
 
-    // Review toggle
-    col.querySelector('.day-review-toggle').addEventListener('click', () => {
-      const body  = document.getElementById(`review-body-${date}`);
-      const arrow = col.querySelector('.review-toggle-arrow');
-      const open  = body.style.display === 'none';
-      body.style.display = open ? '' : 'none';
-      arrow.classList.toggle('open', open);
-      if (open) renderReviewPhotos(date);
-    });
-
-    // Review text auto-save
-    col.querySelector('.day-review-text').addEventListener('blur', () => {
-      const txt = col.querySelector(`.day-review-text[data-date="${date}"]`).value;
-      if (!itinerary[date].review) itinerary[date].review = {};
-      itinerary[date].review.text = txt;
-    });
-
-    // Photo upload
-    col.querySelector('input[type="file"]').addEventListener('change', e => handlePhotoUpload(e, date));
-
-    renderReviewPhotos(date);
   });
 }
 
@@ -802,54 +771,6 @@ function syncItineraryFromDOM() {
   if (timelineMode) renderTimelineView();
 }
 
-// ════════════════════════════════════════════
-//  REVIEW PHOTOS (localStorage)
-// ════════════════════════════════════════════
-function getReviewPhotos(date) {
-  return JSON.parse(localStorage.getItem(`review_photos_${date}`) || '[]');
-}
-function saveReviewPhotos(date, photos) {
-  localStorage.setItem(`review_photos_${date}`, JSON.stringify(photos));
-}
-function renderReviewPhotos(date) {
-  const wrap = document.getElementById(`review-photos-${date}`);
-  if (!wrap) return;
-  const photos = getReviewPhotos(date);
-  wrap.innerHTML = '';
-  photos.forEach((src, i) => {
-    const img = document.createElement('img');
-    img.src = src; img.className = 'review-photo-thumb';
-    img.title = '點擊刪除';
-    img.addEventListener('click', () => {
-      if (confirm('刪除這張照片？')) {
-        const updated = getReviewPhotos(date);
-        updated.splice(i, 1);
-        saveReviewPhotos(date, updated);
-        renderReviewPhotos(date);
-      }
-    });
-    wrap.appendChild(img);
-  });
-}
-function handlePhotoUpload(e, date) {
-  const files = Array.from(e.target.files);
-  const photos = getReviewPhotos(date);
-  let loaded = 0;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      photos.push(ev.target.result);
-      loaded++;
-      if (loaded === files.length) {
-        saveReviewPhotos(date, photos);
-        renderReviewPhotos(date);
-        showToast(`已加入 ${files.length} 張照片 ✓`);
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-  e.target.value = '';
-}
 
 // ════════════════════════════════════════════
 //  DAY OPERATIONS
@@ -966,15 +887,10 @@ document.getElementById('close-nearby').addEventListener('click', () => {
 // ════════════════════════════════════════════
 async function saveItinerary() {
   syncItineraryFromDOM();
-  // 收集 notes 與 review.text
+  // 收集 notes
   Object.keys(itinerary).forEach(date => {
     const notesEl = document.querySelector(`.day-notes[data-date="${date}"]`);
     if (notesEl) itinerary[date].notes = notesEl.value;
-    const revEl = document.querySelector(`.day-review-text[data-date="${date}"]`);
-    if (revEl) {
-      if (!itinerary[date].review) itinerary[date].review = {};
-      itinerary[date].review.text = revEl.value;
-    }
   });
   try {
     await fetch('/api/sync', {
@@ -995,6 +911,7 @@ const DAY_COLORS = {
   '2026-08-06': '#2980B9',
   '2026-08-07': '#8E44AD',
   '2026-08-08': '#16A085',
+  '2026-08-09': '#D35400',
 };
 let routePolylines = {};
 let routeNumMarkers = {};
@@ -1223,6 +1140,7 @@ const DAY_AI_CENTERS = {
   '2026-08-06': { lat: 35.681, lng: 139.767, area: '東京' },
   '2026-08-07': { lat: 35.681, lng: 139.767, area: '東京' },
   '2026-08-08': { lat: 35.681, lng: 139.767, area: '東京' },
+  '2026-08-09': { lat: 35.681, lng: 139.767, area: '東京' },
 };
 
 // 每個分類對應的 Nominatim 關鍵字
@@ -1234,153 +1152,139 @@ const AI_CAT_QUERIES = {
   mix:      '観光地 名所',
 };
 
-let aiActiveCat = 'culture';
+// ════════════════════════════════════════════
+//  GLOBAL AI DRAWER
+// ════════════════════════════════════════════
+const AI_QUICK_PROMPTS = {
+  itinerary: [
+    { label: '📍 附近有什麼推薦景點？',   text: '根據我今天的行程，附近有什麼值得去的景點或咖啡廳？' },
+    { label: '⏱ 行程時間是否合理？',      text: '幫我檢查今天的行程時間安排是否合理，有沒有趕場的問題？' },
+    { label: '🍜 幫我找餐廳',              text: '今天行程附近有什麼好吃的餐廳推薦？請給我 3 個選項。' },
+    { label: '🌧 下雨備案',               text: '如果明天下雨，有什麼室內景點可以替換今天的行程？' },
+  ],
+  shopping: [
+    { label: '💊 藥妝必買清單',            text: '日本藥妝店有哪些是台灣人必買的？幫我列出最值得買的 10 樣。' },
+    { label: '🎁 伴手禮推薦',              text: '幫我推薦適合帶回台灣的日本伴手禮，預算在 ¥500 以內。' },
+    { label: '🛍 哪裡購物最划算？',        text: '東京哪些地方購物最划算？免稅門檻是多少？' },
+    { label: '💴 預算分配建議',            text: '7 天的東京行程，購物預算大概要抓多少才夠？' },
+  ],
+  prep: [
+    { label: '📋 出發前還要做什麼？',      text: '出發去日本前 3 天，還有哪些重要的事情要確認？' },
+    { label: '💴 換匯建議',               text: '去日本旅遊要帶多少現金？哪裡換日幣最划算？' },
+    { label: '📱 網路方案',               text: '去日本旅遊，eSIM、WiFi 分享器還是當地 SIM 卡哪個最划算？' },
+    { label: '🏥 日本醫療與保險',         text: '在日本生病或受傷怎麼辦？旅遊保險要買嗎？' },
+  ],
+  transport: [
+    { label: '🚆 IC 卡還是 JR Pass？',    text: '7 天的東京行程，買 Suica/PASMO 還是 JR Pass 比較划算？' },
+    { label: '✈ 羽田到市區怎麼去？',     text: '從羽田機場到淺草田原町站最快的方法是什麼？費用大概多少？' },
+    { label: '🗺 河口湖怎麼去？',         text: '從東京去河口湖，搭高速巴士還是搭電車比較方便？' },
+    { label: '🚌 深夜沒車怎麼辦？',       text: '東京末班車大概幾點？如果錯過了有什麼選擇？' },
+  ],
+  ledger: [
+    { label: '💰 東京旅遊預算參考',       text: '7 天東京旅遊，餐費、交通、住宿、購物各應該預算多少？' },
+    { label: '🏨 住宿費用行情',           text: '淺草田原町一帶的商務旅館，一晚大概要多少錢？' },
+    { label: '🍱 每日餐費怎麼抓？',       text: '在東京旅遊，三餐加點心，一天的餐費大概要抓多少？' },
+  ],
+  diary: [
+    { label: '✍ 幫我寫今天的旅遊日記',   text: '根據以下地點幫我寫一段旅遊日記：' },
+    { label: '📸 照片說明文字',           text: '幫我為這張在日本拍的照片寫一段 Instagram 說明文字（中英文各一）' },
+    { label: '🌸 旅行感想',              text: '我今天去了東京，幫我用詩意的方式描述這個城市的感受。' },
+  ],
+};
 
-document.getElementById('btn-ai-suggest').addEventListener('click', () => {
-  const panel = document.getElementById('ai-panel');
-  panel.classList.toggle('hidden');
-  if (!panel.classList.contains('hidden')) {
-    const firstVisibleDay = document.querySelector('.day-column')?.dataset?.date;
-    const sel = document.getElementById('ai-date-sel');
-    if (sel && firstVisibleDay) sel.value = firstVisibleDay;
-  }
-});
-document.getElementById('ai-close').addEventListener('click', () => {
-  document.getElementById('ai-panel').classList.add('hidden');
-});
-
-// 分類分頁切換
-document.querySelector('.ai-cat-tabs').addEventListener('click', e => {
-  const tab = e.target.closest('.ai-cat-tab');
-  if (!tab) return;
-  document.querySelectorAll('.ai-cat-tab').forEach(t => t.classList.remove('active'));
-  tab.classList.add('active');
-  aiActiveCat = tab.dataset.cat;
-});
-
-async function runAISearch() {
-  const date = document.getElementById('ai-date-sel').value;
-  const cat  = aiActiveCat;
-  const resultEl = document.getElementById('ai-result');
-  resultEl.innerHTML = '<div class="ai-loading">🤖 AI 分析中，請稍候…</div>';
-
-  const dayPlaces = itinerary[date]?.places || [];
-
-  try {
-    const res = await fetch('/api/suggest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'recommend', date, places: dayPlaces, category: cat }),
+function renderAIQuickPrompts(section) {
+  const prompts = AI_QUICK_PROMPTS[section] || AI_QUICK_PROMPTS['itinerary'];
+  const container = document.getElementById('aiQuickPrompts');
+  if (!container) return;
+  container.innerHTML = prompts.map(p =>
+    `<button class="ai-quick-btn" data-text="${encodeURIComponent(p.text)}">${p.label}</button>`
+  ).join('');
+  container.querySelectorAll('.ai-quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = decodeURIComponent(btn.dataset.text);
+      document.getElementById('aiInput').value = text;
+      document.getElementById('aiInput').focus();
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    renderAIResults(data.suggestions, date, cat);
-    const panel = document.getElementById('ai-panel');
-    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
-  } catch (err) {
-    resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">建議失敗：${escHtml(err.message)}</div>`;
-    const panel = document.getElementById('ai-panel');
-    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
+  });
+}
+
+function getTodayDayKey() {
+  return Object.keys(DAY_SHORT).find(k =>
+    new Date(k).toDateString() === new Date().toDateString()
+  ) || Object.keys(DAY_SHORT)[0];
+}
+
+function closeAIDrawer() {
+  const drawer = document.getElementById('aiDrawer');
+  drawer.classList.remove('ai-drawer-open');
+  setTimeout(() => { drawer.style.display = 'none'; }, 300);
+}
+
+document.getElementById('aiCloseBtn').addEventListener('click', closeAIDrawer);
+
+document.getElementById('aiSendBtn').addEventListener('click', sendAIMessage);
+document.getElementById('aiInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIMessage(); }
+});
+
+async function sendAIMessage() {
+  const input = document.getElementById('aiInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  appendAIMessage(text, 'user');
+  input.value = '';
+  const ctx = buildAIContext();
+  const fullPrompt = ctx + '\n\n用戶問題：' + text;
+  appendAIMessage('⏳ 思考中...', 'bot', 'thinking');
+  try {
+    const reply = await callAIEndpoint(fullPrompt);
+    removeThinkingMessage();
+    appendAIMessage(reply, 'bot');
+  } catch {
+    removeThinkingMessage();
+    appendAIMessage('❌ 抱歉，AI 暫時無法回應，請稍後再試。', 'bot');
   }
 }
 
-function renderAIResults(data, date, cat) {
-  const resultEl = document.getElementById('ai-result');
-  const catLabels = { culture:'文化景點', food:'美食', shopping:'購物', relax:'輕鬆', mix:'綜合' };
-  const existing  = new Set((itinerary[date]?.places || []).map(p => p.name));
-
-  if (!data || data.length === 0) {
-    resultEl.innerHTML = `<div class="ai-loading">找不到${catLabels[cat]}推薦</div>`;
-    return;
-  }
-
-  resultEl.innerHTML = `
-    <div class="ai-result-title">🤖 AI 推薦・${catLabels[cat] || cat}</div>
-    ${data.map((item, i) => {
-      const name    = item.name || '';
-      const desc    = item.desc || '';
-      const lat     = parseFloat(item.lat) || 0;
-      const lng     = parseFloat(item.lng) || 0;
-      const gmapUrl = googleMapsSearchUrl(name, lat, lng);
-      const inPlan  = existing.has(name);
-      return `
-        <div class="ai-suggestion-item">
-          <div class="ai-sugg-info">
-            <span class="ai-sugg-num">${i+1}</span>
-            <div>
-              <div class="ai-sugg-name">${escHtml(name)}</div>
-              <div class="ai-sugg-desc">${escHtml(desc)}</div>
-            </div>
-          </div>
-          <div class="ai-sugg-actions">
-            <button class="ai-add-btn${inPlan ? ' disabled' : ''}"
-              data-date="${date}" data-name="${escHtml(name)}"
-              data-lat="${lat}" data-lng="${lng}"
-              data-type="attraction" data-desc="${escHtml(desc)}"
-              ${inPlan ? 'disabled' : ''}>
-              ${inPlan ? '✓ 已加入' : '＋ 加入'}
-            </button>
-            <a class="ai-gmap-btn" href="${gmapUrl}" target="_blank" rel="noopener">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-              地圖
-            </a>
-          </div>
-        </div>`;
-    }).join('')}`;
-}
-
-document.getElementById('ai-generate-btn').addEventListener('click', runAISearch);
-
-document.getElementById('ai-result').addEventListener('click', e => {
-  const btn = e.target.closest('.ai-add-btn');
-  if (!btn || btn.disabled) return;
-  const date  = btn.dataset.date;
-  const place = {
-    name: btn.dataset.name,
-    lat: parseFloat(btn.dataset.lat),
-    lng: parseFloat(btn.dataset.lng),
-    type: btn.dataset.type,
-    description: btn.dataset.desc,
+function buildAIContext() {
+  const today = getTodayDayKey();
+  const todayPlan = (itinerary[today]?.places || []).map(p => p.name).join('、') || '尚未安排';
+  const base = `你是一個專業的日本旅遊助手，正在協助用戶規劃 2026年8月3日至8月9日的東京旅行。旅客：野狼 & 美珊（台灣旅客）。住宿：淺草田原町站前APA飯店。`;
+  const sectionContext = {
+    itinerary:  `當前查看的是行程規劃頁面。今天（${today}）的行程：${todayPlan}。`,
+    shopping:   `當前查看的是購物清單頁面。已加入清單的商品：${shopItems.map(s => s.name).join('、')}。`,
+    prep:       `當前查看的是行前準備頁面。`,
+    transport:  `當前查看的是交通查詢頁面。`,
+    ledger:     `當前查看的是旅費記帳頁面。目前記錄的支出筆數：${expenses.length} 筆。`,
+    diary:      `當前查看的是旅遊日記頁面。`,
   };
-  if (!place.name || !itinerary[date]) return;
-  if (!itinerary[date].places) itinerary[date].places = [];
-  if (itinerary[date].places.some(p => p.name === place.name)) {
-    showToast('此地點已在行程中'); return;
-  }
-  itinerary[date].places.push(place);
-  const container = document.getElementById(`day-${date}`);
-  if (container) renderDayPlaces(container, date);
-  drawRouteLines();
-  if (timelineMode) renderTimelineView();
-  btn.textContent = '✓ 已加入'; btn.disabled = true;
-  showToast(`${place.name} 已加入 ${DAY_SHORT[date]}`);
-});
+  return base + '\n' + (sectionContext[activeSection] || '') + '\n請用繁體中文回答。回答要簡潔實用。';
+}
 
-// AI 自由問答
-document.getElementById('ai-ask-btn')?.addEventListener('click', async () => {
-  const question = document.getElementById('ai-ask-input')?.value.trim();
-  const resultEl = document.getElementById('ai-ask-result');
-  if (!question || !resultEl) return;
-  const date = document.getElementById('ai-date-sel')?.value;
-  const dayPlaces = (date && itinerary[date]?.places) || [];
-  resultEl.innerHTML = '<div class="ai-loading">🤖 思考中…</div>';
-  try {
-    const res = await fetch('/api/suggest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'ask', question, places: dayPlaces }),
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    resultEl.innerHTML = `<div class="ai-answer">${formatAIText(data.answer)}</div>`;
-    const panel = document.getElementById('ai-panel');
-    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
-  } catch (err) {
-    resultEl.innerHTML = `<div class="ai-loading" style="color:#E74C3C">回覆失敗：${escHtml(err.message)}</div>`;
-    const panel = document.getElementById('ai-panel');
-    if (panel) setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
-  }
-});
+async function callAIEndpoint(prompt) {
+  const res = await fetch('/api/suggest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'ask', question: prompt, places: [] }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data.answer || '';
+}
+
+function appendAIMessage(text, role, id = '') {
+  const messages = document.getElementById('aiMessages');
+  const div = document.createElement('div');
+  div.className = `ai-msg ai-msg-${role}`;
+  if (id) div.id = id;
+  div.innerHTML = role === 'bot' ? (window.marked ? marked.parse(text) : text) : escHtml(text);
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeThinkingMessage() {
+  document.getElementById('thinking')?.remove();
+}
 
 // Currency converter change handler
 document.getElementById('twd2jpy')?.addEventListener('input', updateCurrencyConvert);
@@ -1408,7 +1312,7 @@ document.getElementById('btn-export').addEventListener('click', async () => {
   });
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const rect = document.getElementById('page-itinerary').getBoundingClientRect();
+    const rect = document.getElementById('section-itinerary').getBoundingClientRect();
     const newW = Math.max(200, Math.min(700, e.clientX - rect.left));
     mapPanel.style.width = newW + 'px';
   });
@@ -2115,7 +2019,7 @@ setInterval(syncPull, 30000);
 //  WEATHER TRIP FORECAST (Open-Meteo)
 // ════════════════════════════════════════════
 async function loadTripForecast() {
-  const startDate = '2026-08-03', endDate = '2026-08-08';
+  const startDate = '2026-08-03', endDate = '2026-08-09';
   const url = `https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=139.69&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${startDate}&end_date=${endDate}`;
   try {
     const res = await fetch(url);
@@ -2232,7 +2136,7 @@ document.getElementById('fillFromItinerary')?.addEventListener('click', () => {
 // ════════════════════════════════════════════
 //  DIARY
 // ════════════════════════════════════════════
-const DIARY_DAYS = ['2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08'];
+const DIARY_DAYS = ['2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08','2026-08-09'];
 let activeDiaryDay = DIARY_DAYS[0];
 
 function renderDiaryDayTabs() {

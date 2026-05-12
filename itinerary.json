@@ -1,179 +1,183 @@
 {
   "2026-08-03": {
-    "label": "8/3 (\u4e00)", 
+    "label": "8/3 (一)",
     "places": [
       {
-        "description": "\u65b0\u9bae\u751f\u9b5a\u7247\u3001\u7389\u5b50\u71d2\u65e9\u5e02", 
-        "lat": 35.6654, 
-        "lng": 139.7707, 
-        "name": "\u7bc9\u5730\u5e02\u5834", 
+        "description": "新鮮生魚片、玉子燒早市",
+        "lat": 35.6654,
+        "lng": 139.7707,
+        "name": "築地市場",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u8fd1\u8ddd\u96e2\u62cd\u651d\u6771\u4eac\u9435\u5854", 
-        "lat": 35.6552, 
-        "lng": 139.7489, 
-        "name": "\u829d\u516c\u5712", 
+        "description": "近距離拍攝東京鐵塔",
+        "lat": 35.6552,
+        "lng": 139.7489,
+        "name": "芝公園",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u6c89\u6d78\u5f0f\u71c8\u5149\u79c0\uff0c\u9700\u63d0\u524d\u9810\u7d04", 
-        "lat": 35.6452, 
-        "lng": 139.7844, 
-        "name": "teamLab Planets", 
+        "description": "沉浸式燈光秀，需提前預約",
+        "lat": 35.6452,
+        "lng": 139.7844,
+        "name": "teamLab Planets",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u53f0\u5834\u8cfc\u7269\u4e2d\u5fc3\u3001\u92fc\u5f48\u7acb\u50cf", 
-        "lat": 35.6249, 
-        "lng": 139.7752, 
-        "name": "\u53f0\u5834DiverCity", 
+        "description": "台場購物中心、鋼彈立像",
+        "lat": 35.6249,
+        "lng": 139.7752,
+        "name": "台場DiverCity",
         "type": "attraction"
       }
     ]
-  }, 
+  },
   "2026-08-04": {
-    "label": "8/4 (\u4e8c)", 
+    "label": "8/4 (二)",
     "places": [
       {
-        "description": "\u5bcc\u58eb\u5c71\u7d55\u666f\uff0c\u5bcc\u58eb\u56de\u904a\u865f", 
-        "lat": 35.5076, 
-        "lng": 138.7631, 
-        "name": "\u6cb3\u53e3\u6e56", 
+        "description": "富士山絕景，富士回遊號",
+        "lat": 35.5076,
+        "lng": 138.7631,
+        "name": "河口湖",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u5bcc\u58eb\u5c71\u8207\u82b1\u7530", 
-        "lat": 35.5197, 
-        "lng": 138.743, 
-        "name": "\u5927\u77f3\u516c\u5712", 
+        "description": "富士山與花田",
+        "lat": 35.5197,
+        "lng": 138.743,
+        "name": "大石公園",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "", 
-        "lat": 35.5013908, 
-        "lng": 138.8016313, 
-        "name": "\u65b0\u5009\u5c71\u6dfa\u9593\u516c\u5712", 
+        "description": "",
+        "lat": 35.5013908,
+        "lng": 138.8016313,
+        "name": "新倉山淺間公園",
         "type": "attraction"
       }
     ]
-  }, 
+  },
   "2026-08-05": {
-    "label": "8/5 (\u4e09)", 
+    "label": "8/5 (三)",
     "places": [
       {
-        "description": "\u938c\u5009\u5546\u5e97\u8857", 
-        "lat": 35.322, 
-        "lng": 139.5508, 
-        "name": "\u5c0f\u753a\u901a", 
+        "description": "鎌倉商店街",
+        "lat": 35.322,
+        "lng": 139.5508,
+        "name": "小町通",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u9322\u6d17\u5f01\u8ca1\u5929\uff0c\u5e36\u5851\u81a0\u888b", 
-        "lat": 35.3172, 
-        "lng": 139.5498, 
-        "name": "\u5b87\u8cc0\u798f\u795e\u793e", 
+        "description": "錢洗弁財天，帶塑膠袋",
+        "lat": 35.3172,
+        "lng": 139.5498,
+        "name": "宇賀福神社",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u938c\u5009\u53e4\u5bfa\uff0c\u7e61\u7403\u82b1", 
-        "lat": 35.316, 
-        "lng": 139.5342, 
-        "name": "\u9577\u8c37\u5bfa", 
+        "description": "鎌倉古寺，繡球花",
+        "lat": 35.316,
+        "lng": 139.5342,
+        "name": "長谷寺",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "", 
-        "lat": 35.3056685, 
-        "lng": 139.5102614, 
-        "name": "bills \u4e03\u91cc\u30f6\u6d5c", 
+        "description": "",
+        "lat": 35.3056685,
+        "lng": 139.5102614,
+        "name": "bills 七里ヶ浜",
         "type": "restaurant"
-      }, 
+      },
       {
-        "description": "\u6d77\u5cf6\u89c0\u5149\uff0c\u5915\u967d", 
-        "lat": 35.2998, 
-        "lng": 139.4826, 
-        "name": "\u6c5f\u4e4b\u5cf6", 
+        "description": "海島觀光，夕陽",
+        "lat": 35.2998,
+        "lng": 139.4826,
+        "name": "江之島",
         "type": "attraction"
       }
     ]
-  }, 
+  },
   "2026-08-06": {
-    "label": "8/6 (\u56db)", 
+    "label": "8/6 (四)",
     "places": [
       {
-        "description": "\u539f\u5bbf\u68ee\u6797\u795e\u5bae\uff0c\u62bd\u7c64", 
-        "lat": 35.6763, 
-        "lng": 139.6993, 
-        "name": "\u660e\u6cbb\u795e\u5bae", 
+        "description": "原宿森林神宮，抽籤",
+        "lat": 35.6763,
+        "lng": 139.6993,
+        "name": "明治神宮",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u539f\u5bbf\u6d41\u884c\u8857\uff0c\u53ef\u9e97\u9905", 
-        "lat": 35.67, 
-        "lng": 139.7042, 
-        "name": "\u7af9\u4e0b\u901a", 
+        "description": "原宿流行街，可麗餅",
+        "lat": 35.67,
+        "lng": 139.7042,
+        "name": "竹下通",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u6c34\u679c\u5343\u5c64\uff0c15:00 \u524d\u5230", 
-        "lat": 35.6593, 
-        "lng": 139.7026, 
-        "name": "HARBS", 
+        "description": "水果千層，15:00 前到",
+        "lat": 35.6593,
+        "lng": 139.7026,
+        "name": "HARBS",
         "type": "restaurant"
-      }, 
+      },
       {
-        "description": "\u6f80\u8c37\u5c55\u671b\u53f0\uff0c\u9810\u7d04\u5915\u967d\u6642\u6bb5", 
-        "lat": 35.6588, 
-        "lng": 139.7021, 
-        "name": "SHIBUYA SKY", 
+        "description": "澀谷展望台，預約夕陽時段",
+        "lat": 35.6588,
+        "lng": 139.7021,
+        "name": "SHIBUYA SKY",
         "type": "attraction"
       }
     ]
-  }, 
+  },
   "2026-08-07": {
-    "label": "8/7 (\u4e94)", 
+    "label": "8/7 (五)",
     "places": [
       {
-        "description": "", 
-        "lat": 35.5102487, 
-        "lng": 139.4694843, 
-        "name": "\u53f2\u52aa\u6bd4\u535a\u7269\u9928", 
+        "description": "",
+        "lat": 35.5102487,
+        "lng": 139.4694843,
+        "name": "史努比博物館",
         "type": "attraction"
       }
     ]
-  }, 
+  },
   "2026-08-08": {
-    "label": "8/8 (\u516d)", 
+    "label": "8/8 (六)",
     "places": [
       {
-        "description": "\u96f7\u9580\u3001\u4ef2\u898b\u4e16\u901a\uff0c\u4eba\u529b\u8eca", 
-        "lat": 35.7147, 
-        "lng": 139.7966, 
-        "name": "\u6dfa\u8349\u5bfa", 
+        "description": "雷門、仲見世通，人力車",
+        "lat": 35.7147,
+        "lng": 139.7966,
+        "name": "淺草寺",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "", 
-        "lat": 35.7139345, 
-        "lng": 139.7922291, 
-        "name": "\u6dfa\u8349\u4eca\u534a \u570b\u969b\u901a\u672c\u5e97", 
+        "description": "",
+        "lat": 35.7139345,
+        "lng": 139.7922291,
+        "name": "淺草今半 國際通本店",
         "type": "restaurant"
-      }, 
+      },
       {
-        "description": "\u85e5\u599d\u63a1\u8cb7\uff0cOS-Drug \u6700\u4fbf\u5b9c", 
-        "lat": 35.7073, 
-        "lng": 139.775, 
-        "name": "\u4e0a\u91ce\u963f\u7f8e\u6a6b\u753a", 
+        "description": "藥妝採買，OS-Drug 最便宜",
+        "lat": 35.7073,
+        "lng": 139.775,
+        "name": "上野阿美橫町",
         "type": "attraction"
-      }, 
+      },
       {
-        "description": "\u767b\u9ad8\u770b\u591c\u666f", 
-        "lat": 35.7101, 
-        "lng": 139.8107, 
-        "name": "\u6771\u4eac\u6674\u7a7a\u5854", 
+        "description": "登高看夜景",
+        "lat": 35.7101,
+        "lng": 139.8107,
+        "name": "東京晴空塔",
         "type": "attraction"
       }
     ]
+  },
+  "2026-08-09": {
+    "label": "8/9 (日)",
+    "places": []
   }
 }

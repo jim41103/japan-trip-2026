@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=32" />
+  <link rel="stylesheet" href="style.css?v=33" />
 </head>
 <body>
 
@@ -36,7 +36,7 @@
   <!-- 標題文字（在 .sh 之外，不受 clip-path 影響） -->
   <div class="splash-overlay-text">
     <div class="splash-title-main">雙狼北漂</div>
-    <div class="splash-title-sub">2026 夏 ✈ 6日5夜</div>
+    <div class="splash-title-sub">2026 夏 ✈ 7日6夜</div>
   </div>
 
   <!-- 載入進度條 -->
@@ -51,7 +51,7 @@
 <div id="landing" style="display:none">
   <div class="landing-header">
     <div class="landing-logo">🐾 雙狼北漂</div>
-    <div class="landing-subtitle">2026 · 8/3–8/8 · 東京</div>
+    <div class="landing-subtitle">2026 · 8/3–8/9 · 東京</div>
     <div class="landing-countdown" id="landingCountdown"></div>
   </div>
   <div class="landing-cards">
@@ -106,7 +106,7 @@
   <div class="header-title">
     <span class="snoopy-badge">🐾</span>
     <h1>雙狼北漂</h1>
-    <span class="date-range">2026/8/3-8/8</span>
+    <span class="date-range">2026/8/3-8/9</span>
     <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
   </div>
   <div class="header-actions">
@@ -207,43 +207,6 @@
     <div id="itinerary-days"></div>
     <div id="timeline-view" class="hidden"></div>
 
-    <!-- AI 建議 Panel -->
-    <div id="ai-panel" class="ai-panel hidden">
-      <div class="ai-panel-header">
-        <span>✨ AI 行程建議</span>
-        <button id="ai-close" class="btn-close">✕</button>
-      </div>
-      <div class="ai-panel-form">
-        <div class="ai-panel-row1">
-          <select id="ai-date-sel" class="transit-select">
-            <option value="2026-08-03">8/3 (一)</option>
-            <option value="2026-08-04">8/4 (二)</option>
-            <option value="2026-08-05">8/5 (三)</option>
-            <option value="2026-08-06">8/6 (四)</option>
-            <option value="2026-08-07">8/7 (五)</option>
-            <option value="2026-08-08">8/8 (六)</option>
-          </select>
-          <button id="ai-generate-btn" class="transit-search-btn" style="width:auto;padding:8px 16px;font-size:13px">🔍 搜尋</button>
-        </div>
-        <div class="ai-cat-tabs">
-          <button class="ai-cat-tab active" data-cat="culture">🏯 文化</button>
-          <button class="ai-cat-tab" data-cat="food">🍽 美食</button>
-          <button class="ai-cat-tab" data-cat="shopping">🛍 購物</button>
-          <button class="ai-cat-tab" data-cat="relax">🌿 輕鬆</button>
-          <button class="ai-cat-tab" data-cat="mix">✨ 綜合</button>
-        </div>
-      </div>
-      <!-- AI 問答輸入框 -->
-      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">💬 問 AI 任何旅遊問題</div>
-        <div class="ai-ask-row">
-          <textarea id="ai-ask-input" class="ai-ask-input" placeholder="例：從淺草到秋葉原怎麼去？鎌倉有什麼好吃的？" rows="2"></textarea>
-          <button id="ai-ask-btn" class="ai-ask-btn">送出</button>
-        </div>
-        <div id="ai-ask-result" style="margin-top:8px"></div>
-      </div>
-      <div id="ai-result" class="ai-result"></div>
-    </div>
   </section>
 
 </div><!-- /section-itinerary -->
@@ -419,6 +382,7 @@
         <option value="20260806">8/6 (四)</option>
         <option value="20260807">8/7 (五)</option>
         <option value="20260808">8/8 (六)</option>
+        <option value="20260809">8/9 (日)</option>
       </select>
       <input id="transit-time" class="transit-time-input" type="time" value="09:00">
       <select id="transit-way" class="transit-select transit-way-sel">
@@ -522,6 +486,7 @@
             <option value="2026-08-06">8/6 (四)</option>
             <option value="2026-08-07">8/7 (五)</option>
             <option value="2026-08-08">8/8 (六)</option>
+            <option value="2026-08-09">8/9 (日)</option>
           </select>
           <select id="exp-cat">
             <option value="food">🍽 餐飲</option>
@@ -577,6 +542,28 @@
   <button class="mnav-btn" data-panel="ledger"><span class="mnav-icon">💴</span><span class="mnav-label">記帳</span></button>
 </nav>
 
-<script src="app.js?v=32"></script>
+<!-- ════════════════════════════════════════════
+     GLOBAL AI DRAWER — slides up from bottom
+════════════════════════════════════════════ -->
+<div id="aiDrawer" class="ai-drawer" style="display:none">
+  <div class="ai-drawer-handle" id="aiDrawerClose">
+    <span class="ai-handle-bar"></span>
+    <span class="ai-drawer-title">✨ AI 旅遊助手</span>
+    <button class="ai-close-btn" id="aiCloseBtn">✕</button>
+  </div>
+  <div class="ai-quick-prompts" id="aiQuickPrompts"></div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg ai-msg-bot">
+      你好！我是你的日本旅遊 AI 助手 🐾<br>
+      可以問我行程安排、景點推薦、購物清單、交通查詢，或任何旅遊問題！
+    </div>
+  </div>
+  <div class="ai-input-row">
+    <textarea id="aiInput" class="ai-input" placeholder="問任何旅遊問題..." rows="2"></textarea>
+    <button id="aiSendBtn" class="ai-send-btn">送出</button>
+  </div>
+</div>
+
+<script src="app.js?v=33"></script>
 </body>
 </html>

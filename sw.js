@@ -1,6 +1,6 @@
-const CACHE = 'tokyo-trip-2026-v32';
+const CACHE = 'tokyo-trip-2026-v33';
 // HTML 不放入快取，永遠從網路取最新版
-const STATIC = ['/style.css?v=32', '/app.js?v=32', '/manifest.json', '/icon.svg'];
+const STATIC = ['/style.css?v=33', '/app.js?v=33', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
