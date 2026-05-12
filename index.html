@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=34" />
+  <link rel="stylesheet" href="style.css?v=35" />
 </head>
 <body>
 
@@ -70,8 +70,8 @@
         <stop offset="100%" stop-color="#bdd8e8"/>
       </linearGradient>
       <linearGradient id="fieldGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#c8dde8"/>
-        <stop offset="100%" stop-color="#e8f4f8"/>
+        <stop offset="0%"   stop-color="#8ab4c8"/>
+        <stop offset="100%" stop-color="#5a8fa8"/>
       </linearGradient>
     </defs>
     <rect width="1200" height="500" fill="url(#skyGrad)"/>
@@ -113,11 +113,11 @@
       <rect x="1002" y="481" width="6" height="10"/><rect x="1036" y="481" width="6" height="10"/>
       <rect x="1069" y="481" width="6" height="10"/><rect x="1104" y="481" width="6" height="10"/>
     </g>
-    <path d="M 0,455 Q 300,438 600,448 Q 900,438 1200,455 L 1200,500 L 0,500 Z" fill="url(#fieldGrad)"/>
-    <ellipse cx="200" cy="468" rx="90" ry="14" fill="white" opacity="0.28"/>
-    <ellipse cx="520" cy="463" rx="130" ry="11" fill="white" opacity="0.2"/>
-    <ellipse cx="820" cy="466" rx="110" ry="12" fill="white" opacity="0.22"/>
-    <ellipse cx="1060" cy="470" rx="75" ry="10" fill="white" opacity="0.18"/>
+    <rect x="0" y="448" width="1200" height="52" fill="url(#fieldGrad)"/>
+    <ellipse cx="200"  cy="460" rx="90"  ry="14" fill="white" opacity="0.18"/>
+    <ellipse cx="520"  cy="455" rx="130" ry="11" fill="white" opacity="0.12"/>
+    <ellipse cx="820"  cy="458" rx="110" ry="12" fill="white" opacity="0.14"/>
+    <ellipse cx="1060" cy="462" rx="75"  ry="10" fill="white" opacity="0.10"/>
   </svg>
   <div class="landing-header">
     <div class="landing-logo">🐾 雙狼北漂</div>
@@ -266,8 +266,6 @@
       <div class="itinerary-actions">
         <button id="btn-map-toggle"  class="btn btn-outline btn-sm">🗺 地圖</button>
         <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
-        <button id="btn-ai-suggest"  class="btn btn-outline btn-sm">✨ AI 建議</button>
-        <button id="btn-save"        class="btn btn-save">💾 儲存</button>
       </div>
     </div>
 
@@ -634,6 +632,6 @@
   </div>
 </div>
 
-<script src="app.js?v=34"></script>
+<script src="app.js?v=35"></script>
 </body>
 </html>

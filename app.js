@@ -603,21 +603,21 @@ renderWishlist();
 // ════════════════════════════════════════════
 const FLIGHT_OUTBOUND = {
   id: 'flight-outbound',
-  name: '✈ 捷星 GK12 出發 — 桃園T1 02:40 → 成田T2 07:00',
+  name: '✈ GK12 桃園T1 02:40 → 成田T2 07:00',
   time: '02:40',
   type: 'transport',
   locked: true,
-  note: '捷星日本 GK12 | 桃園國際機場第1航站 02:40 起飛 → 東京成田國際機場第2航站 07:00 抵達 | 飛行時間 3小時20分 | 訂位號：YQETNT | 野狼 + 美珊 | 手提7kg 寄艙20kg',
+  note: 'Jetstar Japan GK12 | 訂位：YQETNT',
   icon: '✈',
   lat: 0, lng: 0, description: '',
 };
 const FLIGHT_RETURN = {
   id: 'flight-return',
-  name: '✈ 捷星 GK11 返台 — 成田T3 22:40 → 桃園T1 01:30(+1)',
+  name: '✈ GK11 成田T3 22:40 → 桃園T1 01:30(+1)',
   time: '22:40',
   type: 'transport',
   locked: true,
-  note: '捷星日本 GK11 | 東京成田國際機場第3航站 22:40 起飛 → 台北桃園國際機場第1航站 08/10 01:30 抵達 | 飛行時間 3小時50分 | 訂位號：ZPNERW | 野狼座位11F、美珊座位11E | 手提7kg 寄艙20kg',
+  note: 'Jetstar Japan GK11 | 訂位：ZPNERW | 野狼11F 美珊11E',
   icon: '✈',
   lat: 0, lng: 0, description: '',
 };
@@ -1401,7 +1401,6 @@ function removeThinkingMessage() {
 // Currency converter change handler
 document.getElementById('twd2jpy')?.addEventListener('input', updateCurrencyConvert);
 
-document.getElementById('btn-save').addEventListener('click', saveItinerary);
 document.getElementById('btn-export').addEventListener('click', async () => {
   syncItineraryFromDOM();
   await saveItinerary();

@@ -1040,7 +1040,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #landing {
   position: fixed;
   inset: 0;
-  background: linear-gradient(180deg, #080f24 0%, #12244e 30%, #7a3a5a 55%, #c8705a 70%, #c8dde8 100%);
+  background: linear-gradient(180deg, #080f24 0%, #12244e 30%, #7a3a5a 55%, #c8705a 70%, #5a8fa8 100%);
   overflow: hidden;
   z-index: 500;
   display: flex;
