@@ -1,1746 +1,1746 @@
 [
   {
     "name": "Mizno Hotel",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5138928,
     "lng": 138.7735067,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Mizno+Hotel/data=!4m2!3m1!1s0x60195e3beebcc89b:0xd46130c1cbe21159"
   },
   {
     "name": "大石公園",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 26.208116,
     "lng": 127.705367,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%A4%A7%E7%9F%B3%E5%85%AC%E5%9C%92/data=!4m2!3m1!1s0x60195fa68c0b2b95:0xa22e530b3a652904"
   },
   {
     "name": "Manpuku",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6712727,
     "lng": 139.7694684,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Manpuku/data=!4m2!3m1!1s0x60195e3fef963ef3:0x3f30a1bbed4bed27"
   },
   {
     "name": "湖山亭產屋前",
-    "description": "喔這個超美完整的富士山",
+    "note": "喔這個超美完整的富士山",
+    "type": "attraction",
     "lat": 35.5128798,
     "lng": 138.7694986,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B9%96%E5%B1%B1%E4%BA%AD%E7%94%A2%E5%B1%8B%E5%89%8D/data=!4m2!3m1!1s0x60195e30ada65d61:0xe8da60569aec54e8"
   },
   {
     "name": "レンタサイクル富士乃蔵",
-    "description": "腳踏車店",
+    "note": "腳踏車店",
+    "type": "attraction",
     "lat": 35.5330357,
     "lng": 138.7524425,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E3%83%AC%E3%83%B3%E3%82%BF%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB%E5%AF%8C%E5%A3%AB%E4%B9%83%E8%94%B5/data=!4m2!3m1!1s0x60195f069ca86f1d:0x51d803c71e5e9ae"
   },
   {
     "name": "Fujikanko Travel Agency",
-    "description": "腳踏車店",
+    "note": "腳踏車店",
+    "type": "attraction",
     "lat": 35.4988849,
     "lng": 138.7684795,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Fujikanko+Travel+Agency/data=!4m2!3m1!1s0x60196082a740a593:0x7f9ff17eb3c2937"
   },
   {
     "name": "Rental Cycle Puu-san",
-    "description": "腳踏車店",
+    "note": "腳踏車店",
+    "type": "attraction",
     "lat": 35.5015691,
     "lng": 138.7672131,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Rental+Cycle+Puu-san/data=!4m2!3m1!1s0x60195e28e6a70e69:0xa9ee5d8f0e56aa68"
   },
   {
     "name": "羅森便利商店 河口湖車站前店",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.498648,
     "lng": 138.767231,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%BE%85%E6%A3%AE%E4%BE%BF%E5%88%A9%E5%95%86%E5%BA%97+%E6%B2%B3%E5%8F%A3%E6%B9%96%E8%BB%8A%E7%AB%99%E5%89%8D%E5%BA%97/data=!4m2!3m1!1s0x60195e28296a89bf:0x611c18cefec8cb56"
   },
   {
     "name": "HOTEL FUJiTORiiGATE -ホテル富士トリイゲート-",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4425725,
     "lng": 138.7951951,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/HOTEL+FUJiTORiiGATE+-%E3%83%9B%E3%83%86%E3%83%AB%E5%AF%8C%E5%A3%AB%E3%83%88%E3%83%AA%E3%82%A4%E3%82%B2%E3%83%BC%E3%83%88-/data=!4m2!3m1!1s0x60196153e8ecd82d:0x6430cb81f7c21d92"
   },
   {
     "name": "Fuji Grand Villa - Toki",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4425029,
     "lng": 138.7535113,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Fuji+Grand+Villa+-+Toki/data=!4m2!3m1!1s0x601961a3f7b29a03:0x12722641fcadcda5"
   },
   {
     "name": "Highland Resort Hotel & Spa",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4848624,
     "lng": 138.7778774,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Highland+Resort+Hotel+%26+Spa/data=!4m2!3m1!1s0x601961fcb89e1c81:0x77e870c6ec870b"
   },
   {
     "name": "Fuji Kawaguchiko Resort Hotel",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4223099,
     "lng": 138.7564963,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Fuji+Kawaguchiko+Resort+Hotel/data=!4m2!3m1!1s0x60196180f4819c19:0x991389c778175524"
   },
   {
     "name": "HOTEL MYSTAYS Fuji Onsen Resort",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4921641,
     "lng": 138.7796593,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/HOTEL+MYSTAYS+Fuji+Onsen+Resort/data=!4m2!3m1!1s0x601960bd81e68ab7:0x6ba2ecbc45de1b46"
   },
   {
     "name": "The Garden Resort & Condominium",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4223047,
     "lng": 138.7342785,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/The+Garden+Resort+%26+Condominium/data=!4m2!3m1!1s0x601961eddf6ada27:0xd30346e2a1fd388f"
   },
   {
     "name": "Godere hotel 富士山中湖 Tabist",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4413131,
     "lng": 138.8551529,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Godere+hotel+%E5%AF%8C%E5%A3%AB%E5%B1%B1%E4%B8%AD%E6%B9%96+Tabist/data=!4m2!3m1!1s0x601965bf29ff3895:0x47275bc9aeb3f2b"
   },
   {
     "name": "Sunnide Resort Yamanashi",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5225704,
     "lng": 138.7541729,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Sunnide+Resort+Yamanashi/data=!4m2!3m1!1s0x60195fa845efaff3:0x715a11013577661d"
   },
   {
     "name": "Ubuya",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5126392,
     "lng": 138.7689961,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Ubuya/data=!4m2!3m1!1s0x60195e3752af872b:0xfe53e78fbe247853"
   },
   {
     "name": "The Noborisaka Village",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4575899,
     "lng": 138.7608606,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/The+Noborisaka+Village/data=!4m2!3m1!1s0x601961005caf37fd:0xf1f8123f43614cce"
   },
   {
     "name": "河口湖拍富士山倒影較無人景點",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5329932,
     "lng": 138.7593114,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B2%B3%E5%8F%A3%E6%B9%96%E6%8B%8D%E5%AF%8C%E5%A3%AB%E5%B1%B1%E5%80%92%E5%BD%B1%E8%BC%83%E7%84%A1%E4%BA%BA%E6%99%AF%E9%BB%9E/data=!4m2!3m1!1s0x60195f0020a7fa0f:0x330a8f881cb32f47"
   },
   {
     "name": "Hirano beach",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 24.5640465,
     "lng": 124.2878693,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hirano+beach/data=!4m2!3m1!1s0x60196fec8ed01c37:0xaea15f41d50a234a"
   },
   {
     "name": "Comfort Hotel Tokyo Higashi-Kanda",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6945707,
     "lng": 139.7797258,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Comfort+Hotel+Tokyo+Higashi-Kanda/data=!4m2!3m1!1s0x60188eac45adc3cf:0x7f626701f4c4e0e3"
   },
   {
     "name": "淺草田原町站前APA飯店",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.710269,
     "lng": 139.7901016,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E7%94%B0%E5%8E%9F%E7%94%BA%E7%AB%99%E5%89%8DAPA%E9%A3%AF%E5%BA%97/data=!4m2!3m1!1s0x60188ebec487f909:0x49b8ac644b467e30"
   },
   {
     "name": "HININE NOTE(ハイナイン ノート)",
-    "description": "做手帳的地方",
+    "note": "做手帳的地方",
+    "type": "attraction",
     "lat": 35.6681307,
     "lng": 139.6868102,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/HININE+NOTE(%E3%83%8F%E3%82%A4%E3%83%8A%E3%82%A4%E3%83%B3+%E3%83%8E%E3%83%BC%E3%83%88)/data=!4m2!3m1!1s0x6018f34bf7170001:0x5eb5319cd75197d3"
   },
   {
     "name": "Little Nap Coffee Stand",
-    "description": "香蕉蛋糕",
+    "note": "香蕉蛋糕",
+    "type": "restaurant",
     "lat": 35.6720937,
     "lng": 139.6905932,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Little+Nap+Coffee+Stand/data=!4m2!3m1!1s0x6018f34ad0922653:0xda43dda9ba85f9eb"
   },
   {
     "name": "Kitsuneya",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6657268,
     "lng": 139.7698346,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Kitsuneya/data=!4m2!3m1!1s0x60188bdedd884c3f:0x955ce7e61b61f102"
   },
   {
     "name": "Meggendorfer",
-    "description": "童書店",
+    "note": "童書店",
+    "type": "attraction",
     "lat": 35.3146081,
     "lng": 139.5489504,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Meggendorfer/data=!4m2!3m1!1s0x1521220f00172163:0x7ab8f5f125fb2e9"
   },
   {
     "name": "ガチャガチャの杜",
-    "description": "扭蛋店",
+    "note": "扭蛋店",
+    "type": "attraction",
     "lat": 35.3229096,
     "lng": 139.5528569,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E3%82%AC%E3%83%81%E3%83%A3%E3%82%AC%E3%83%81%E3%83%A3%E3%81%AE%E6%9D%9C/data=!4m2!3m1!1s0x601845b5a6f1e785:0x530161b0357630d9"
   },
   {
     "name": "Shibuya Hikarie ShinQs",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6589689,
     "lng": 139.7034588,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Shibuya+Hikarie+ShinQs/data=!4m2!3m1!1s0x60188b5789e3c191:0x118f18fc8ef872eb"
   },
   {
     "name": "Kawaguchiko Post Office",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.4985075,
     "lng": 138.7658383,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Kawaguchiko+Post+Office/data=!4m2!3m1!1s0x60195e29c314c655:0x788f5b77b14848da"
   },
   {
     "name": "新倉富士淺間神社",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5003379,
     "lng": 138.8001621,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%96%B0%E5%80%89%E5%AF%8C%E5%A3%AB%E6%B7%BA%E9%96%93%E7%A5%9E%E7%A4%BE/data=!4m2!3m1!1s0x6019674cda070c6b:0xdc6154ac26eed07d"
   },
   {
     "name": "北口本宮富士淺間神社",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.470696,
     "lng": 138.7922637,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%8C%97%E5%8F%A3%E6%9C%AC%E5%AE%AE%E5%AF%8C%E5%A3%AB%E6%B7%BA%E9%96%93%E7%A5%9E%E7%A4%BE/data=!4m2!3m1!1s0x60196129b1baaaab:0x351d81311ed09dfe"
   },
   {
     "name": "新倉山淺間公園",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5013908,
     "lng": 138.8016313,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%96%B0%E5%80%89%E5%B1%B1%E6%B7%BA%E9%96%93%E5%85%AC%E5%9C%92/data=!4m2!3m1!1s0x6019674d1d58a8bb:0x8fee767dd147a07d"
   },
   {
     "name": "Ginza Loft",
-    "description": "美珊推薦的逛衣服店",
+    "note": "美珊推薦的逛衣服店",
+    "type": "attraction",
     "lat": 35.6741115,
     "lng": 139.766261,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Ginza+Loft/data=!4m2!3m1!1s0x60188be45c99d2a9:0x323ea1310dee9c4c"
   },
   {
     "name": "noix de beurre Ginza Mitsukoshi Store",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6714528,
     "lng": 139.7655931,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/noix+de+beurre+Ginza+Mitsukoshi+Store/data=!4m2!3m1!1s0x60188b638595212d:0xd0f80f22b62377f1"
   },
   {
     "name": "Harajuku Okonomiyaki Yai-yai",
-    "description": "御好燒",
+    "note": "御好燒",
+    "type": "restaurant",
     "lat": 35.6670378,
     "lng": 139.7057068,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Harajuku+Okonomiyaki+Yai-yai/data=!4m2!3m1!1s0x60188ca41056c9e7:0x73355ddde04011ff"
   },
   {
     "name": "炸饅頭 九重",
-    "description": "章魚燒",
+    "note": "章魚燒",
+    "type": "restaurant",
     "lat": 35.7134718,
     "lng": 139.7966667,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%82%B8%E9%A5%85%E9%A0%AD+%E4%B9%9D%E9%87%8D/data=!4m2!3m1!1s0x60188ec1172eb355:0x6861feeef89948b9"
   },
   {
     "name": "Shibakoen",
-    "description": "看東京鐵塔",
+    "note": "看東京鐵塔",
+    "type": "attraction",
     "lat": 35.6571637,
     "lng": 139.7485979,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Shibakoen/data=!4m2!3m1!1s0x60188bbe9029c3ff:0x6b5cf959a2346d3f"
   },
   {
     "name": "赤羽橋",
-    "description": "看東京鐵塔",
+    "note": "看東京鐵塔",
+    "type": "attraction",
     "lat": 35.6549848,
     "lng": 139.7440021,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E8%B5%A4%E7%BE%BD%E6%A9%8B/data=!4m2!3m1!1s0x60188bbc8f7931ef:0xad420d4d69d80c9a"
   },
   {
     "name": "NUMBER SUGAR Daikanyama",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6489567,
     "lng": 139.7014417,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/NUMBER+SUGAR+Daikanyama/data=!4m2!3m1!1s0x60188bb2507ef3b7:0xe0ed52f6b4a18e8b"
   },
   {
     "name": "BEAMS F / International Gallery",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6715222,
     "lng": 139.7079544,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/BEAMS+F+%2F+International+Gallery/data=!4m2!3m1!1s0x60188ca33699939b:0xe2251f6e216df70a"
   },
   {
     "name": "Howmore Living 本店",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.7055521,
     "lng": 139.7919536,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Howmore+Living+%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x60188fd01169773d:0x8249cb6cd2ff73c7"
   },
   {
     "name": "Totoken Nihonbashi Hamacho",
-    "description": "跑者驛站",
+    "note": "跑者驛站",
+    "type": "attraction",
     "lat": 35.683726,
     "lng": 139.789163,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Totoken+Nihonbashi+Hamacho/data=!4m2!3m1!1s0x601889059922c3d7:0xacc31e8a176c26e0"
   },
   {
     "name": "Mitsugu (Mitsuhachimangu)",
-    "description": "狗狗神社",
+    "note": "狗狗神社",
+    "type": "attraction",
     "lat": 34.6713314,
     "lng": 135.4992746,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Mitsugu+(Mitsuhachimangu)/data=!4m2!3m1!1s0x6000e71109d905f1:0xacb87b57871f1fbc"
   },
   {
     "name": "Hitachi Station",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 36.5908428,
     "lng": 140.6620685,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hitachi+Station/data=!4m2!3m1!1s0x60218034dd4a1fd1:0xff4caa067d8ec9cc"
   },
   {
     "name": "The North Face Standard",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6673191,
     "lng": 139.7047697,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/The+North+Face+Standard/data=!4m2!3m1!1s0x60188ca446ed0b6d:0xdb1ddf56ba258fb3"
   },
   {
     "name": "Beams Japan",
-    "description": "衣服店",
+    "note": "衣服店",
+    "type": "attraction",
     "lat": 35.6903982,
     "lng": 139.7039897,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Beams+Japan/data=!4m2!3m1!1s0x60188cdb02ce6651:0xea86b34ba35eb3c5"
   },
   {
     "name": "Tokyo Metropolitan Government Building No.1",
-    "description": "看市景",
+    "note": "看市景",
+    "type": "attraction",
     "lat": 35.6891848,
     "lng": 139.6916481,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tokyo+Metropolitan+Government+Building+No.1/data=!4m2!3m1!1s0x60188cd4b71a37a1:0xf1665c37f38661e8"
   },
   {
     "name": "Sukiyaki-Botan",
-    "description": "雞壽喜燒",
+    "note": "雞壽喜燒",
+    "type": "attraction",
     "lat": 35.6962862,
     "lng": 139.7687358,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Sukiyaki-Botan/data=!4m2!3m1!1s0x60188c1cb4a13bf7:0x975852da64be8fc7"
   },
   {
     "name": "Shinjiko Shijimi Chūkasoba Kohaku Main Store",
-    "description": "蕎麥麵",
+    "note": "蕎麥麵",
+    "type": "restaurant",
     "lat": 35.5512472,
     "lng": 139.7111871,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shinjiko+Shijimi+Ch%C5%ABkasoba+Kohaku+Main+Store/data=!4m2!3m1!1s0x601861d14a9591d9:0xcd7fdc76ad127c78"
   },
   {
     "name": "玉出超市 天神橋店",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 34.7046397,
     "lng": 135.5112419,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%8E%89%E5%87%BA%E8%B6%85%E5%B8%82+%E5%A4%A9%E7%A5%9E%E6%A9%8B%E5%BA%97/data=!4m2!3m1!1s0x6000e6c72c77bd8f:0x182ff91b3da153de"
   },
   {
     "name": "鰻之成瀨 六本木店",
-    "description": "鰻魚飯",
+    "note": "鰻魚飯",
+    "type": "restaurant",
     "lat": 35.6613,
     "lng": 139.7312,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%B0%BB%E4%B9%8B%E6%88%90%E7%80%A8+%E5%85%AD%E6%9C%AC%E6%9C%A8%E5%BA%97/data=!4m2!3m1!1s0x60188b0a9c0f85f5:0x93e81e408a6491c7"
   },
   {
     "name": "YAKINIKU A FIVE 徳 銀座八丁目店",
-    "description": "燒肉放題",
+    "note": "燒肉放題",
+    "type": "restaurant",
     "lat": 35.6692505,
     "lng": 139.7592458,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/YAKINIKU+A+FIVE+%E5%BE%B3+%E9%8A%80%E5%BA%A7%E5%85%AB%E4%B8%81%E7%9B%AE%E5%BA%97/data=!4m2!3m1!1s0x60188be9339e632f:0xdd8673f0d73a095e"
   },
   {
     "name": "fruits and season",
-    "description": "純水果三明治",
+    "note": "純水果三明治",
+    "type": "restaurant",
     "lat": 35.6471219,
     "lng": 139.7076835,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/fruits+and+season/data=!4m2!3m1!1s0x60188ba26c92d6c1:0x7c84a3242da9a124"
   },
   {
     "name": "Higashiyotsugihinan Bridge",
-    "description": "看晴空塔",
+    "note": "看晴空塔",
+    "type": "attraction",
     "lat": 35.72764,
     "lng": 139.837399,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Higashiyotsugihinan+Bridge/data=!4m2!3m1!1s0x60188f0007d3c563:0x1a7fe43df4b78cde"
   },
   {
     "name": "Oyokogawa Shinsui Park",
-    "description": "看晴空塔",
+    "note": "看晴空塔",
+    "type": "attraction",
     "lat": 35.7091263,
     "lng": 139.8077573,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Oyokogawa+Shinsui+Park/data=!4m2!3m1!1s0x60188ed1243aaaab:0x678b9f3e8e458dd2"
   },
   {
     "name": "Jukkenbashi-dori St",
-    "description": "看晴空塔\n十間橋",
+    "note": "看晴空塔\n十間橋",
+    "type": "attraction",
     "lat": 35.7114067,
     "lng": 139.8218269,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Jukkenbashi-dori+St/data=!4m2!3m1!1s0x60188f2b6a4d3a57:0xdfd9700523f23df0"
   },
   {
     "name": "曳舟",
-    "description": "曳舟駅東口\n看晴空塔",
+    "note": "曳舟駅東口\n看晴空塔",
+    "type": "attraction",
     "lat": 35.7183941,
     "lng": 139.8167618,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%9B%B3%E8%88%9F/data=!4m2!3m1!1s0x60188f26fbe96ca7:0xc77684c20ce3d94f"
   },
   {
     "name": "全家便利商店 押上站店",
-    "description": "看晴空塔",
+    "note": "看晴空塔",
+    "type": "attraction",
     "lat": 35.7106854,
     "lng": 139.8131716,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%85%A8%E5%AE%B6%E4%BE%BF%E5%88%A9%E5%95%86%E5%BA%97+%E6%8A%BC%E4%B8%8A%E7%AB%99%E5%BA%97/data=!4m2!3m1!1s0x60188ed65d637173:0x499cef2597f7e68"
   },
   {
     "name": "京島南公園",
-    "description": "看晴空塔",
+    "note": "看晴空塔",
+    "type": "attraction",
     "lat": 35.7130359,
     "lng": 139.8221461,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E4%BA%AC%E5%B3%B6%E5%8D%97%E5%85%AC%E5%9C%92/data=!4m2!3m1!1s0x60188f2e77fbe9fd:0xfe226a6dcd400ea7"
   },
   {
     "name": "押上",
-    "description": "押上駅A3出口\n看晴空塔",
+    "note": "押上駅A3出口\n看晴空塔",
+    "type": "attraction",
     "lat": 35.710332,
     "lng": 139.8132971,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%8A%BC%E4%B8%8A/data=!4m2!3m1!1s0x60188ed63c424369:0xa16dd866dfaa5fb9"
   },
   {
     "name": "宮下公園",
-    "description": "chill",
+    "note": "chill",
+    "type": "attraction",
     "lat": 35.661791,
     "lng": 139.7018507,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%AE%AE%E4%B8%8B%E5%85%AC%E5%9C%92/data=!4m2!3m1!1s0x60188de622941551:0x5400fedc2467d9be"
   },
   {
     "name": "Satella",
-    "description": "古早味硬式布丁是必點",
+    "note": "古早味硬式布丁是必點",
+    "type": "restaurant",
     "lat": 35.6606705,
     "lng": 139.7063119,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Satella/data=!4m2!3m1!1s0x60188bcc488854e1:0xae81bbf5e8c0e794"
   },
   {
     "name": "Echigoya Sandayu",
-    "description": "日本氛圍的烤魚定食店",
+    "note": "日本氛圍的烤魚定食店",
+    "type": "restaurant",
     "lat": 35.6590585,
     "lng": 139.6984745,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Echigoya+Sandayu/data=!4m2!3m1!1s0x60188b57d54deee7:0xc27876c0e67d702a"
   },
   {
     "name": "Belle Face",
-    "description": "另一個看東京鐵塔的點",
+    "note": "另一個看東京鐵塔的點",
+    "type": "attraction",
     "lat": 35.6579353,
     "lng": 139.7440288,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Belle+Face/data=!4m2!3m1!1s0x60188bbd6e738d53:0x1fe831e73ae018ba"
   },
   {
     "name": "Higurashi Bakery",
-    "description": "硬式麵包",
+    "note": "硬式麵包",
+    "type": "restaurant",
     "lat": 35.7318224,
     "lng": 139.77394,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Higurashi+Bakery/data=!4m2!3m1!1s0x60188e78943f882b:0x4456bd62480f6967"
   },
   {
     "name": "PREMIER MAI",
-    "description": "鐵板厚切吐司、起司歐姆蛋、法式吐司",
+    "note": "鐵板厚切吐司、起司歐姆蛋、法式吐司",
+    "type": "restaurant",
     "lat": 35.6691131,
     "lng": 139.6895222,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/PREMIER+MAI/data=!4m2!3m1!1s0x6018f3c0d8ba5dd5:0xe9ed383771d81705"
   },
   {
     "name": "tecona bagel works",
-    "description": "可選四五種韌度，蓬鬆/Q彈/緊實都有，創意內餡超多選擇",
+    "note": "可選四五種韌度，蓬鬆/Q彈/緊實都有，創意內餡超多選擇",
+    "type": "restaurant",
     "lat": 35.6687215,
     "lng": 139.6890697,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/tecona+bagel+works/data=!4m2!3m1!1s0x6018f34c9cca8119:0x6ae961c52c1ada22"
   },
   {
     "name": "Path",
-    "description": "荷蘭鬆餅\n鬆軟酥脆配火腿起司蜂蜜",
+    "note": "荷蘭鬆餅\n鬆軟酥脆配火腿起司蜂蜜",
+    "type": "restaurant",
     "lat": 35.6685131,
     "lng": 139.6899099,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Path/data=!4m2!3m1!1s0x6018f34cbd42e61d:0xd89102144ff9a2a0"
   },
   {
     "name": "AMAM DACOTAN",
-    "description": "超人氣bakery\n奶油麵包、三明治",
+    "note": "超人氣bakery\n奶油麵包、三明治",
+    "type": "restaurant",
     "lat": 35.6645406,
     "lng": 139.7110558,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/AMAM+DACOTAN/data=!4m2!3m1!1s0x60188d3adfee4ea5:0x65cf5b0328cba22"
   },
   {
     "name": "bakery_bank",
-    "description": "明太子法棍、紅豆司康等日式風味麵包，舊銀行改建超有格調 📍麻布十番（近六本木）",
+    "note": "明太子法棍、紅豆司康等日式風味麵包，舊銀行改建超有格調 📍麻布十番（近六本木）",
+    "type": "restaurant",
     "lat": 35.6817752,
     "lng": 139.7787563,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/bakery_bank/data=!4m2!3m1!1s0x601889e13424a497:0xd3b6b1b5b6657d7a"
   },
   {
     "name": "Parklet Bakery",
-    "description": "All day brunch\n甜點店\n酸麵包No.1 季節ricotta多種配料、酸奶、酪梨吐司超讚，氛圍舒適明亮",
+    "note": "All day brunch\n甜點店\n酸麵包No.1 季節ricotta多種配料、酸奶、酪梨吐司超讚，氛圍舒適明亮",
+    "type": "restaurant",
     "lat": 35.6869879,
     "lng": 139.7788709,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Parklet+Bakery/data=!4m2!3m1!1s0x6018894f6e84724d:0x1f290cd4d080a50b"
   },
   {
     "name": "POSS COFFEE - Shinjuku Store",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.690081,
     "lng": 139.7078706,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/POSS+COFFEE+-+Shinjuku+Store/data=!4m2!3m1!1s0x60188d0008c23833:0x9abcfdb2c7dfcb6d"
   },
   {
     "name": "Cois Espresso Club Shinjuku Gyoemmae",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6883544,
     "lng": 139.7105611,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Cois+Espresso+Club+Shinjuku+Gyoemmae/data=!4m2!3m1!1s0x60188d41dd039a87:0xfdeeeed7ad0d06e8"
   },
   {
     "name": "GRIN",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6881712,
     "lng": 139.7101445,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/GRIN/data=!4m2!3m1!1s0x60188d847bb5356d:0x57885cbd1645e9af"
   },
   {
     "name": "星巴克 新宿御苑店",
-    "description": "很漂亮的星巴克在新宿御苑裡面",
+    "note": "很漂亮的星巴克在新宿御苑裡面",
+    "type": "restaurant",
     "lat": 35.6837071,
     "lng": 139.7113021,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%98%9F%E5%B7%B4%E5%85%8B+%E6%96%B0%E5%AE%BF%E5%BE%A1%E8%8B%91%E5%BA%97/data=!4m2!3m1!1s0x60188ddb8b6fb92d:0xcd837ce8a23de9cb"
   },
   {
     "name": "和食 一芯",
-    "description": "每日午間有限定1500円套餐",
+    "note": "每日午間有限定1500円套餐",
+    "type": "restaurant",
     "lat": 35.6471899,
     "lng": 139.7017788,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%92%8C%E9%A3%9F+%E4%B8%80%E8%8A%AF/data=!4m2!3m1!1s0x60188b45f168e763:0x2955154442b50b8a"
   },
   {
     "name": "Yakiniku Kokokara Ueno Store",
-    "description": "厚切牛盛合兩人份4378円",
+    "note": "厚切牛盛合兩人份4378円",
+    "type": "restaurant",
     "lat": 35.7087949,
     "lng": 139.7723285,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Yakiniku+Kokokara+Ueno+Store/data=!4m2!3m1!1s0x60188d514c774689:0xaf005366be8a2d89"
   },
   {
     "name": "文字燒 大吉",
-    "description": "豬肉文字燒和海鮮大阪燒都不到1500円",
+    "note": "豬肉文字燒和海鮮大阪燒都不到1500円",
+    "type": "restaurant",
     "lat": 35.7117348,
     "lng": 139.7934849,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%96%87%E5%AD%97%E7%87%92+%E5%A4%A7%E5%90%89/data=!4m2!3m1!1s0x60188ec0a1a65a07:0xaae97b6e743eeac2"
   },
   {
     "name": "Maguro no Miyako",
-    "description": "海鮮燒1000円",
+    "note": "海鮮燒1000円",
+    "type": "restaurant",
     "lat": 35.6647324,
     "lng": 139.7702014,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Maguro+no+Miyako/data=!4m2!3m1!1s0x60188b1d48b08745:0x1423ff7fa2245c24"
   },
   {
     "name": "Gusto 鶯谷店",
-    "description": "7點營業，餐點選擇眾多，是好吃又便宜的連鎖店，幾乎都不到1000円",
+    "note": "7點營業，餐點選擇眾多，是好吃又便宜的連鎖店，幾乎都不到1000円",
+    "type": "restaurant",
     "lat": 35.7210265,
     "lng": 139.7805785,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Gusto+%E9%B6%AF%E8%B0%B7%E5%BA%97/data=!4m2!3m1!1s0x60188e851e8a9861:0x6a2d17014a735b1f"
   },
   {
     "name": "Shinpachi Shokudō Shibuya Meijidōri",
-    "description": "早餐定食539-649円，啤酒只要一百多日圓",
+    "note": "早餐定食539-649円，啤酒只要一百多日圓",
+    "type": "restaurant",
     "lat": 35.6573703,
     "lng": 139.7036451,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shinpachi+Shokud%C5%8D+Shibuya+Meijid%C5%8Dri/data=!4m2!3m1!1s0x60188b8af708b567:0x152bbb64dc11c46e"
   },
   {
     "name": "Pelican CAFE",
-    "description": "11點前有烤吐司+飲料特價830円，厚切火腿吐司1100円",
+    "note": "11點前有烤吐司+飲料特價830円，厚切火腿吐司1100円",
+    "type": "restaurant",
     "lat": 35.7069782,
     "lng": 139.7911622,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Pelican+CAFE/data=!4m2!3m1!1s0x60188eb84fd2bad1:0x3afa8133eeae4229"
   },
   {
     "name": "淺草牛光",
-    "description": "午間套餐牛排飯和茶泡飯套餐都是1408円",
+    "note": "午間套餐牛排飯和茶泡飯套餐都是1408円",
+    "type": "restaurant",
     "lat": 35.7114837,
     "lng": 139.7985892,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E7%89%9B%E5%85%89/data=!4m2!3m1!1s0x60188fa947576661:0x7ab4db5caffd52fd"
   },
   {
     "name": "Misojyu",
-    "description": "飯糰\n早上10點前有特價套餐850円",
+    "note": "飯糰\n早上10點前有特價套餐850円",
+    "type": "restaurant",
     "lat": 35.7116123,
     "lng": 139.7937274,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Misojyu/data=!4m2!3m1!1s0x60188f4051b9cb51:0xcc23574ca23ffe0b"
   },
   {
     "name": "bills (Shichirigahama)",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.3055305,
     "lng": 139.510141,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/bills+(Shichirigahama)/data=!4m2!3m1!1s0x60184f6aeaa0078b:0x86d5ad8cf86b28"
   },
   {
     "name": "Hakuba Mountain Harbor- The City… Temporarily closed",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 36.7285113,
     "lng": 137.8880875,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hakuba+Mountain+Harbor-+The+City%E2%80%A6+Temporarily+closed/data=!4m2!3m1!1s0x5ff7cd6cfc053745:0x9baa10d2ecc90a9d"
   },
   {
     "name": "Enoura Observatory",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.1883228,
     "lng": 139.1345852,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Enoura+Observatory/data=!4m2!3m1!1s0x6019bb68ded284b3:0xd235503de908e439"
   },
   {
     "name": "Pokémon Center Tokyo DX",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6808336,
     "lng": 139.773163,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Pok%C3%A9mon+Center+Tokyo+DX/data=!4m2!3m1!1s0x60188957de0e5009:0xeec96412fe192abc"
   },
   {
     "name": "7-Eleven",
-    "description": "看東京鐵塔的711",
+    "note": "看東京鐵塔的711",
+    "type": "attraction",
     "lat": 42.1569633,
     "lng": 142.7901407,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/7-Eleven/data=!4m2!3m1!1s0x60188bbba532d199:0x88640a266a56c674"
   },
   {
     "name": "Hotel Metropolitan Kawasaki",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5495839,
     "lng": 139.7439267,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hotel+Metropolitan+Kawasaki/data=!4m2!3m1!1s0x60186117c7654a85:0xb32d89ee21fea816"
   },
   {
     "name": "Togoshi Ginza Shopping Street",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.615263,
     "lng": 139.716924,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Togoshi+Ginza+Shopping+Street/data=!4m2!3m1!1s0x60188aec066b75d3:0xa38ab313b484ee6f"
   },
   {
     "name": "Todoroki Ravine Park",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6050425,
     "lng": 139.6458249,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Todoroki+Ravine+Park/data=!4m2!3m1!1s0x6018f45405495069:0x71ab45cd45edb2b9"
   },
   {
     "name": "センタービーフ渋谷道玄坂店",
-    "description": "牛排飯",
+    "note": "牛排飯",
+    "type": "restaurant",
     "lat": 35.6484389,
     "lng": 139.7181862,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%93%E3%83%BC%E3%83%95%E6%B8%8B%E8%B0%B7%E9%81%93%E7%8E%84%E5%9D%82%E5%BA%97/data=!4m2!3m1!1s0x60188b6ccb481945:0xaa62bf4fcfd95aaf"
   },
   {
     "name": "1-chōme-3-6 Higashiazabu",
-    "description": "看東京鐵塔",
+    "note": "看東京鐵塔",
+    "type": "attraction",
     "lat": 35.6567362,
     "lng": 139.7442859,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/1-ch%C5%8Dme-3-6+Higashiazabu/data=!4m2!3m1!1s0x60188bbd6f0917db:0x37fef01d6255f4a8"
   },
   {
     "name": "玩具店 Yamashiroya",
-    "description": "六層樓的可愛玩具店",
+    "note": "六層樓的可愛玩具店",
+    "type": "attraction",
     "lat": 35.711328,
     "lng": 139.7753067,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/data=!4m2!3m1!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1"
   },
   {
     "name": "Prince Smart Inn Naha",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 26.2205677,
     "lng": 127.6822679,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Prince+Smart+Inn+Naha/data=!4m2!3m1!1s0x34e569a51c7de5af:0xccb879303111f69c"
   },
   {
     "name": "Life Supermarket",
-    "description": "超市",
+    "note": "超市",
+    "type": "attraction",
     "lat": 35.0254687,
     "lng": 135.7731768,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Life+Supermarket/data=!4m2!3m1!1s0x60188ed61d5f87b9:0x470c90ca25a00815"
   },
   {
     "name": "Life",
-    "description": "超市",
+    "note": "超市",
+    "type": "attraction",
     "lat": 35.7158117,
     "lng": 139.7923847,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Life/data=!4m2!3m1!1s0x60188e953ff5db9f:0xa26d5e59216f62a3"
   },
   {
     "name": "Tosei Hotel Cocone Ueno Okachimachi",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7064469,
     "lng": 139.7731452,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tosei+Hotel+Cocone+Ueno+Okachimachi/data=!4m2!3m1!1s0x60188f502aa9b107:0xad19bb029c6848c"
   },
   {
     "name": "炭火串焼き こうめさん",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6469143,
     "lng": 139.7149233,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%82%AD%E7%81%AB%E4%B8%B2%E7%84%BC%E3%81%8D+%E3%81%93%E3%81%86%E3%82%81%E3%81%95%E3%82%93/data=!4m2!3m1!1s0x60188b14cc4d9ddb:0x28d1b8e14021ae0c"
   },
   {
     "name": "Noah",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.4268989,
     "lng": 138.8729384,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Noah/data=!4m2!3m1!1s0x6019657bbc06086f:0xf6ce60378508b3f0"
   },
   {
     "name": "喜楽食堂",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.5002655,
     "lng": 138.7686019,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%96%9C%E6%A5%BD%E9%A3%9F%E5%A0%82/data=!4m2!3m1!1s0x60195e286c53325d:0xabe8b8366a802506"
   },
   {
     "name": "Orimine Bakers Ningyocho",
-    "description": "熊熊麵包",
+    "note": "熊熊麵包",
+    "type": "restaurant",
     "lat": 35.6860113,
     "lng": 139.7822796,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Orimine+Bakers+Ningyocho/data=!4m2!3m1!1s0x601889d56caa2e87:0x1aa324f60d02689b"
   },
   {
     "name": "Joto Curry",
-    "description": "咖喱",
+    "note": "咖喱",
+    "type": "restaurant",
     "lat": 35.6571334,
     "lng": 139.7038008,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Joto+Curry/data=!4m2!3m1!1s0x60188b599da6b5c3:0x89922071e4316be1"
   },
   {
     "name": "Shirotae",
-    "description": "蛋糕店",
+    "note": "蛋糕店",
+    "type": "restaurant",
     "lat": 35.6766367,
     "lng": 139.7353945,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shirotae/data=!4m2!3m1!1s0x60188c7eef9b57cd:0xce8829db418eb50c"
   },
   {
     "name": "Ginza Brazil",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.7121675,
     "lng": 139.7945553,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ginza+Brazil/data=!4m2!3m1!1s0x60188ec0bf938131:0xb26bc97f39c1e798"
   },
   {
     "name": "CANELÉ et CRÈME GLACÉE",
-    "description": "Canele",
+    "note": "Canele",
+    "type": "restaurant",
     "lat": 35.7120868,
     "lng": 139.7949826,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/CANEL%C3%89+et+CR%C3%88ME+GLAC%C3%89E/data=!4m2!3m1!1s0x60188fecf8171333:0x2f7b4f29cfb53f8d"
   },
   {
     "name": "Asakusa Menchi",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.712893,
     "lng": 139.7960619,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Asakusa+Menchi/data=!4m2!3m1!1s0x60188ec121f3c5d5:0x9fe1c9087625b6c6"
   },
   {
     "name": "Ginkado",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.7121288,
     "lng": 139.7963996,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ginkado/data=!4m2!3m1!1s0x60188ec0d8042373:0x52fef47b4e211381"
   },
   {
     "name": "Tower Hall Funabori",
-    "description": "展望台",
+    "note": "展望台",
+    "type": "attraction",
     "lat": 35.6843356,
     "lng": 139.8648708,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tower+Hall+Funabori/data=!4m2!3m1!1s0x60188700755db7b1:0xa31a8af8a4873997"
   },
   {
     "name": "Asakusa Culture Tourist Information Center",
-    "description": "8樓觀景",
+    "note": "8樓觀景",
+    "type": "attraction",
     "lat": 35.7139684,
     "lng": 139.7964498,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Asakusa+Culture+Tourist+Information+Center/data=!4m2!3m1!1s0x60188ec1060d67af:0x7740294b7ef17d49"
   },
   {
     "name": "Shibuya Hikarie",
-    "description": "11樓看夜景",
+    "note": "11樓看夜景",
+    "type": "attraction",
     "lat": 35.6591803,
     "lng": 139.7036853,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Shibuya+Hikarie/data=!4m2!3m1!1s0x60188b5850e5a83f:0x70297507b32efce5"
   },
   {
     "name": "breadworks Tennozu",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6230842,
     "lng": 139.7475456,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/breadworks+Tennozu/data=!4m2!3m1!1s0x60188a6a1dc65357:0x90c521e6e5deeb33"
   },
   {
     "name": "Drogheria Sancricca",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6467308,
     "lng": 139.7332214,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Drogheria+Sancricca/data=!4m2!3m1!1s0x60188b199acd8e8d:0x2c503f5440d71057"
   },
   {
     "name": "Balcony by 6th",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6609484,
     "lng": 139.7405229,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Balcony+by+6th/data=!4m2!3m1!1s0x60188b48578e3a2b:0x204cbefef973cd8c"
   },
   {
     "name": "LINDINO",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.7059358,
     "lng": 139.7915915,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/LINDINO/data=!4m2!3m1!1s0x60188fa374c80e63:0xd6142bb835d9b062"
   },
   {
     "name": "IGORCOSY",
-    "description": "居酒屋",
+    "note": "居酒屋",
+    "type": "restaurant",
     "lat": 35.6595984,
     "lng": 139.695403,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/IGORCOSY/data=!4m2!3m1!1s0x60188dbfda9e0343:0xd288a23e8ea3e531"
   },
   {
     "name": "Maruko",
-    "description": "居酒屋",
+    "note": "居酒屋",
+    "type": "restaurant",
     "lat": 35.6541757,
     "lng": 139.7035899,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Maruko/data=!4m2!3m1!1s0x60188b560ee6cd83:0x4ec1ca52b39d1a78"
   },
   {
     "name": "Kotaro",
-    "description": "居酒屋",
+    "note": "居酒屋",
+    "type": "restaurant",
     "lat": 36.1415534,
     "lng": 137.254485,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Kotaro/data=!4m2!3m1!1s0x60188b5723b0b379:0x81de666a149162bb"
   },
   {
     "name": "Hanchika",
-    "description": "居酒屋",
+    "note": "居酒屋",
+    "type": "restaurant",
     "lat": 35.6583244,
     "lng": 139.6957278,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hanchika/data=!4m2!3m1!1s0x60188d194a33bb9d:0x4b328ddc812b2233"
   },
   {
     "name": "Bread, Espresso &",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6689132,
     "lng": 139.7126189,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Bread,+Espresso+%26/data=!4m2!3m1!1s0x60188c9f4a2960bb:0x519d9c159761d1ea"
   },
   {
     "name": "Fujisan Shokupan",
-    "description": "麵包店",
+    "note": "麵包店",
+    "type": "restaurant",
     "lat": 35.4988872,
     "lng": 138.76518,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Fujisan+Shokupan/data=!4m2!3m1!1s0x60195f06da758745:0x9df03613887026a2"
   },
   {
     "name": "Hakkoku",
-    "description": "壽司",
+    "note": "壽司",
+    "type": "restaurant",
     "lat": 35.6704471,
     "lng": 139.7627103,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hakkoku/data=!4m2!3m1!1s0x60188be60240803d:0x9bd3a0a67f42034f"
   },
   {
     "name": "Kushiyaki Bistro Fukumimi Ginza",
-    "description": "串燒",
+    "note": "串燒",
+    "type": "restaurant",
     "lat": 35.669608,
     "lng": 139.7651867,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Kushiyaki+Bistro+Fukumimi+Ginza/data=!4m2!3m1!1s0x60188be6ff864021:0x2e62761ff0249d77"
   },
   {
     "name": "BONGENCOFFEE Ginza",
-    "description": "拿鐵",
+    "note": "拿鐵",
+    "type": "restaurant",
     "lat": 35.6710713,
     "lng": 139.7708038,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/BONGENCOFFEE+Ginza/data=!4m2!3m1!1s0x60188be05b6d603f:0x8116694f0e7eeeff"
   },
   {
     "name": "Nakamura Tokichi",
-    "description": "パフェ",
+    "note": "パフェ",
+    "type": "attraction",
     "lat": 34.9860482,
     "lng": 135.7582531,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Nakamura+Tokichi/data=!4m2!3m1!1s0x60188be64571fda3:0x8a9f866d39f58be9"
   },
   {
     "name": "Ginza Kagari - Soba",
-    "description": "雞白湯拉麵",
+    "note": "雞白湯拉麵",
+    "type": "restaurant",
     "lat": 35.6273081,
     "lng": 139.7093458,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ginza+Kagari+-+Soba/data=!4m2!3m1!1s0x60188b206409298f:0x82596ca4626f1e33"
   },
   {
     "name": "Kumamoto AKAUSHI Shabu Shabu Koubai",
-    "description": "柚子鍋",
+    "note": "柚子鍋",
+    "type": "restaurant",
     "lat": 35.6691431,
     "lng": 139.763844,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Kumamoto+AKAUSHI+Shabu+Shabu+Koubai/data=!4m2!3m1!1s0x60188bbcf09154ad:0x7059f33deb31e0a0"
   },
   {
     "name": "Ningyocho Imahan Ginza",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "attraction",
     "lat": 35.6700698,
     "lng": 139.7628064,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Ningyocho+Imahan+Ginza/data=!4m2!3m1!1s0x60188be61dd29f29:0xb889a03eba782075"
   },
   {
     "name": "USHIGORO S. GINZA",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6693111,
     "lng": 139.7620223,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/USHIGORO+S.+GINZA/data=!4m2!3m1!1s0x60188b4ba315a745:0x6be7f5aeaf98569a"
   },
   {
     "name": "Tempura Fukamachi",
-    "description": "天婦羅 omakase",
+    "note": "天婦羅 omakase",
+    "type": "attraction",
     "lat": 35.6764822,
     "lng": 139.7704733,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tempura+Fukamachi/data=!4m2!3m1!1s0x60188be2fe4371ad:0x7f4f3fc2b347e1b1"
   },
   {
     "name": "Gyutan Ara",
-    "description": "牛舌",
+    "note": "牛舌",
+    "type": "restaurant",
     "lat": 35.6889147,
     "lng": 139.6980057,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Gyutan+Ara/data=!4m2!3m1!1s0x60188cd10fc11de7:0xe3a4be60c28ef0fa"
   },
   {
     "name": "Maruushi meat",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.6719298,
     "lng": 139.7687422,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Maruushi+meat/data=!4m2!3m1!1s0x60188be13edf09d5:0x30631e5b83459ef4"
   },
   {
     "name": "Sushi Tsu",
-    "description": "壽司",
+    "note": "壽司",
+    "type": "restaurant",
     "lat": 35.6601045,
     "lng": 139.7265082,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Sushi+Tsu/data=!4m2!3m1!1s0x60188b70b3f7b795:0x8850a3374dd75b77"
   },
   {
     "name": "JAPANESE UNAGI YOSAKURA Fujisan 日本鰻 世桜",
-    "description": "鰻魚",
+    "note": "鰻魚",
+    "type": "restaurant",
     "lat": 35.4923117,
     "lng": 138.8023918,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/JAPANESE+UNAGI+YOSAKURA+Fujisan+%E6%97%A5%E6%9C%AC%E9%B0%BB+%E4%B8%96%E6%A1%9C/data=!4m2!3m1!1s0x60196711b4d7d619:0xb6eed516e748c9e1"
   },
   {
     "name": "Shabushabu yamawarau Omotesando",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6674844,
     "lng": 139.7109823,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shabushabu+yamawarau+Omotesando/data=!4m2!3m1!1s0x60188ca38c7aaaab:0x6f2dfffc4bb29e20"
   },
   {
     "name": "Nara Seimen",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.6852902,
     "lng": 139.6993043,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Nara+Seimen/data=!4m2!3m1!1s0x60188dc98beb1cb7:0xdb97d86319424d30"
   },
   {
     "name": "HAYAKAWA coffee",
-    "description": "純咖啡",
+    "note": "純咖啡",
+    "type": "restaurant",
     "lat": 35.6990794,
     "lng": 139.7504812,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/HAYAKAWA+coffee/data=!4m2!3m1!1s0x60188d50e28ac99b:0x396736a595da143e"
   },
   {
     "name": "Acid Coffee Tokyo",
-    "description": "純咖啡店",
+    "note": "純咖啡店",
+    "type": "restaurant",
     "lat": 35.668352,
     "lng": 139.679981,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Acid+Coffee+Tokyo/data=!4m2!3m1!1s0x60188dc2afdc7109:0xa643d425ba2dc1e6"
   },
   {
     "name": "GLITCH TOKYO",
-    "description": "純咖啡",
+    "note": "純咖啡",
+    "type": "restaurant",
     "lat": 35.6852785,
     "lng": 139.7761723,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/GLITCH+TOKYO/data=!4m2!3m1!1s0x601889046d005d9b:0x3b14b893021d47f8"
   },
   {
     "name": "Echiré Maison du Beurre Marunouchi Store",
-    "description": "餅乾費南雪",
+    "note": "餅乾費南雪",
+    "type": "restaurant",
     "lat": 35.6785703,
     "lng": 139.7625325,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Echir%C3%A9+Maison+du+Beurre+Marunouchi+Store/data=!4m2!3m1!1s0x60188bfa0d273fe9:0xc0aab5e8979d0d8"
   },
   {
     "name": "Nenrinya Ginza Main Store",
-    "description": "伴手禮",
+    "note": "伴手禮",
+    "type": "attraction",
     "lat": 35.6699532,
     "lng": 139.764398,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Nenrinya+Ginza+Main+Store/data=!4m2!3m1!1s0x60188be645ab25f9:0x9354261d818ef67"
   },
   {
     "name": "Hamacho Hotel",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.6846688,
     "lng": 139.7894576,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hamacho+Hotel/data=!4m2!3m1!1s0x60188923f381447d:0x5ea606162b2a3747"
   },
   {
     "name": "NUMBER SUGAR",
-    "description": "伴手禮",
+    "note": "伴手禮",
+    "type": "attraction",
     "lat": 26.2948416,
     "lng": -98.1814321,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/NUMBER+SUGAR/data=!4m2!3m1!1s0x60188ca6aa1af26f:0x4d50f93c26c90c6d"
   },
   {
     "name": "Asakusa Unana",
-    "description": "鰻魚飯糰",
+    "note": "鰻魚飯糰",
+    "type": "restaurant",
     "lat": 35.7147474,
     "lng": 139.7944546,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Asakusa+Unana/data=!4m2!3m1!1s0x60188f3b199068bf:0x9e7cb8d2fa9ae0fd"
   },
   {
     "name": "Asakusa Onigiri Haruchan",
-    "description": "飯糰",
+    "note": "飯糰",
+    "type": "restaurant",
     "lat": 35.715514,
     "lng": 139.7927893,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Asakusa+Onigiri+Haruchan/data=!4m2!3m1!1s0x60188ff79f222179:0x17dc24967665b79e"
   },
   {
     "name": "Pâtisserie ease",
-    "description": "泡芙",
+    "note": "泡芙",
+    "type": "restaurant",
     "lat": 35.6818994,
     "lng": 139.7777509,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/P%C3%A2tisserie+ease/data=!4m2!3m1!1s0x6018899bffcbb56f:0x479f778e88173cf6"
   },
   {
     "name": "THE PARK",
-    "description": "看富士山的咖啡廳",
+    "note": "看富士山的咖啡廳",
+    "type": "restaurant",
     "lat": 35.4276322,
     "lng": 138.8680675,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/THE+PARK/data=!4m2!3m1!1s0x60196515525c459d:0x26da6867604eb090"
   },
   {
     "name": "Kushiyaki Meat Man",
-    "description": "居酒屋",
+    "note": "居酒屋",
+    "type": "restaurant",
     "lat": 35.6594013,
     "lng": 139.6958659,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Kushiyaki+Meat+Man/data=!4m2!3m1!1s0x60188caa25cea8ef:0x19407a1641a3c6b7"
   },
   {
     "name": "Tsukiji Itadori Bekkan",
-    "description": "生魚片",
+    "note": "生魚片",
+    "type": "restaurant",
     "lat": 35.665613,
     "lng": 139.7703696,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Tsukiji+Itadori+Bekkan/data=!4m2!3m1!1s0x60188bdf20adecb3:0x471d374852f94b62"
   },
   {
     "name": "Midoen Ikebukuro hanare",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.7320512,
     "lng": 139.7079906,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Midoen+Ikebukuro+hanare/data=!4m2!3m1!1s0x60188d5e97443d31:0x12ef39483a8114e4"
   },
   {
     "name": "Yakiniku Itadaki",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.6896204,
     "lng": 139.782362,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Yakiniku+Itadaki/data=!4m2!3m1!1s0x601889526f8a45cb:0x15896d4aa561121a"
   },
   {
     "name": "Afternoon Tea Love & Table Shinjuku Lumine 1",
-    "description": "咖啡廳",
+    "note": "咖啡廳",
+    "type": "restaurant",
     "lat": 35.6891454,
     "lng": 139.6992743,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Afternoon+Tea+Love+%26+Table+Shinjuku+Lumine+1/data=!4m2!3m1!1s0x60188cd0f9a46d89:0x8fa6071f20c20b63"
   },
   {
     "name": "Suzukien Asakusa matcha gelato",
-    "description": "抹茶",
+    "note": "抹茶",
+    "type": "restaurant",
     "lat": 35.7163436,
     "lng": 139.7969391,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Suzukien+Asakusa+matcha+gelato/data=!4m2!3m1!1s0x60188ec1dc27d889:0x1abebdcadc452655"
   },
   {
     "name": "Sukiyaki Chikayo Shibuya",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6568022,
     "lng": 139.697701,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Sukiyaki+Chikayo+Shibuya/data=!4m2!3m1!1s0x60188ba120931b23:0x5edc64bd47916f61"
   },
   {
     "name": "Hatoya Asakusa",
-    "description": "抹茶",
+    "note": "抹茶",
+    "type": "restaurant",
     "lat": 35.7183137,
     "lng": 139.6921819,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hatoya+Asakusa/data=!4m2!3m1!1s0x60188d4d2096709d:0xa3f29d92f6ae1181"
   },
   {
     "name": "Sports wear Disc. Alpen Tokyo",
-    "description": "買鞋子",
+    "note": "買鞋子",
+    "type": "attraction",
     "lat": 35.6933914,
     "lng": 139.7007168,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Sports+wear+Disc.+Alpen+Tokyo/data=!4m2!3m1!1s0x60188dd4851f56fd:0xdcf3fc757c2c6ea4"
   },
   {
     "name": "PEANUTS Cafe SUNNY SIDE kitchen",
-    "description": "史努比咖啡廳",
+    "note": "史努比咖啡廳",
+    "type": "restaurant",
     "lat": 35.6705208,
     "lng": 139.7031067,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/PEANUTS+Cafe+SUNNY+SIDE+kitchen/data=!4m2!3m1!1s0x60188d1c597b5c7f:0x8961dde21c49028a"
   },
   {
     "name": "銀座 佐藤養助",
-    "description": "烏龍麵",
+    "note": "烏龍麵",
+    "type": "restaurant",
     "lat": 35.6714522,
     "lng": 139.7615542,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%8A%80%E5%BA%A7+%E4%BD%90%E8%97%A4%E9%A4%8A%E5%8A%A9/data=!4m2!3m1!1s0x60188bef4028d60d:0xb2eb95367d3c94ea"
   },
   {
     "name": "炭燒富士鰻魚 有樂町店",
-    "description": "鰻魚飯",
+    "note": "鰻魚飯",
+    "type": "restaurant",
     "lat": 35.6703288,
     "lng": 139.7590179,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%82%AD%E7%87%92%E5%AF%8C%E5%A3%AB%E9%B0%BB%E9%AD%9A+%E6%9C%89%E6%A8%82%E7%94%BA%E5%BA%97/data=!4m2!3m1!1s0x60188b16f2bdff41:0x4e9c6e96a8131195"
   },
   {
     "name": "ASICS RUN TOKYO MARUNOUCHI",
-    "description": "跑步",
+    "note": "跑步",
+    "type": "attraction",
     "lat": 35.6803085,
     "lng": 139.7635986,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/ASICS+RUN+TOKYO+MARUNOUCHI/data=!4m2!3m1!1s0x60188b634d70ce99:0x2c695a11779d8a07"
   },
   {
     "name": "YOUR DAILY COFFEE ROAST AND BREAKFAST",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6287133,
     "lng": 139.6562002,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/YOUR+DAILY+COFFEE+ROAST+AND+BREAKFAST/data=!4m2!3m1!1s0x6018f5002d08c143:0x3c889c5604a6e274"
   },
   {
     "name": "Et -THE CULTURAL COFFEEHOUSE-",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6601304,
     "lng": 139.6650393,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Et+-THE+CULTURAL+COFFEEHOUSE-/data=!4m2!3m1!1s0x6018f325c7478747:0x3ee29c2aef41dadc"
   },
   {
     "name": "butter baby",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6427477,
     "lng": 139.6475805,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/butter+baby/data=!4m2!3m1!1s0x6018f36fb6986a57:0x594be4fe3e192605"
   },
   {
     "name": "Pati coffee&plants",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6533205,
     "lng": 139.6720674,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Pati+coffee%26plants/data=!4m2!3m1!1s0x6018f3ef3e327bbd:0x5cebf3ab17ea2917"
   },
   {
     "name": "SAMAA_",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6390552,
     "lng": 139.6683278,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/SAMAA_/data=!4m2!3m1!1s0x6018f50f49be9b3b:0xf5c85fcc84578ff2"
   },
   {
     "name": "LATTE ART MANIA TOKYO / ラテアートマニア東京店",
-    "description": "咖啡店",
+    "note": "咖啡店",
+    "type": "restaurant",
     "lat": 35.6711984,
     "lng": 139.7164832,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/LATTE+ART+MANIA+TOKYO+%2F+%E3%83%A9%E3%83%86%E3%82%A2%E3%83%BC%E3%83%88%E3%83%9E%E3%83%8B%E3%82%A2%E6%9D%B1%E4%BA%AC%E5%BA%97/data=!4m2!3m1!1s0x60188d01bc9cfe27:0xebc9e99761d22bf1"
   },
   {
     "name": "SIDEWALK STAND",
-    "description": "咖啡廳",
+    "note": "咖啡廳",
+    "type": "restaurant",
     "lat": 35.64691,
     "lng": 139.696679,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/SIDEWALK+STAND/data=!4m2!3m1!1s0x60188b4e7c440001:0xff47a7b0f270ee9"
   },
   {
     "name": "ONIBUS COFFEE 中目黑站前店",
-    "description": "咖啡廳ㄑ",
+    "note": "咖啡廳ㄑ",
+    "type": "restaurant",
     "lat": 35.6431767,
     "lng": 139.6980318,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/ONIBUS+COFFEE+%E4%B8%AD%E7%9B%AE%E9%BB%91%E7%AB%99%E5%89%8D%E5%BA%97/data=!4m2!3m1!1s0x60188b49101975bd:0xa4d389d765fd2d94"
   },
   {
     "name": "Streamer Coffee Company Nakameguro",
-    "description": "咖啡廳",
+    "note": "咖啡廳",
+    "type": "restaurant",
     "lat": 35.6487985,
     "lng": 139.6946208,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Streamer+Coffee+Company+Nakameguro/data=!4m2!3m1!1s0x60188b526e70e4f5:0x174f197028b3abf9"
   },
   {
     "name": "Super Hotel LOHAS Ikebukuro-Eki Kitaguchi",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7351173,
     "lng": 139.7104196,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Super+Hotel+LOHAS+Ikebukuro-Eki+Kitaguchi/data=!4m2!3m1!1s0x60188d5fc9a24837:0x13b59c443c939adc"
   },
   {
     "name": "Keisei Richmond Hotel Tokyo Kinshicho",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.6936367,
     "lng": 139.8149441,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Keisei+Richmond+Hotel+Tokyo+Kinshicho/data=!4m2!3m1!1s0x601888d88d1ab3bd:0x254b91a22fe762a"
   },
   {
     "name": "Dormy Inn EXPRESS Asakusa",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7119557,
     "lng": 139.7989133,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Dormy+Inn+EXPRESS+Asakusa/data=!4m2!3m1!1s0x60188ec4185727b3:0x40c25a2958f6c605"
   },
   {
     "name": "東京押上 京成Richmond酒店",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7109288,
     "lng": 139.8141536,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E6%8A%BC%E4%B8%8A+%E4%BA%AC%E6%88%90Richmond%E9%85%92%E5%BA%97/data=!4m2!3m1!1s0x60188f29dc6aaaab:0x818d154dbdc242f4"
   },
   {
     "name": "相鐵FRESA INN 銀座三丁目",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.6719028,
     "lng": 139.7677259,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%9B%B8%E9%90%B5FRESA+INN+%E9%8A%80%E5%BA%A7%E4%B8%89%E4%B8%81%E7%9B%AE/data=!4m2!3m1!1s0x60188be14b6f1dff:0x6bcdcf7987ec3017"
   },
   {
     "name": "木曽路 新宿三丁目店",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6917956,
     "lng": 139.7032169,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%9C%A8%E6%9B%BD%E8%B7%AF+%E6%96%B0%E5%AE%BF%E4%B8%89%E4%B8%81%E7%9B%AE%E5%BA%97/data=!4m2!3m1!1s0x60188cda381783a3:0x72c68f30f3937c51"
   },
   {
     "name": "Shabu-shabu Yamawarau Ginza Branch",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6719427,
     "lng": 139.7677264,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shabu-shabu+Yamawarau+Ginza+Branch/data=!4m2!3m1!1s0x60188be6b4d8acd7:0xd29d7e8ad4ff7a6f"
   },
   {
     "name": "黑毛和牛壽喜燒 日本橋一里",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6853196,
     "lng": 139.776342,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%BB%91%E6%AF%9B%E5%92%8C%E7%89%9B%E5%A3%BD%E5%96%9C%E7%87%92+%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%80%E9%87%8C/data=!4m2!3m1!1s0x601889004d1c4c01:0xd546648fc9d92bad"
   },
   {
     "name": "淺草東武飯店",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7113848,
     "lng": 139.7974249,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E6%9D%B1%E6%AD%A6%E9%A3%AF%E5%BA%97/data=!4m2!3m1!1s0x60188ec6bfc844f1:0xa504c87458de5cac"
   },
   {
     "name": "東京大飯店",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.6528995,
     "lng": 139.7511944,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%A4%A7%E9%A3%AF%E5%BA%97/data=!4m2!3m1!1s0x601894cfb6995555:0xe22fcb28cdea920d"
   },
   {
     "name": "Sotetsu Grand Fresa Takadanobaba",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.7125479,
     "lng": 139.7049787,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Sotetsu+Grand+Fresa+Takadanobaba/data=!4m2!3m1!1s0x60188dac5afb489d:0xa86cab26b1dd8550"
   },
   {
     "name": "Iriya Plus Café Custom Warehouse",
-    "description": "法式吐司團子",
+    "note": "法式吐司團子",
+    "type": "restaurant",
     "lat": 35.7086586,
     "lng": 139.7918538,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Iriya+Plus+Caf%C3%A9+Custom+Warehouse/data=!4m2!3m1!1s0x60188eb8ec0b643b:0xa64ce2ae102de86c"
   },
   {
     "name": "相鐵FRESA INN 東京錦糸町",
-    "description": "飯店",
+    "note": "飯店",
+    "type": "attraction",
     "lat": 35.6959044,
     "lng": 139.8116894,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%9B%B8%E9%90%B5FRESA+INN+%E6%9D%B1%E4%BA%AC%E9%8C%A6%E7%B3%B8%E7%94%BA/data=!4m2!3m1!1s0x6018892865ada1e5:0x91358530ff5dd8dd"
   },
   {
     "name": "五代目 花山烏冬 銀座店",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6699002,
     "lng": 139.7691376,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E4%BA%94%E4%BB%A3%E7%9B%AE+%E8%8A%B1%E5%B1%B1%E7%83%8F%E5%86%AC+%E9%8A%80%E5%BA%A7%E5%BA%97/data=!4m2!3m1!1s0x60188be095730edd:0xc3804ee1afc7eb9e"
   },
   {
     "name": "L'atelier de Plaisir",
-    "description": "麵包店",
+    "note": "麵包店",
+    "type": "restaurant",
     "lat": 35.6416716,
     "lng": 139.6056981,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/L'atelier+de+Plaisir/data=!4m2!3m1!1s0x6018f160e872e90b:0x8b3db81fc9bb3038"
   },
   {
     "name": "Chocolatier Palet D'or Tokyo",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6827072,
     "lng": 139.7643254,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Chocolatier+Palet+D'or+Tokyo/data=!4m2!3m1!1s0x60188bf9b3e08c37:0x4bb1aa8c1c32a55e"
   },
   {
     "name": "Yoroniku",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6602462,
     "lng": 139.7175653,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Yoroniku/data=!4m2!3m1!1s0x60188b643a255555:0xf2ec513ac017a91a"
   },
   {
     "name": "AKOMEYA Shokudo Tokyu Plaza Shibuya Branch",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6575425,
     "lng": 139.7003675,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/AKOMEYA+Shokudo+Tokyu+Plaza+Shibuya+Branch/data=!4m2!3m1!1s0x60188b3b962677a1:0x1e37ecb5fd4afab3"
   },
   {
     "name": "EDW yellow Shibuya",
-    "description": "蛋包飯",
+    "note": "蛋包飯",
+    "type": "restaurant",
     "lat": 35.6600118,
     "lng": 139.6988155,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/EDW+yellow+Shibuya/data=!4m2!3m1!1s0x60188ca834ce534b:0x33c39b274de10547"
   },
   {
     "name": "Biscuit",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.7515666,
     "lng": 139.878495,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Biscuit/data=!4m2!3m1!1s0x601885bf02a7b555:0x1d954d4cac5636d7"
   },
   {
     "name": "Ramen Yamatoki",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.7036218,
     "lng": 139.6550871,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ramen+Yamatoki/data=!4m2!3m1!1s0x6018f288d6aac5cf:0xbbb53009f88eeccf"
   },
   {
     "name": "日本橋炸豬排 一 HAJIME",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6864255,
     "lng": 139.7754729,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%97%A5%E6%9C%AC%E6%A9%8B%E7%82%B8%E8%B1%AC%E6%8E%92+%E4%B8%80+HAJIME/data=!4m2!3m1!1s0x6018893a6a0bc439:0x5b3c4a97aeae1398"
   },
   {
     "name": "Ramen Oyster And Shell",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.6662798,
     "lng": 139.7711916,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ramen+Oyster+And+Shell/data=!4m2!3m1!1s0x60188b85c24c5b0f:0x268b397465264598"
   },
   {
     "name": "Shibuya Morimoto",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6585852,
     "lng": 139.698656,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Shibuya+Morimoto/data=!4m2!3m1!1s0x60188b562c66b20d:0xbf11df5152df251c"
   },
   {
     "name": "Aidaya",
-    "description": "沾麵",
+    "note": "沾麵",
+    "type": "restaurant",
     "lat": 35.7082346,
     "lng": 139.7758712,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Aidaya/data=!4m2!3m1!1s0x60188f60cc446247:0xe26ed5798043f274"
   },
   {
     "name": "Negishi",
-    "description": "牛舌",
+    "note": "牛舌",
+    "type": "restaurant",
     "lat": 35.7113495,
     "lng": 139.7755783,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Negishi/data=!4m2!3m1!1s0x60188e9ef5dce7a3:0xbb224a58b2279c6b"
   },
   {
     "name": "DOLCE TACUBO",
-    "description": "費南雪泡芙",
+    "note": "費南雪泡芙",
+    "type": "restaurant",
     "lat": 35.6498856,
     "lng": 139.7054774,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/DOLCE+TACUBO/data=!4m2!3m1!1s0x60188b589a78a3bd:0x2c8434769002deea"
   },
   {
     "name": "Unagi Irokawa",
-    "description": "鰻魚飯",
+    "note": "鰻魚飯",
+    "type": "restaurant",
     "lat": 35.7092929,
     "lng": 139.7951762,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Unagi+Irokawa/data=!4m2!3m1!1s0x60188ec708f65555:0x4bb31c294b45243b"
   },
   {
     "name": "米久本店",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.7159235,
     "lng": 139.7937095,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%B1%B3%E4%B9%85%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x60188eeaadfd553b:0x3625458b60493b8c"
   },
   {
     "name": "人形町今半 人形町本店",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.6857703,
     "lng": 139.7836715,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A+%E4%BA%BA%E5%BD%A2%E7%94%BA%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x6018894fd1c12f2f:0x306acc4e4e9ed1cf"
   },
   {
     "name": "淺草今半 國際通本店",
-    "description": "壽喜燒",
+    "note": "壽喜燒",
+    "type": "restaurant",
     "lat": 35.7139345,
     "lng": 139.7922291,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E4%BB%8A%E5%8D%8A+%E5%9C%8B%E9%9A%9B%E9%80%9A%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x60188ebfe994dcf7:0x402534c8b8ced7d8"
   },
   {
     "name": "銀座八五",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.6705477,
     "lng": 139.77015,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%8A%80%E5%BA%A7%E5%85%AB%E4%BA%94/data=!4m2!3m1!1s0x60188be664634e5f:0xb960da45f432b5da"
   },
   {
     "name": "金色不如歸 新宿御苑本店",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.6887843,
     "lng": 139.7082917,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%87%91%E8%89%B2%E4%B8%8D%E5%A6%82%E6%AD%B8+%E6%96%B0%E5%AE%BF%E5%BE%A1%E8%8B%91%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x6018f324eb5d1539:0x53493bc1aff770b"
   },
   {
     "name": "無敵家拉麵",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.7269046,
     "lng": 139.7116557,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%84%A1%E6%95%B5%E5%AE%B6%E6%8B%89%E9%BA%B5/data=!4m2!3m1!1s0x60188d682708f977:0x829333b0d73eb2cd"
   },
   {
     "name": "Ramen Kamo to Negi Ueno Okachimachi Main Store",
-    "description": "拉麵",
+    "note": "拉麵",
+    "type": "restaurant",
     "lat": 35.7083768,
     "lng": 139.7752537,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ramen+Kamo+to+Negi+Ueno+Okachimachi+Main+Store/data=!4m2!3m1!1s0x60188e9f836fe4eb:0xe59c5e732e04d0f7"
   },
   {
     "name": "Ginza Katsukami",
-    "description": "豬排",
+    "note": "豬排",
+    "type": "restaurant",
     "lat": 35.6707126,
     "lng": 139.7636256,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Ginza+Katsukami/data=!4m2!3m1!1s0x60188bfca4c7d391:0xf52070b2a469b74a"
   },
   {
     "name": "豬排丼屋 瑞兆",
-    "description": "豬排",
+    "note": "豬排",
+    "type": "restaurant",
     "lat": 35.662703,
     "lng": 139.6953601,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E8%B1%AC%E6%8E%92%E4%B8%BC%E5%B1%8B+%E7%91%9E%E5%85%86/data=!4m2!3m1!1s0x60188cac12069909:0x41c48d07160668ef"
   },
   {
     "name": "炸豬排檍 橫濱馬車道店",
-    "description": "豬排",
+    "note": "豬排",
+    "type": "restaurant",
     "lat": 35.4479087,
     "lng": 139.6358339,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%82%B8%E8%B1%AC%E6%8E%92%E6%AA%8D+%E6%A9%AB%E6%BF%B1%E9%A6%AC%E8%BB%8A%E9%81%93%E5%BA%97/data=!4m2!3m1!1s0x60185db24c0f7697:0x9f2903774d3cf148"
   },
   {
     "name": "Tonkatsu Yamabe",
-    "description": "豬排",
+    "note": "豬排",
+    "type": "attraction",
     "lat": 35.708662,
     "lng": 139.7738323,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tonkatsu+Yamabe/data=!4m2!3m1!1s0x60188e9fc1e862f3:0x7467c163e2631f28"
   },
   {
     "name": "燒肉29 Terrace 澀谷南口店",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.657374,
     "lng": 139.6990006,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%87%92%E8%82%8929+Terrace+%E6%BE%80%E8%B0%B7%E5%8D%97%E5%8F%A3%E5%BA%97/data=!4m2!3m1!1s0x60188b652e57f2ab:0xb33b3fe387533d9c"
   },
   {
     "name": "一頭牛燒肉 房家",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.7088053,
     "lng": 139.7760391,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E4%B8%80%E9%A0%AD%E7%89%9B%E7%87%92%E8%82%89+%E6%88%BF%E5%AE%B6/data=!4m2!3m1!1s0x60188e9f7ad01e89:0xd8f7a007634589e0"
   },
   {
     "name": "燒肉亭 六歌仙",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.6896075,
     "lng": 139.6985124,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%87%92%E8%82%89%E4%BA%AD+%E5%85%AD%E6%AD%8C%E4%BB%99/data=!4m2!3m1!1s0x60188cd700890879:0x3e5fd755a58636f3"
   },
   {
     "name": "厚切り牛タン食べ放題 焼肉一心たん助 旦 有楽町",
-    "description": "燒肉",
+    "note": "燒肉",
+    "type": "restaurant",
     "lat": 35.6628646,
     "lng": 139.7360523,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%8E%9A%E5%88%87%E3%82%8A%E7%89%9B%E3%82%BF%E3%83%B3%E9%A3%9F%E3%81%B9%E6%94%BE%E9%A1%8C+%E7%84%BC%E8%82%89%E4%B8%80%E5%BF%83%E3%81%9F%E3%82%93%E5%8A%A9+%E6%97%A6+%E6%9C%89%E6%A5%BD%E7%94%BA/data=!4m2!3m1!1s0x60188b9c8c48fbd7:0x431e8d08379ce9e6"
   },
   {
     "name": "Nihonbashi Tonkatsu Hajime HANARE",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6854075,
     "lng": 139.775362,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Nihonbashi+Tonkatsu+Hajime+HANARE/data=!4m2!3m1!1s0x601889480750c11d:0xd95408c441b57bc7"
   },
   {
     "name": "BLOSSOM & BOUQUET TOKYO",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.6907078,
     "lng": 139.7003134,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/BLOSSOM+%26+BOUQUET+TOKYO/data=!4m2!3m1!1s0x60188d00792b1199:0x81f1e53a08109e11"
   },
   {
     "name": "Tokyo-Yakiniku Nikuyakiya D-29 Hiroo",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.6610374,
     "lng": 139.7639367,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Tokyo-Yakiniku+Nikuyakiya+D-29+Hiroo/data=!4m2!3m1!1s0x60188bdb6aa991bd:0x32ceaba4296691b7"
   },
   {
     "name": "Hontosaya",
-    "description": "",
+    "note": "",
+    "type": "restaurant",
     "lat": 35.7143719,
     "lng": 139.7920081,
-    "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hontosaya/data=!4m2!3m1!1s0x60188ebfe7001e83:0x48b073d419277394"
   },
   {
     "name": "史努比博物館",
-    "description": "",
+    "note": "",
+    "type": "attraction",
     "lat": 35.5102487,
     "lng": 139.4694843,
-    "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%8F%B2%E5%8A%AA%E6%AF%94%E5%8D%9A%E7%89%A9%E9%A4%A8/data=!4m2!3m1!1s0x60188b9dd0d97ed3:0x7c0f44073a3c60ce"
   }
 ]
