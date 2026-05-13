@@ -599,6 +599,89 @@ Sortable.create(document.getElementById('wishlist-list'), {
 renderWishlist();
 
 // ════════════════════════════════════════════
+//  IMPORT JSON (Google Takeout GeoJSON / places_geocoded)
+// ════════════════════════════════════════════
+function importPlacesFromData(data) {
+  let entries = [];
+
+  // GeoJSON format: { type: 'FeatureCollection', features: [...] }
+  if (data && Array.isArray(data.features)) {
+    entries = data.features
+      .filter(f => f.geometry?.coordinates)
+      .map(f => ({
+        name: f.properties?.name || f.properties?.Title || '',
+        description: f.properties?.description || f.properties?.note || '',
+        type: 'attraction',
+        lat: f.geometry.coordinates[1],
+        lng: f.geometry.coordinates[0],
+        googleMapsUrl: f.properties?.['Google Maps URL'] || f.properties?.googleMapsUrl || '',
+      }));
+  }
+  // Simple array format: [{name, lat, lng, note, type, googleMapsUrl}, ...]
+  else if (Array.isArray(data)) {
+    entries = data
+      .filter(p => p.lat != null && p.lng != null)
+      .map(p => ({
+        name: p.name || '',
+        description: p.note || p.description || '',
+        type: p.type || 'attraction',
+        lat: p.lat,
+        lng: p.lng,
+        googleMapsUrl: p.googleMapsUrl || '',
+      }));
+  }
+
+  const valid = entries.filter(p => p.name && p.lat && p.lng);
+  let added = 0;
+  valid.forEach(place => {
+    if (!wishlist.some(w => w.name === place.name)) {
+      wishlist.push(place);
+      added++;
+    }
+  });
+  saveWishlist();
+  renderWishlist();
+  // 展開候選清單
+  const body = document.getElementById('wishlist-body');
+  if (body && body.style.display === 'none') {
+    body.style.display = '';
+    document.querySelector('.wishlist-chevron').textContent = '▲';
+  }
+  showToast(`已匯入 ${added} 個地點（共 ${valid.length} 筆有效）✓`);
+}
+
+document.getElementById('importJsonBtn').addEventListener('click', () => {
+  document.getElementById('importJsonFile').click();
+});
+
+document.getElementById('importJsonFile').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      importPlacesFromData(data);
+    } catch {
+      showToast('❌ JSON 解析失敗，請確認檔案格式');
+    }
+  };
+  reader.readAsText(file);
+  this.value = '';
+});
+
+document.getElementById('loadGeocodedBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/data/maps/places_geocoded.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    importPlacesFromData(data);
+  } catch (err) {
+    showToast(`❌ 載入失敗：${err.message}`);
+  }
+});
+
+// ════════════════════════════════════════════
 //  LOCKED FLIGHT DATA
 // ════════════════════════════════════════════
 const FLIGHT_OUTBOUND = {

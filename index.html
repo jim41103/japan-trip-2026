@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=37" />
 </head>
 <body>
 
@@ -208,6 +208,11 @@
         <input id="search-input" type="text" placeholder="搜尋地點名稱…" />
         <button id="btn-place-search" title="搜尋新地標加入行程">🔍 新地標</button>
         <button id="mapResetBtn" title="顯示全部地點" style="flex-shrink:0;padding:6px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:13px;cursor:pointer">🗾</button>
+      </div>
+      <div class="search-row" style="margin-top:4px">
+        <button id="importJsonBtn" title="匯入 Google Takeout / places_geocoded JSON" style="flex:1;padding:5px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;cursor:pointer;white-space:nowrap">📂 匯入 JSON</button>
+        <button id="loadGeocodedBtn" title="從 /data/maps/places_geocoded.json 讀取（localhost）" style="flex:1;padding:5px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;cursor:pointer;white-space:nowrap">🗺 載入地標庫</button>
+        <input id="importJsonFile" type="file" accept=".json" style="display:none">
       </div>
       <!-- 路線顏色圖例 -->
       <div class="route-legend" id="route-legend"></div>
@@ -632,6 +637,6 @@
   </div>
 </div>
 
-<script src="app.js?v=36"></script>
+<script src="app.js?v=37"></script>
 </body>
 </html>
