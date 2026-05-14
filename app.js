@@ -238,8 +238,7 @@ function switchTab(tabName) {
     document.getElementById('itinerary-panel')?.classList.add('mobile-active');
     document.getElementById('map-panel')?.classList.remove('mobile-active');
     setTimeout(() => map.invalidateSize(), 50);
-    renderItinerary();
-    drawRouteLines();
+    try { renderItinerary(); drawRouteLines(); } catch(e) { console.error('[switchTab itinerary]', e); }
   }
   if (tabName === 'shopping') renderShoppingList();
   if (tabName === 'ledger') {
@@ -664,6 +663,13 @@ async function loadItinerary() {
 // ════════════════════════════════════════════
 function renderItinerary() {
   const container = document.getElementById('itinerary-days');
+  if (!container) { console.error('[renderItinerary] #itinerary-days not found'); return; }
+  const keys = Object.keys(itinerary);
+  console.log('[renderItinerary] itinerary keys:', keys.length, keys);
+  // 如果 itinerary 為空，確保至少有 7 天
+  Object.keys(DAY_SHORT).forEach(d => {
+    if (!itinerary[d]) itinerary[d] = { label: DAY_SHORT[d], places: [] };
+  });
   container.innerHTML = '';
   Object.entries(itinerary).forEach(([date, day]) => {
     const col = document.createElement('div');
