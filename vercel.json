@@ -4,6 +4,7 @@
     { "src": "/api/transit", "dest": "/api/transit.js" },
     { "src": "/api/sync",    "dest": "/api/sync.js" },
     { "src": "/api/suggest", "dest": "/api/suggest.js" },
+    { "src": "/api/tenki-weekly", "dest": "/api/tenki-weekly.js" },
     { "src": "/(.*)",        "dest": "/$1" }
   ]
 }
