@@ -238,6 +238,8 @@ function switchTab(tabName) {
     document.getElementById('itinerary-panel')?.classList.add('mobile-active');
     document.getElementById('map-panel')?.classList.remove('mobile-active');
     setTimeout(() => map.invalidateSize(), 50);
+    renderItinerary();
+    drawRouteLines();
   }
   if (tabName === 'shopping') renderShoppingList();
   if (tabName === 'ledger') {
@@ -623,9 +625,12 @@ function ensureFlights() {
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
-  // 立刻用靜態檔渲染，不等 sync
-  const res = await fetch('/itinerary.json');
-  itinerary = await res.json();
+  try {
+    const res = await fetch('/itinerary.json');
+    itinerary = await res.json();
+  } catch (e) {
+    console.warn('itinerary.json 載入失敗，使用空行程', e);
+  }
   ensureDays();
   ensureFlights();
   renderItinerary();
@@ -640,8 +645,16 @@ async function loadItinerary() {
       itinerary = remote;
       ensureDays();
       ensureFlights();
-      renderItinerary();
-      drawRouteLines();
+      // 保存當前容器內容，若 renderItinerary 失敗則不清空
+      const container = document.getElementById('itinerary-days');
+      const backup = container ? container.innerHTML : '';
+      try {
+        renderItinerary();
+        drawRouteLines();
+      } catch (e) {
+        console.error('sync 後重新渲染失敗', e);
+        if (container && backup) container.innerHTML = backup;
+      }
     })
     .catch(() => {});
 }
