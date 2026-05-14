@@ -279,7 +279,20 @@ document.getElementById('floatAIBtn').addEventListener('click', () => {
 //  SERVICE WORKER
 // ════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      nw.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+          nw.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+    });
+  }).catch(() => {});
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!reloading) { reloading = true; window.location.reload(); }
+  });
 }
 
 // ════════════════════════════════════════════
@@ -438,7 +451,7 @@ function googleMapsUrl(place) {
 // ════════════════════════════════════════════
 async function loadPlaces() {
   try {
-    const res = await fetch('/places.json?v=42');
+    const res = await fetch('/places.json?v=43');
     allPlaces = await res.json();
     filteredPlaces = allPlaces;
     renderPlacesList();
@@ -625,7 +638,7 @@ function ensureFlights() {
 // ════════════════════════════════════════════
 async function loadItinerary() {
   try {
-    const res = await fetch('/itinerary.json');
+    const res = await fetch('/itinerary.json?v=43');
     itinerary = await res.json();
   } catch (e) {
     console.warn('itinerary.json 載入失敗，使用空行程', e);
