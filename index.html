@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=40" />
+  <link rel="stylesheet" href="style.css?v=41" />
 </head>
 <body>
 
@@ -204,7 +204,6 @@
     <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
   </div>
   <div class="header-actions">
-    <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 同步中</span>
     <button id="btn-export" class="btn btn-accent">⬇ 儲存</button>
   </div>
 </header>
@@ -585,9 +584,22 @@
      SECTION: 日記
 ════════════════════════════════════════════ -->
 <section id="section-diary" class="tab-section page" style="display:none">
-  <div class="diary-wrap">
-    <div class="diary-day-tabs" id="diaryDayTabs"></div>
-    <div class="diary-content" id="diaryContent"></div>
+  <div id="diary-landing" class="diary-hub"></div>
+  <div id="diary-editor" class="diary-editor-wrap" style="display:none">
+    <button id="diary-back-btn" class="diary-back">← 返回</button>
+    <div class="diary-editor-inner">
+      <div class="diary-meta">
+        <div class="diary-day-label" id="diaryEditorDayLabel"></div>
+      </div>
+      <input type="text" id="diaryTitle" class="diary-title-input" placeholder="今天的主題…" maxlength="50">
+      <div class="diary-photo-upload" id="photoDropzone">
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+        <label for="photoInput" class="diary-upload-label">📷 上傳照片</label>
+      </div>
+      <div class="diary-photos" id="diaryPhotoGrid"></div>
+      <textarea id="diaryText" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="10"></textarea>
+      <button id="saveDiary" class="diary-save-btn">💾 儲存日記</button>
+    </div>
   </div>
 </section>
 
@@ -632,6 +644,6 @@
   </div>
 </div>
 
-<script src="app.js?v=40"></script>
+<script src="app.js?v=41"></script>
 </body>
 </html>

@@ -632,9 +632,7 @@ async function loadItinerary() {
   }
   ensureDays();
   ensureFlights();
-  renderItinerary();
-  drawRouteLines();
-  renderRouteLegend();
+  try { renderItinerary(); drawRouteLines(); renderRouteLegend(); } catch(e) { console.error('[loadItinerary] render:', e); }
   // 背景從 Gist 拉最新版，有差異再重新渲染
   fetch('/api/sync')
     .then(r => r.json())
@@ -681,14 +679,7 @@ function renderItinerary() {
         <span>${DAY_SHORT[date] || day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
         <div class="day-header-btns">
           <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺</button>
-          <button class="btn-add-activity" data-date="${date}" title="新增行程">＋ 新增</button>
         </div>
-      </div>
-      <div class="day-add-form" id="add-form-${date}" style="display:none">
-        <input type="time" class="add-form-time" value="09:00">
-        <input type="text" class="add-form-name" placeholder="活動名稱…" maxlength="40">
-        <button class="add-form-confirm" data-date="${date}">✓</button>
-        <button class="add-form-cancel" data-date="${date}">✕</button>
       </div>
       <div class="day-places" id="day-${date}"></div>
       <div class="day-notes-wrap">
@@ -756,34 +747,6 @@ function renderItinerary() {
     col.querySelector('.day-notes').addEventListener('blur', () => {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
       if (itinerary[date]) itinerary[date].notes = txt;
-    });
-
-    // 新增行程 inline form
-    col.querySelector('.btn-add-activity').addEventListener('click', () => {
-      const form = document.getElementById(`add-form-${date}`);
-      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-      if (form.style.display === 'flex') form.querySelector('.add-form-name').focus();
-    });
-    col.querySelector('.add-form-cancel').addEventListener('click', () => {
-      document.getElementById(`add-form-${date}`).style.display = 'none';
-    });
-    col.querySelector('.add-form-confirm').addEventListener('click', () => {
-      const form = document.getElementById(`add-form-${date}`);
-      const time = form.querySelector('.add-form-time').value;
-      const name = form.querySelector('.add-form-name').value.trim();
-      if (!name) { form.querySelector('.add-form-name').focus(); return; }
-      if (!itinerary[date].places) itinerary[date].places = [];
-      itinerary[date].places.push({ name, time, type: 'other', description: '', lat: 0, lng: 0 });
-      renderDayPlaces(placesList, date);
-      drawRouteLines();
-      if (typeof renderTimelineView === 'function' && timelineMode) renderTimelineView();
-      form.querySelector('.add-form-name').value = '';
-      form.style.display = 'none';
-      showToast(`已新增「${name}」✓`);
-    });
-    col.querySelector('.add-form-name').addEventListener('keydown', e => {
-      if (e.key === 'Enter') col.querySelector(`.add-form-confirm[data-date="${date}"]`).click();
-      if (e.key === 'Escape') col.querySelector(`.add-form-cancel[data-date="${date}"]`).click();
     });
 
   });
@@ -1437,9 +1400,18 @@ function removeThinkingMessage() {
 document.getElementById('twd2jpy')?.addEventListener('input', updateCurrencyConvert);
 
 document.getElementById('btn-export').addEventListener('click', async () => {
-  syncItineraryFromDOM();
-  await saveItinerary();
-  showToast('行程已儲存至雲端 ✓');
+  const btn = document.getElementById('btn-export');
+  btn.textContent = '⏳ 儲存中…';
+  btn.disabled = true;
+  try {
+    await saveItinerary();
+    btn.textContent = '✅ 已儲存';
+    setTimeout(() => { btn.textContent = '⬇ 儲存'; btn.disabled = false; }, 2000);
+  } catch(e) {
+    alert('儲存失敗：' + e.message);
+    btn.textContent = '⬇ 儲存';
+    btn.disabled = false;
+  }
 });
 
 // ════════════════════════════════════════════
@@ -2137,10 +2109,7 @@ async function syncPull() {
   } catch (_) { updateSyncIndicator('離線'); }
 }
 
-function updateSyncIndicator(text) {
-  const el = document.getElementById('sync-indicator');
-  if (el) { el.textContent = text === '已同步' ? '☁ 已同步' : '⚡ 離線'; el.dataset.state = text === '已同步' ? 'ok' : 'offline'; }
-}
+function updateSyncIndicator(text) { /* removed */ }
 
 // 攔截 localStorage.setItem 以在儲存時自動同步到 server
 const _origSetItem = localStorage.setItem.bind(localStorage);
@@ -2285,63 +2254,90 @@ document.getElementById('fillFromItinerary')?.addEventListener('click', () => {
 const DIARY_DAYS = ['2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08','2026-08-09'];
 let activeDiaryDay = DIARY_DAYS[0];
 
-function renderDiaryDayTabs() {
-  const container = document.getElementById('diaryDayTabs');
-  if (!container) return;
-  container.innerHTML = DIARY_DAYS.map(d =>
-    `<button class="diary-day-tab${d === activeDiaryDay ? ' active' : ''}" data-day="${d}">${DAY_SHORT[d] || d}</button>`
-  ).join('');
-  container.querySelectorAll('.diary-day-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      activeDiaryDay = btn.dataset.day;
-      renderDiaryDayTabs();
-      renderDiaryContent();
-    });
+function renderDiary() {
+  const hub = document.getElementById('diary-landing');
+  const editor = document.getElementById('diary-editor');
+  if (!hub || !editor) return;
+  hub.style.display = 'flex';
+  editor.style.display = 'none';
+  const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
+  hub.innerHTML = `
+    <div class="diary-hub-header">
+      <div class="diary-hub-title">📷 旅遊日記</div>
+      <div class="diary-hub-sub">記錄每天的精彩時刻</div>
+    </div>
+    <div class="diary-day-cards">
+      ${DIARY_DAYS.map(d => {
+        const day = diaryData[d] || {};
+        const hasContent = day.text || (day.photos && day.photos.length > 0);
+        const photoCount = (day.photos || []).length;
+        return `
+          <button class="diary-day-card${hasContent ? ' has-content' : ''}" data-day="${d}">
+            <span class="diary-card-date">${DAY_SHORT[d] || d}</span>
+            <span class="diary-card-title">${escHtml(day.title || (hasContent ? '已記錄' : '尚無記錄'))}</span>
+            ${photoCount > 0 ? `<span class="diary-card-photos">📷 ${photoCount} 張</span>` : '<span class="diary-card-photos">點擊記錄</span>'}
+          </button>`;
+      }).join('')}
+    </div>`;
+  hub.querySelectorAll('.diary-day-card').forEach(btn => {
+    btn.addEventListener('click', () => openDiaryEditor(btn.dataset.day));
   });
 }
 
-function renderDiaryContent() {
-  const container = document.getElementById('diaryContent');
-  if (!container) return;
+function openDiaryEditor(day) {
+  activeDiaryDay = day;
+  const hub = document.getElementById('diary-landing');
+  const editor = document.getElementById('diary-editor');
+  if (!hub || !editor) return;
+  hub.style.display = 'none';
+  editor.style.display = 'flex';
+  const label = document.getElementById('diaryEditorDayLabel');
+  if (label) label.textContent = DAY_SHORT[day] || day;
   const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  const dayData   = diaryData[activeDiaryDay] || { text: '', photos: [] };
-  container.innerHTML = `
-    <h3 class="diary-day-heading">${DAY_SHORT[activeDiaryDay] || activeDiaryDay} 的日記</h3>
-    <div class="diary-photo-upload" id="photoDropzone">
-      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
-      <label for="photoInput" style="cursor:pointer">📷 點擊上傳照片</label>
-    </div>
-    <div class="diary-photos" id="diaryPhotoGrid"></div>
-    <textarea id="diaryText" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="8">${escHtml(dayData.text || '')}</textarea>
-    <button id="saveDiary" class="diary-save-btn">💾 儲存日記</button>`;
+  const dayData = diaryData[day] || { title: '', text: '', photos: [] };
+  const titleEl = document.getElementById('diaryTitle');
+  const textEl = document.getElementById('diaryText');
+  if (titleEl) titleEl.value = dayData.title || '';
+  if (textEl) textEl.value = dayData.text || '';
   renderDiaryPhotos(dayData.photos || []);
-  document.getElementById('photoInput').addEventListener('change', e => {
+  // 重新綁定 save 按鈕（移除舊 listener）
+  const saveBtn = document.getElementById('saveDiary');
+  const newSaveBtn = saveBtn.cloneNode(true);
+  saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+  newSaveBtn.addEventListener('click', () => saveDiaryDay());
+  // 重新綁定照片 input
+  const photoInput = document.getElementById('photoInput');
+  const newPhotoInput = photoInput.cloneNode(true);
+  photoInput.parentNode.replaceChild(newPhotoInput, photoInput);
+  newPhotoInput.id = 'photoInput';
+  document.querySelector('label[for="photoInput"]').htmlFor = 'photoInput';
+  newPhotoInput.addEventListener('change', e => {
     [...e.target.files].forEach(file => {
       const reader = new FileReader();
       reader.onload = ev => addDiaryPhoto(ev.target.result);
       reader.readAsDataURL(file);
     });
   });
-  document.getElementById('saveDiary').addEventListener('click', () => {
-    const text = document.getElementById('diaryText').value;
-    const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-    if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
-    data[activeDiaryDay].text = text;
-    localStorage.setItem('diaryData', JSON.stringify(data));
-    const btn = document.getElementById('saveDiary');
-    btn.textContent = '✅ 已儲存';
-    setTimeout(() => btn.textContent = '💾 儲存日記', 1500);
-  });
 }
 
-function renderDiary() {
-  renderDiaryDayTabs();
-  renderDiaryContent();
+function saveDiaryDay() {
+  const title = (document.getElementById('diaryTitle') || {}).value || '';
+  const text = (document.getElementById('diaryText') || {}).value || '';
+  const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
+  if (!data[activeDiaryDay]) data[activeDiaryDay] = { title: '', text: '', photos: [] };
+  data[activeDiaryDay].title = title;
+  data[activeDiaryDay].text = text;
+  localStorage.setItem('diaryData', JSON.stringify(data));
+  const btn = document.getElementById('saveDiary');
+  if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => btn.textContent = '💾 儲存日記', 1500); }
 }
+
+// 日記返回按鈕
+document.getElementById('diary-back-btn')?.addEventListener('click', () => renderDiary());
 
 function addDiaryPhoto(base64) {
   const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
+  if (!data[activeDiaryDay]) data[activeDiaryDay] = { title: '', text: '', photos: [] };
   data[activeDiaryDay].photos.push(base64);
   localStorage.setItem('diaryData', JSON.stringify(data));
   renderDiaryPhotos(data[activeDiaryDay].photos);
@@ -2358,9 +2354,11 @@ function renderDiaryPhotos(photos) {
   grid.querySelectorAll('.photo-delete').forEach(btn => {
     btn.addEventListener('click', () => {
       const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-      data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
-      localStorage.setItem('diaryData', JSON.stringify(data));
-      renderDiaryContent();
+      if (data[activeDiaryDay]) {
+        data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
+        localStorage.setItem('diaryData', JSON.stringify(data));
+        renderDiaryPhotos(data[activeDiaryDay].photos);
+      }
     });
   });
 }
@@ -2369,13 +2367,13 @@ function renderDiaryPhotos(photos) {
 //  INIT
 // ════════════════════════════════════════════
 (async () => {
-  await loadItinerary();
+  try { await loadItinerary(); } catch(e) { console.error('[init] loadItinerary:', e); ensureDays(); ensureFlights(); renderItinerary(); }
   loadTripForecast();
-  await loadPlaces();
-  await loadExpenses();
+  try { await loadPlaces(); } catch(e) { console.error('[init] loadPlaces:', e); }
+  try { await loadExpenses(); } catch(e) {}
   initPrepChecklists();
   renderShoppingList();
   updateCountdown();
   updatePrepRing();
-  await syncPull();
+  try { await syncPull(); } catch(e) {}
 })();
