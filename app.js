@@ -438,12 +438,12 @@ function googleMapsUrl(place) {
 // ════════════════════════════════════════════
 async function loadPlaces() {
   try {
-    const res = await fetch('/places.json');
+    const res = await fetch('/places.json?v=42');
     allPlaces = await res.json();
     filteredPlaces = allPlaces;
     renderPlacesList();
-    renderMarkers();
     updateCount();
+    try { renderMarkers(); } catch(e) { console.error('[loadPlaces] renderMarkers:', e); }
   } catch (e) { console.error('載入地點失敗', e); }
 }
 
@@ -2371,8 +2371,8 @@ function renderDiaryPhotos(photos) {
   loadTripForecast();
   try { await loadPlaces(); } catch(e) { console.error('[init] loadPlaces:', e); }
   try { await loadExpenses(); } catch(e) {}
-  initPrepChecklists();
-  renderShoppingList();
+  try { initPrepChecklists(); } catch(e) { console.error('[init] initPrepChecklists:', e); }
+  try { renderShoppingList(); } catch(e) { console.error('[init] renderShoppingList:', e); }
   updateCountdown();
   updatePrepRing();
   try { await syncPull(); } catch(e) {}
