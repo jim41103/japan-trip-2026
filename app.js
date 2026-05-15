@@ -4,21 +4,11 @@
 const HOTEL = {
   name: '淺草田原町站前APA飯店',
   description: '住宿', lat: 35.710269, lng: 139.7901016, type: 'hotel',
-  googleMapsUrl: '',
 };
-const HOTEL_FUJI = {
-  name: 'HOTEL FUJiTORiiGATE（ホテル富士トリイゲート）',
+const HOTEL_0808 = {
+  name: 'HOTEL FUJiTORiiGATE',
   description: '住宿', lat: 35.4828938, lng: 138.7967342, type: 'hotel',
   googleMapsUrl: 'https://maps.app.goo.gl/xDJqon45c7W1vL2HA',
-};
-const HOTEL_BY_DATE = {
-  '2026-08-03': HOTEL,
-  '2026-08-04': HOTEL,
-  '2026-08-05': HOTEL,
-  '2026-08-06': HOTEL,
-  '2026-08-07': HOTEL,
-  '2026-08-08': HOTEL_FUJI,
-  '2026-08-09': null,  // 返台日，無住宿
 };
 const NEARBY_RADIUS_KM = 1.0;
 const DAY_SHORT = {
@@ -32,157 +22,11 @@ const CAT_LABEL  = { food:'餐飲', ticket:'票券', transport:'交通', shoppin
 const SHOP_CAT   = { medicine:'💊 藥妝', food:'🍬 食品/零食', fashion:'👗 服飾', souvenir:'🎁 伴手禮', other:'📦 其他' };
 
 // ════════════════════════════════════════════
-//  SEARCH SYNONYMS & FUZZY SEARCH
-// ════════════════════════════════════════════
-const SEARCH_SYNONYMS = {
-  '餐廳': ['食','料理','餐','飯','麵','壽司','拉麵','燒肉','居酒屋','咖啡','甜點','蛋糕','restaurant','food','cafe','ramen','sushi','izakaya'],
-  '吃':   ['食','料理','餐','飯','麵','壽司','拉麵','燒肉','居酒屋','咖啡','甜點','restaurant','food'],
-  '咖啡': ['café','cafe','coffee','珈琲','カフェ'],
-  '甜點': ['dessert','sweets','菓子','和菓子','パン','麵包','bakery'],
-  '購物': ['shop','store','商場','百貨','藥妝','超市','便利','免稅','市集','mall','market'],
-  '藥妝': ['drugstore','matsumoto','松本','唐吉軻德','don quijote','コスメ'],
-  '景點': ['觀光','寺','神社','公園','博物館','美術館','展望','市場','街道','park','temple','shrine','museum','tower'],
-  '寺':   ['寺院','temple','お寺'],
-  '神社': ['shrine','神宮','jinja'],
-  '公園': ['garden','庭園','花園','park'],
-  '住宿': ['飯店','旅館','hotel','hostel','民宿','旅店'],
-  '車站': ['station','駅','eki','地鐵','地下鐵','電車'],
-};
-
-function expandQuery(query) {
-  const q = query.toLowerCase().trim();
-  const terms = new Set([q]);
-  for (const [key, synonyms] of Object.entries(SEARCH_SYNONYMS)) {
-    if (key.includes(q) || q.includes(key)) synonyms.forEach(s => terms.add(s.toLowerCase()));
-    if (synonyms.some(s => s.toLowerCase().includes(q) || q.includes(s.toLowerCase()))) {
-      terms.add(key.toLowerCase());
-      synonyms.forEach(s => terms.add(s.toLowerCase()));
-    }
-  }
-  return [...terms];
-}
-
-function fuzzyScore(target, query) {
-  if (!target || !query) return 0;
-  const t = target.toLowerCase(), q = query.toLowerCase();
-  if (t === q) return 1;
-  if (t.includes(q)) return 0.9;
-  let qi = 0;
-  for (let ti = 0; ti < t.length && qi < q.length; ti++) { if (t[ti] === q[qi]) qi++; }
-  if (qi === q.length) return 0.5;
-  return 0;
-}
-
-function searchPlaces(query) {
-  if (!query || !query.trim()) return allPlaces;
-  const terms = expandQuery(query.trim());
-  return allPlaces
-    .map(place => {
-      const fields = [place.name||'', place.description||'', place.type||'', place.note||''].map(f => f.toLowerCase());
-      let best = 0;
-      for (const term of terms) for (const field of fields) { const s = fuzzyScore(field, term); if (s > best) best = s; }
-      return { place, score: best };
-    })
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map(({ place }) => place);
-}
-
-// ════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════
 let allPlaces = [], filteredPlaces = [], itinerary = {}, notionPages = [], expenses = [];
 let markers = {}, activeFilter = 'all', activeNotionTab = 0;
 let shopItems = JSON.parse(localStorage.getItem('shopItems') || 'null') || defaultShopItems();
-
-// ════════════════════════════════════════════
-//  WEATHER MODAL (Landing)
-// ════════════════════════════════════════════
-const WEATHER_LAT = 35.7148, WEATHER_LNG = 139.7967;
-
-function tenkiEmoji(c) {
-  if (!c) return '🌡'; if (/晴/.test(c)) return '☀️'; if (/くもり|曇/.test(c)) return '☁️';
-  if (/雷/.test(c)) return '⛈'; if (/雪/.test(c)) return '❄️'; if (/雨/.test(c)) return '🌧'; return '🌡';
-}
-
-function openWeatherModal() {
-  document.getElementById('weatherModal').style.display = 'flex';
-  loadHourlyWeather();
-  loadWeeklyWeather();
-}
-function closeWeatherModal() {
-  document.getElementById('weatherModal').style.display = 'none';
-}
-
-async function loadWeatherCardPreview() {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&current_weather=true&timezone=Asia%2FTokyo`;
-    const data = await (await fetch(url)).json();
-    const cw = data.current_weather;
-    const [emoji] = wmo(cw.weathercode);
-    document.getElementById('weatherCardIcon').textContent = emoji;
-    document.getElementById('weatherCardDesc').textContent = `${Math.round(cw.temperature)}° · 東京淺草`;
-  } catch(e) { /* keep default */ }
-}
-
-async function loadHourlyWeather() {
-  const strip = document.getElementById('hourlyStrip');
-  if (!strip) return;
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&hourly=temperature_2m,precipitation_probability,weathercode&timezone=Asia%2FTokyo&forecast_days=2`;
-    const h = (await (await fetch(url)).json()).hourly;
-    const now = new Date(), nowH = now.getHours(), todayStr = now.toISOString().slice(0,10);
-    const si = h.time.findIndex(t => t.startsWith(todayStr) && parseInt(t.slice(11,13)) >= nowH);
-    if (si === -1) { strip.innerHTML = '<div class="weather-loading">資料暫時無法取得</div>'; return; }
-    strip.innerHTML = h.time.slice(si, si+24).map((t, i) => {
-      const idx = si+i, [emoji] = wmo(h.weathercode[idx]);
-      return `<div class="hourly-item${i===0?' hourly-now':''}">
-        <div class="hi-time">${i===0?'現在':t.slice(11,16)}</div>
-        <div class="hi-icon">${emoji}</div>
-        <div class="hi-temp">${Math.round(h.temperature_2m[idx])}°</div>
-        <div class="hi-rain">💧${h.precipitation_probability[idx]??'--'}%</div>
-      </div>`;
-    }).join('');
-  } catch(e) { strip.innerHTML = '<div class="weather-loading">載入失敗</div>'; }
-}
-
-async function loadWeeklyWeather() {
-  const row = document.getElementById('weeklyRow');
-  if (!row) return;
-  const DN = ['日','一','二','三','四','五','六'];
-  try {
-    const tj = await (await fetch('/api/tenki-weekly')).json();
-    if (tj.days && tj.days.length > 0) {
-      row.innerHTML = tj.days.slice(0,7).map(d => {
-        const emoji = tenkiEmoji(d.condition);
-        const dt = new Date(d.date+'T12:00:00+09:00');
-        const label = `${dt.getMonth()+1}/${dt.getDate()}(${DN[dt.getDay()]})`;
-        return `<div class="weekly-item">
-          <div class="wi-date">${label}</div><div class="wi-icon">${emoji}</div>
-          <div class="wi-cond">${d.condition||''}</div>
-          <div class="wi-temp"><span class="temp-hi">${d.hi??'--'}°</span><span class="temp-sep">/</span><span class="temp-lo">${d.lo??'--'}°</span></div>
-          <div class="wi-rain">💧${d.rainPct??'--'}%</div>
-        </div>`;
-      }).join('');
-      return;
-    }
-  } catch(e) { /* fall through to fallback */ }
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=7`;
-    const d = (await (await fetch(url)).json()).daily;
-    row.innerHTML = d.time.map((date, i) => {
-      const [emoji, cond] = wmo(d.weathercode[i]);
-      const dt = new Date(date+'T12:00:00+09:00');
-      const label = `${dt.getMonth()+1}/${dt.getDate()}(${DN[dt.getDay()]})`;
-      return `<div class="weekly-item">
-        <div class="wi-date">${label}</div><div class="wi-icon">${emoji}</div>
-        <div class="wi-cond">${cond}</div>
-        <div class="wi-temp"><span class="temp-hi">${Math.round(d.temperature_2m_max[i])}°</span><span class="temp-sep">/</span><span class="temp-lo">${Math.round(d.temperature_2m_min[i])}°</span></div>
-        <div class="wi-rain">💧${d.precipitation_probability_max[i]??'--'}%</div>
-      </div>`;
-    }).join('');
-  } catch(e) { row.innerHTML = '<div class="weather-loading">一週天氣載入失敗</div>'; }
-}
 
 // ════════════════════════════════════════════
 //  SPLASH → LANDING
@@ -205,7 +49,8 @@ function showLanding() {
   const cd = document.getElementById('landingCountdown');
   const daysLeft = Math.ceil((new Date('2026-08-03') - new Date()) / 86400000);
   if (cd) cd.textContent = daysLeft > 0 ? `✈ 還有 ${daysLeft} 天出發！` : '🎉 旅程進行中！';
-  document.querySelectorAll('.landing-card[data-tab]').forEach(card => {
+  loadWeatherCardPreview();
+  document.querySelectorAll('.landing-card').forEach(card => {
     card.onclick = () => {
       const tab = card.dataset.tab;
       landing.classList.add('landing-exit');
@@ -217,7 +62,6 @@ function showLanding() {
       }, 300);
     };
   });
-  loadWeatherCardPreview();
 }
 
 let activeSection = 'itinerary';
@@ -238,7 +82,6 @@ function switchTab(tabName) {
     document.getElementById('itinerary-panel')?.classList.add('mobile-active');
     document.getElementById('map-panel')?.classList.remove('mobile-active');
     setTimeout(() => map.invalidateSize(), 50);
-    try { renderItinerary(); drawRouteLines(); } catch(e) { console.error('[switchTab itinerary]', e); }
   }
   if (tabName === 'shopping') renderShoppingList();
   if (tabName === 'ledger') {
@@ -279,20 +122,7 @@ document.getElementById('floatAIBtn').addEventListener('click', () => {
 //  SERVICE WORKER
 // ════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    reg.addEventListener('updatefound', () => {
-      const nw = reg.installing;
-      nw.addEventListener('statechange', () => {
-        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-          nw.postMessage({ type: 'SKIP_WAITING' });
-        }
-      });
-    });
-  }).catch(() => {});
-  let reloading = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!reloading) { reloading = true; window.location.reload(); }
-  });
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
 // ════════════════════════════════════════════
@@ -451,12 +281,12 @@ function googleMapsUrl(place) {
 // ════════════════════════════════════════════
 async function loadPlaces() {
   try {
-    const res = await fetch('/places.json?v=43');
+    const res = await fetch('/places.json');
     allPlaces = await res.json();
     filteredPlaces = allPlaces;
     renderPlacesList();
+    renderMarkers();
     updateCount();
-    try { renderMarkers(); } catch(e) { console.error('[loadPlaces] renderMarkers:', e); }
   } catch (e) { console.error('載入地點失敗', e); }
 }
 
@@ -500,30 +330,23 @@ function buildPopupHTML(place, idx) {
     </div>`;
 }
 
-function renderPlacesList(places) {
-  if (places === undefined) places = filteredPlaces;
+function renderPlacesList() {
   const ul = document.getElementById('places-list');
-  if (!ul) return;
   ul.innerHTML = '';
-  if (places.length === 0) {
-    ul.innerHTML = '<div class="place-empty">找不到相關地點</div>';
-    initPlaceListDrag();
-    return;
-  }
-  places.forEach((place, idx) => {
+  filteredPlaces.forEach((place, idx) => {
     const li = document.createElement('li');
-    li.className = 'place-item';
-    li.dataset.placeId = place.id !== undefined ? place.id : idx;
-    const mapsUrl = place.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`;
-    const dot = place.type === 'restaurant' ? '🍽' : '🏯';
+    li.dataset.idx = idx;
+    const icon = place.type==='restaurant' ? '🍽' : '🏯';
     li.innerHTML = `
-      <span class="place-type-dot type-${place.type || 'other'}">${dot}</span>
-      <span class="place-name">${escHtml(place.name)}</span>
-      <a class="place-map-link" href="${mapsUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺</a>`;
+      <span class="place-icon">${icon}</span>
+      <div class="place-info">
+        <div class="place-name">${escHtml(place.name)}</div>
+        ${place.description ? `<div class="place-desc">${escHtml(place.description)}</div>` : ''}
+      </div>
+      <a class="place-map-link" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">G</a>`;
     li.addEventListener('click', e => {
       if (e.target.closest('.place-map-link')) return;
       flyToPlace(idx);
-      showNearbyByIdx(idx);
     });
     ul.appendChild(li);
   });
@@ -531,24 +354,21 @@ function renderPlacesList(places) {
 }
 
 function initPlaceListDrag() {
-  const listEl = document.getElementById('places-list');
-  if (!listEl) return;
-  Sortable.create(listEl, {
+  const ul = document.getElementById('places-list');
+  if (!ul) return;
+  if (ul._sortable) { ul._sortable.destroy(); }
+  ul._sortable = Sortable.create(ul, {
     group: { name: 'places', pull: 'clone', put: false },
     sort: false,
     animation: 120,
-    ghostClass: 'drag-ghost',
-    chosenClass: 'drag-chosen',
-    onClone(evt) {
-      evt.clone.dataset.placeId = evt.item.dataset.placeId;
-    },
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
   });
 }
 
 function highlightListItem(idx) {
   document.querySelectorAll('#places-list li').forEach(li => li.classList.remove('highlighted'));
-  const lis = document.querySelectorAll('#places-list li');
-  const target = lis[idx];
+  const target = document.querySelector(`#places-list li[data-idx="${idx}"]`);
   if (target) { target.classList.add('highlighted'); target.scrollIntoView({ block:'nearest' }); }
 }
 
@@ -564,15 +384,13 @@ function updateCount() {
 }
 
 function applyFilter() {
-  const q = document.getElementById('search-input').value.trim();
-  if (q) {
-    filteredPlaces = searchPlaces(q).filter(p => activeFilter === 'all' || p.type === activeFilter);
-  } else {
-    filteredPlaces = activeFilter === 'all' ? allPlaces : allPlaces.filter(p => p.type === activeFilter);
-  }
-  renderPlacesList(filteredPlaces);
-  renderMarkers();
-  updateCount();
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  filteredPlaces = allPlaces.filter(p => {
+    const matchType = activeFilter==='all' || p.type===activeFilter;
+    const matchQ = !q || p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q);
+    return matchType && matchQ;
+  });
+  renderPlacesList(); renderMarkers(); updateCount();
 }
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -585,6 +403,295 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 });
 document.getElementById('search-input').addEventListener('input', applyFilter);
 
+// ════════════════════════════════════════════
+//  PLACE SEARCH (Nominatim + Google Maps link)
+// ════════════════════════════════════════════
+const OSM_TYPE_EMOJI = {
+  restaurant: '🍽', cafe: '☕', bar: '🍺', fast_food: '🍔',
+  attraction: '🏯', temple: '⛩', shrine: '⛩', museum: '🏛',
+  park: '🌳', garden: '🌸', theme_park: '🎢',
+  hotel: '🏨', hostel: '🏨',
+  shop: '🛍', mall: '🛍', supermarket: '🛒',
+  station: '🚉', subway: '🚇',
+  default: '📍',
+};
+
+function osmEmoji(tags) {
+  if (!tags) return '📍';
+  const t = tags.tourism || tags.amenity || tags.leisure || tags.shop || tags.railway || '';
+  return OSM_TYPE_EMOJI[t] || '📍';
+}
+
+function osmToType(tags) {
+  if (!tags) return 'attraction';
+  const a = tags.amenity || '';
+  if (['restaurant','cafe','bar','fast_food','food_court'].includes(a)) return 'restaurant';
+  return 'attraction';
+}
+
+function googleMapsSearchUrl(name, lat, lng) {
+  // 用名稱+座標組成搜尋連結，在手機上會開啟 Google Maps app
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&center=${lat},${lng}`;
+}
+
+let pspDebounce = null;
+
+document.getElementById('btn-place-search').addEventListener('click', () => {
+  document.getElementById('place-search-panel').classList.remove('hidden');
+  document.getElementById('psp-input').focus();
+});
+
+document.getElementById('psp-close').addEventListener('click', () => {
+  document.getElementById('place-search-panel').classList.add('hidden');
+  document.getElementById('psp-input').value = '';
+  document.getElementById('psp-results').innerHTML = '';
+});
+
+document.getElementById('psp-input').addEventListener('input', function() {
+  clearTimeout(pspDebounce);
+  const q = this.value.trim();
+  if (!q) { document.getElementById('psp-results').innerHTML = ''; return; }
+  document.getElementById('psp-results').innerHTML = '<div class="psp-loading">搜尋中…</div>';
+  pspDebounce = setTimeout(() => searchNominatim(q), 500);
+});
+
+async function searchNominatim(query) {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&extratags=1&limit=8&accept-language=zh-TW,ja,en&viewbox=138.0,35.0,141.5,36.8&bounded=0`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,ja,en' } });
+    const data = await res.json();
+    renderPspResults(data, query);
+  } catch (e) {
+    document.getElementById('psp-results').innerHTML = '<div class="psp-empty">搜尋失敗，請稍後再試</div>';
+  }
+}
+
+function renderPspResults(data, query) {
+  const el = document.getElementById('psp-results');
+  if (!data || data.length === 0) {
+    el.innerHTML = `<div class="psp-empty">找不到「${escHtml(query)}」的相關地點</div>`;
+    return;
+  }
+  const dayOptions = Object.entries(DAY_SHORT).map(([d, label]) =>
+    `<option value="${d}">${label}</option>`).join('');
+
+  el.innerHTML = data.map((item, idx) => {
+    const name = item.namedetails?.name || item.display_name.split(',')[0];
+    const addr = item.display_name.split(',').slice(1, 4).join('、').trim();
+    const lat  = parseFloat(item.lat);
+    const lng  = parseFloat(item.lon);
+    const emoji = osmEmoji(item.extratags);
+    const gmapUrl = googleMapsSearchUrl(name, lat, lng);
+    return `
+      <div class="psp-card">
+        <div class="psp-card-icon">${emoji}</div>
+        <div class="psp-card-body">
+          <div class="psp-card-name">${escHtml(name)}</div>
+          <div class="psp-card-addr">${escHtml(addr)}</div>
+          <div class="psp-card-actions">
+            <select class="psp-day-sel" id="psp-day-${idx}">${dayOptions}</select>
+            <button class="psp-add-btn" data-idx="${idx}" data-name="${escHtml(name)}" data-lat="${lat}" data-lng="${lng}" data-type="${osmToType(item.extratags)}">＋ 加入行程</button>
+            <button class="psp-wish-btn" data-name="${escHtml(name)}" data-lat="${lat}" data-lng="${lng}" data-type="${osmToType(item.extratags)}">⭐ 候選</button>
+            <a class="psp-gmap-btn" href="${gmapUrl}" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              Google Maps
+            </a>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('psp-results').addEventListener('click', e => {
+  const btn = e.target.closest('.psp-add-btn');
+  if (!btn) return;
+  const idx  = btn.dataset.idx;
+  const date = document.getElementById(`psp-day-${idx}`)?.value;
+  if (!date || !itinerary[date]) return;
+  const place = {
+    name: btn.dataset.name,
+    lat: parseFloat(btn.dataset.lat),
+    lng: parseFloat(btn.dataset.lng),
+    type: btn.dataset.type,
+    description: '',
+  };
+  if (!itinerary[date].places) itinerary[date].places = [];
+  if (itinerary[date].places.some(p => p.name === place.name)) {
+    showToast('此地點已在行程中'); return;
+  }
+  itinerary[date].places.push(place);
+  const container = document.getElementById(`day-${date}`);
+  if (container) renderDayPlaces(container, date);
+  drawRouteLines();
+  showToast(`✓ 已加入 ${DAY_SHORT[date]}`);
+  btn.textContent = '✓ 已加入'; btn.disabled = true;
+});
+
+// ⭐ 加入候選清單（PSP 搜尋結果）
+document.getElementById('psp-results').addEventListener('click', e => {
+  const btn = e.target.closest('.psp-wish-btn');
+  if (!btn) return;
+  const place = {
+    name: btn.dataset.name,
+    lat: parseFloat(btn.dataset.lat),
+    lng: parseFloat(btn.dataset.lng),
+    type: btn.dataset.type || 'attraction',
+    description: '',
+  };
+  if (wishlist.some(p => p.name === place.name)) {
+    showToast('已在候選清單中'); return;
+  }
+  wishlist.push(place);
+  saveWishlist();
+  renderWishlist();
+  showToast(`⭐ 已加入候選清單：${place.name}`);
+  btn.textContent = '✓ 已加入'; btn.disabled = true;
+});
+
+// ════════════════════════════════════════════
+//  WISHLIST（候選清單 / 地標緩衝區）
+// ════════════════════════════════════════════
+let wishlist = JSON.parse(localStorage.getItem('japan_wishlist') || '[]');
+
+function saveWishlist() {
+  localStorage.setItem('japan_wishlist', JSON.stringify(wishlist));
+}
+
+function renderWishlist() {
+  const list   = document.getElementById('wishlist-list');
+  const empty  = document.getElementById('wishlist-empty');
+  const count  = document.getElementById('wishlist-count');
+  count.textContent = `${wishlist.length} 個`;
+  list.innerHTML = '';
+  if (!wishlist.length) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  wishlist.forEach((place, i) => {
+    const icon = place.type === 'restaurant' ? '🍽' : '🏯';
+    const li = document.createElement('li');
+    li.className = 'wishlist-item itinerary-place';
+    li.dataset.name        = place.name;
+    li.dataset.lat         = place.lat;
+    li.dataset.lng         = place.lng;
+    li.dataset.type        = place.type;
+    li.dataset.description = place.description || '';
+    li.dataset.time        = '';
+    li.innerHTML = `
+      <span class="wi-icon">${icon}</span>
+      <div class="wi-info"><div class="wi-name">${escHtml(place.name)}</div></div>
+      <button class="wi-remove" data-i="${i}" title="移除">✕</button>`;
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('wishlist-list').addEventListener('click', e => {
+  const btn = e.target.closest('.wi-remove');
+  if (!btn) return;
+  e.stopPropagation();
+  wishlist.splice(parseInt(btn.dataset.i), 1);
+  saveWishlist();
+  renderWishlist();
+});
+
+document.getElementById('wishlist-toggle').addEventListener('click', () => {
+  const body    = document.getElementById('wishlist-body');
+  const chevron = document.querySelector('.wishlist-chevron');
+  const hidden  = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  chevron.textContent = hidden ? '▲' : '▼';
+});
+
+// SortableJS：候選清單 → 拖入行程欄（clone，原件保留）
+Sortable.create(document.getElementById('wishlist-list'), {
+  group:       { name: 'itinerary', pull: 'clone', put: false },
+  animation:   150,
+  sort:        false,
+  ghostClass:  'sortable-ghost',
+});
+
+renderWishlist();
+
+// ════════════════════════════════════════════
+//  IMPORT JSON (Google Takeout GeoJSON / places_geocoded)
+// ════════════════════════════════════════════
+function importPlacesFromData(data) {
+  let entries = [];
+
+  // GeoJSON format: { type: 'FeatureCollection', features: [...] }
+  if (data && Array.isArray(data.features)) {
+    entries = data.features
+      .filter(f => f.geometry?.coordinates)
+      .map(f => ({
+        name: f.properties?.name || f.properties?.Title || '',
+        description: f.properties?.description || f.properties?.note || '',
+        type: 'attraction',
+        lat: f.geometry.coordinates[1],
+        lng: f.geometry.coordinates[0],
+        googleMapsUrl: f.properties?.['Google Maps URL'] || f.properties?.googleMapsUrl || '',
+      }));
+  }
+  // Simple array format: [{name, lat, lng, note, type, googleMapsUrl}, ...]
+  else if (Array.isArray(data)) {
+    entries = data
+      .filter(p => p.lat != null && p.lng != null)
+      .map(p => ({
+        name: p.name || '',
+        description: p.note || p.description || '',
+        type: p.type || 'attraction',
+        lat: p.lat,
+        lng: p.lng,
+        googleMapsUrl: p.googleMapsUrl || '',
+      }));
+  }
+
+  const valid = entries.filter(p => p.name && p.lat && p.lng);
+  let added = 0;
+  valid.forEach(place => {
+    if (!wishlist.some(w => w.name === place.name)) {
+      wishlist.push(place);
+      added++;
+    }
+  });
+  saveWishlist();
+  renderWishlist();
+  // 展開候選清單
+  const body = document.getElementById('wishlist-body');
+  if (body && body.style.display === 'none') {
+    body.style.display = '';
+    document.querySelector('.wishlist-chevron').textContent = '▲';
+  }
+  showToast(`已匯入 ${added} 個地點（共 ${valid.length} 筆有效）✓`);
+}
+
+document.getElementById('importJsonBtn').addEventListener('click', () => {
+  document.getElementById('importJsonFile').click();
+});
+
+document.getElementById('importJsonFile').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      importPlacesFromData(data);
+    } catch {
+      showToast('❌ JSON 解析失敗，請確認檔案格式');
+    }
+  };
+  reader.readAsText(file);
+  this.value = '';
+});
+
+document.getElementById('loadGeocodedBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/data/maps/places_geocoded.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    importPlacesFromData(data);
+  } catch (err) {
+    showToast(`❌ 載入失敗：${err.message}`);
+  }
+});
 
 // ════════════════════════════════════════════
 //  LOCKED FLIGHT DATA
@@ -637,15 +744,14 @@ function ensureFlights() {
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
 async function loadItinerary() {
-  try {
-    const res = await fetch('/itinerary.json?v=43');
-    itinerary = await res.json();
-  } catch (e) {
-    console.warn('itinerary.json 載入失敗，使用空行程', e);
-  }
+  // 立刻用靜態檔渲染，不等 sync
+  const res = await fetch('/itinerary.json');
+  itinerary = await res.json();
   ensureDays();
   ensureFlights();
-  try { renderItinerary(); drawRouteLines(); renderRouteLegend(); } catch(e) { console.error('[loadItinerary] render:', e); }
+  renderItinerary();
+  drawRouteLines();
+  renderRouteLegend();
   // 背景從 Gist 拉最新版，有差異再重新渲染
   fetch('/api/sync')
     .then(r => r.json())
@@ -655,16 +761,8 @@ async function loadItinerary() {
       itinerary = remote;
       ensureDays();
       ensureFlights();
-      // 保存當前容器內容，若 renderItinerary 失敗則不清空
-      const container = document.getElementById('itinerary-days');
-      const backup = container ? container.innerHTML : '';
-      try {
-        renderItinerary();
-        drawRouteLines();
-      } catch (e) {
-        console.error('sync 後重新渲染失敗', e);
-        if (container && backup) container.innerHTML = backup;
-      }
+      renderItinerary();
+      drawRouteLines();
     })
     .catch(() => {});
 }
@@ -674,13 +772,6 @@ async function loadItinerary() {
 // ════════════════════════════════════════════
 function renderItinerary() {
   const container = document.getElementById('itinerary-days');
-  if (!container) { console.error('[renderItinerary] #itinerary-days not found'); return; }
-  const keys = Object.keys(itinerary);
-  console.log('[renderItinerary] itinerary keys:', keys.length, keys);
-  // 如果 itinerary 為空，確保至少有 7 天
-  Object.keys(DAY_SHORT).forEach(d => {
-    if (!itinerary[d]) itinerary[d] = { label: DAY_SHORT[d], places: [] };
-  });
   container.innerHTML = '';
   Object.entries(itinerary).forEach(([date, day]) => {
     const col = document.createElement('div');
@@ -692,65 +783,52 @@ function renderItinerary() {
         <span>${DAY_SHORT[date] || day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
         <div class="day-header-btns">
           <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺</button>
+          <button class="btn-add-activity" data-date="${date}" title="新增行程">＋ 新增</button>
         </div>
+      </div>
+      <div class="day-add-form" id="add-form-${date}" style="display:none">
+        <input type="time" class="add-form-time" value="09:00">
+        <input type="text" class="add-form-name" placeholder="活動名稱…" maxlength="40">
+        <button class="add-form-confirm" data-date="${date}">✓</button>
+        <button class="add-form-cancel" data-date="${date}">✕</button>
       </div>
       <div class="day-places" id="day-${date}"></div>
       <div class="day-notes-wrap">
         <div class="day-notes-label">📝 備注</div>
         <textarea class="day-notes" data-date="${date}" placeholder="新增當日備注…" rows="2">${escHtml(day.notes||'')}</textarea>
-      </div>`;
-    container.appendChild(col);
-
-    // 條件渲染飯店 footer（8/9 返台日無住宿）
-    const hotel = HOTEL_BY_DATE[date];
-    if (hotel) {
-      const footer = document.createElement('div');
-      footer.className = 'day-hotel-footer';
-      footer.innerHTML = `
+      </div>
+      ${date === '2026-08-09' ? '' : `<div class="day-hotel-footer">
         <div class="hotel-card">
           <span class="hotel-icon">🏨</span>
-          <span class="hotel-name">${escHtml(hotel.name)}</span>
-          <a class="hotel-gmaps" href="${hotel.googleMapsUrl || googleMapsUrl(hotel)}" target="_blank" rel="noopener" title="在 Google Maps 查看">📍</a>
+          <span class="hotel-name">${escHtml(date === '2026-08-08' ? HOTEL_0808.name : HOTEL.name)}</span>
+          <a class="hotel-gmaps" href="${date === '2026-08-08' ? HOTEL_0808.googleMapsUrl : googleMapsUrl(HOTEL)}" target="_blank" rel="noopener" title="在 Google Maps 查看">📍</a>
           <span class="hotel-badge">住宿</span>
-        </div>`;
-      col.appendChild(footer);
-    }
+        </div>
+      </div>`}`;
+    container.appendChild(col);
 
     const placesList = col.querySelector('.day-places');
     renderDayPlaces(placesList, date);
     Sortable.create(placesList, {
-      group: { name: 'places', pull: true, put: true },
+      group: { name: 'itinerary', put: ['itinerary', 'places'] },
       animation: 150,
       filter: '.iplace-locked',
-      ghostClass: 'drag-ghost',
-      chosenClass: 'drag-chosen',
-      onAdd(evt) {
-        const placeId = evt.item.dataset.placeId;
-        if (!placeId) { evt.item.remove(); return; }
-        const pidx = parseInt(placeId);
-        const place = isNaN(pidx) ? allPlaces.find(p => String(p.id) === String(placeId)) : allPlaces[pidx];
-        evt.item.remove();
-        if (!place) return;
-        if (!itinerary[date]) itinerary[date] = { label: DAY_SHORT[date], places: [] };
-        if (!itinerary[date].places.some(p => p.name === place.name)) {
-          itinerary[date].places.push({
-            name: place.name,
-            time: '',
-            type: place.type || 'attraction',
-            description: place.description || '',
-            lat: place.lat || 0,
-            lng: place.lng || 0,
-            googleMapsUrl: place.googleMapsUrl || '',
-          });
+      ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+      onAdd: function(evt) {
+        if (evt.from && evt.from.id === 'places-list') {
+          const idx = parseInt(evt.item.dataset.idx);
+          const place = filteredPlaces[idx];
+          evt.item.remove();
+          if (place && itinerary[date] && !itinerary[date].places.some(p => p.name === place.name)) {
+            itinerary[date].places.push({ ...place });
+          }
           renderDayPlaces(placesList, date);
           drawRouteLines();
-          showToast(`✓ 已加入 ${DAY_SHORT[date]}`);
-        } else {
-          showToast('此地點已在行程中');
+          if (timelineMode) renderTimelineView();
         }
       },
-      onEnd(evt) {
-        if (evt.from !== evt.to || evt.oldIndex !== evt.newIndex) {
+      onEnd: function(evt) {
+        if (!evt.from || evt.from.id !== 'places-list') {
           syncItineraryFromDOM();
         }
       },
@@ -760,6 +838,34 @@ function renderItinerary() {
     col.querySelector('.day-notes').addEventListener('blur', () => {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
       if (itinerary[date]) itinerary[date].notes = txt;
+    });
+
+    // 新增行程 inline form
+    col.querySelector('.btn-add-activity').addEventListener('click', () => {
+      const form = document.getElementById(`add-form-${date}`);
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+      if (form.style.display === 'flex') form.querySelector('.add-form-name').focus();
+    });
+    col.querySelector('.add-form-cancel').addEventListener('click', () => {
+      document.getElementById(`add-form-${date}`).style.display = 'none';
+    });
+    col.querySelector('.add-form-confirm').addEventListener('click', () => {
+      const form = document.getElementById(`add-form-${date}`);
+      const time = form.querySelector('.add-form-time').value;
+      const name = form.querySelector('.add-form-name').value.trim();
+      if (!name) { form.querySelector('.add-form-name').focus(); return; }
+      if (!itinerary[date].places) itinerary[date].places = [];
+      itinerary[date].places.push({ name, time, type: 'other', description: '', lat: 0, lng: 0 });
+      renderDayPlaces(placesList, date);
+      drawRouteLines();
+      if (typeof renderTimelineView === 'function' && timelineMode) renderTimelineView();
+      form.querySelector('.add-form-name').value = '';
+      form.style.display = 'none';
+      showToast(`已新增「${name}」✓`);
+    });
+    col.querySelector('.add-form-name').addEventListener('keydown', e => {
+      if (e.key === 'Enter') col.querySelector(`.add-form-confirm[data-date="${date}"]`).click();
+      if (e.key === 'Escape') col.querySelector(`.add-form-cancel[data-date="${date}"]`).click();
     });
 
   });
@@ -787,10 +893,7 @@ function renderDayPlaces(container, date) {
   container.innerHTML = '';
   const places = itinerary[date]?.places || [];
   if (places.length === 0) {
-    const hint = document.createElement('div');
-    hint.className = 'drag-hint';
-    hint.innerHTML = '<span class="drag-hint-icon">👈</span><span>從左側拖入地點開始規劃</span>';
-    container.appendChild(hint);
+    container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
     return;
   }
   // 有時間的依早→晚排序，無時間排最後（保持原有相對順序）
@@ -821,7 +924,7 @@ function makePlaceCard(place, date, pIdx) {
       <div class="iplace-top">
         <span class="iplace-icon">${place.icon || '✈'}</span>
         <div class="iplace-info" style="min-width:0">
-          <div class="iplace-name" style="font-size:11px;white-space:normal;line-height:1.3">${escHtml(place.name)}</div>
+          <div class="iplace-name" style="font-size:11px;white-space:normal;line-height:1.3;text-align:left">${escHtml(place.name)}</div>
         </div>
       </div>
       ${place.note ? `<div class="iplace-locked-note">${escHtml(place.note)}</div>` : ''}
@@ -892,11 +995,9 @@ function syncItineraryFromDOM() {
       return base;
     });
     if (cards.length === 0) {
-      container.innerHTML = '';
-      const hint = document.createElement('div');
-      hint.className = 'drag-hint';
-      hint.innerHTML = '<span class="drag-hint-icon">👈</span><span>從左側拖入地點開始規劃</span>';
-      container.appendChild(hint);
+      container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
+    } else {
+      container.querySelectorAll('.day-empty').forEach(el => el.remove());
     }
   });
   drawRouteLines();
@@ -924,6 +1025,15 @@ function addToDay(placeIdx, date) {
   map.closePopup();
 }
 
+function showDayPicker(idx) {
+  const place = filteredPlaces[idx];
+  const dateKeys = Object.keys(itinerary);
+  const options = dateKeys.map((d,i) => `${i+1}. ${itinerary[d].label}`).join('\n');
+  const choice = prompt(`將「${place.name}」加入哪一天？\n\n${options}\n\n請輸入數字：`);
+  const n = parseInt(choice);
+  if (isNaN(n) || n<1 || n>dateKeys.length) return;
+  addToDay(idx, dateKeys[n-1]);
+}
 
 function removeFromDay(date, pIdx) {
   itinerary[date].places.splice(pIdx, 1);
@@ -1413,18 +1523,9 @@ function removeThinkingMessage() {
 document.getElementById('twd2jpy')?.addEventListener('input', updateCurrencyConvert);
 
 document.getElementById('btn-export').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-export');
-  btn.textContent = '⏳ 儲存中…';
-  btn.disabled = true;
-  try {
-    await saveItinerary();
-    btn.textContent = '✅ 已儲存';
-    setTimeout(() => { btn.textContent = '⬇ 儲存'; btn.disabled = false; }, 2000);
-  } catch(e) {
-    alert('儲存失敗：' + e.message);
-    btn.textContent = '⬇ 儲存';
-    btn.disabled = false;
-  }
+  syncItineraryFromDOM();
+  await saveItinerary();
+  showToast('行程已儲存至雲端 ✓');
 });
 
 // ════════════════════════════════════════════
@@ -2122,7 +2223,10 @@ async function syncPull() {
   } catch (_) { updateSyncIndicator('離線'); }
 }
 
-function updateSyncIndicator(text) { /* removed */ }
+function updateSyncIndicator(text) {
+  const el = document.getElementById('sync-indicator');
+  if (el) { el.textContent = text === '已同步' ? '☁ 已同步' : '⚡ 離線'; el.dataset.state = text === '已同步' ? 'ok' : 'offline'; }
+}
 
 // 攔截 localStorage.setItem 以在儲存時自動同步到 server
 const _origSetItem = localStorage.setItem.bind(localStorage);
@@ -2267,90 +2371,63 @@ document.getElementById('fillFromItinerary')?.addEventListener('click', () => {
 const DIARY_DAYS = ['2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08','2026-08-09'];
 let activeDiaryDay = DIARY_DAYS[0];
 
-function renderDiary() {
-  const hub = document.getElementById('diary-landing');
-  const editor = document.getElementById('diary-editor');
-  if (!hub || !editor) return;
-  hub.style.display = 'flex';
-  editor.style.display = 'none';
-  const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  hub.innerHTML = `
-    <div class="diary-hub-header">
-      <div class="diary-hub-title">📷 旅遊日記</div>
-      <div class="diary-hub-sub">記錄每天的精彩時刻</div>
-    </div>
-    <div class="diary-day-cards">
-      ${DIARY_DAYS.map(d => {
-        const day = diaryData[d] || {};
-        const hasContent = day.text || (day.photos && day.photos.length > 0);
-        const photoCount = (day.photos || []).length;
-        return `
-          <button class="diary-day-card${hasContent ? ' has-content' : ''}" data-day="${d}">
-            <span class="diary-card-date">${DAY_SHORT[d] || d}</span>
-            <span class="diary-card-title">${escHtml(day.title || (hasContent ? '已記錄' : '尚無記錄'))}</span>
-            ${photoCount > 0 ? `<span class="diary-card-photos">📷 ${photoCount} 張</span>` : '<span class="diary-card-photos">點擊記錄</span>'}
-          </button>`;
-      }).join('')}
-    </div>`;
-  hub.querySelectorAll('.diary-day-card').forEach(btn => {
-    btn.addEventListener('click', () => openDiaryEditor(btn.dataset.day));
+function renderDiaryDayTabs() {
+  const container = document.getElementById('diaryDayTabs');
+  if (!container) return;
+  container.innerHTML = DIARY_DAYS.map(d =>
+    `<button class="diary-day-tab${d === activeDiaryDay ? ' active' : ''}" data-day="${d}">${DAY_SHORT[d] || d}</button>`
+  ).join('');
+  container.querySelectorAll('.diary-day-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeDiaryDay = btn.dataset.day;
+      renderDiaryDayTabs();
+      renderDiaryContent();
+    });
   });
 }
 
-function openDiaryEditor(day) {
-  activeDiaryDay = day;
-  const hub = document.getElementById('diary-landing');
-  const editor = document.getElementById('diary-editor');
-  if (!hub || !editor) return;
-  hub.style.display = 'none';
-  editor.style.display = 'flex';
-  const label = document.getElementById('diaryEditorDayLabel');
-  if (label) label.textContent = DAY_SHORT[day] || day;
+function renderDiaryContent() {
+  const container = document.getElementById('diaryContent');
+  if (!container) return;
   const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  const dayData = diaryData[day] || { title: '', text: '', photos: [] };
-  const titleEl = document.getElementById('diaryTitle');
-  const textEl = document.getElementById('diaryText');
-  if (titleEl) titleEl.value = dayData.title || '';
-  if (textEl) textEl.value = dayData.text || '';
+  const dayData   = diaryData[activeDiaryDay] || { text: '', photos: [] };
+  container.innerHTML = `
+    <h3 class="diary-day-heading">${DAY_SHORT[activeDiaryDay] || activeDiaryDay} 的日記</h3>
+    <div class="diary-photo-upload" id="photoDropzone">
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+      <label for="photoInput" style="cursor:pointer">📷 點擊上傳照片</label>
+    </div>
+    <div class="diary-photos" id="diaryPhotoGrid"></div>
+    <textarea id="diaryText" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="8">${escHtml(dayData.text || '')}</textarea>
+    <button id="saveDiary" class="diary-save-btn">💾 儲存日記</button>`;
   renderDiaryPhotos(dayData.photos || []);
-  // 重新綁定 save 按鈕（移除舊 listener）
-  const saveBtn = document.getElementById('saveDiary');
-  const newSaveBtn = saveBtn.cloneNode(true);
-  saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-  newSaveBtn.addEventListener('click', () => saveDiaryDay());
-  // 重新綁定照片 input
-  const photoInput = document.getElementById('photoInput');
-  const newPhotoInput = photoInput.cloneNode(true);
-  photoInput.parentNode.replaceChild(newPhotoInput, photoInput);
-  newPhotoInput.id = 'photoInput';
-  document.querySelector('label[for="photoInput"]').htmlFor = 'photoInput';
-  newPhotoInput.addEventListener('change', e => {
+  document.getElementById('photoInput').addEventListener('change', e => {
     [...e.target.files].forEach(file => {
       const reader = new FileReader();
       reader.onload = ev => addDiaryPhoto(ev.target.result);
       reader.readAsDataURL(file);
     });
   });
+  document.getElementById('saveDiary').addEventListener('click', () => {
+    const text = document.getElementById('diaryText').value;
+    const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
+    if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
+    data[activeDiaryDay].text = text;
+    localStorage.setItem('diaryData', JSON.stringify(data));
+    const btn = document.getElementById('saveDiary');
+    btn.textContent = '✅ 已儲存';
+    setTimeout(() => btn.textContent = '💾 儲存日記', 1500);
+  });
 }
 
-function saveDiaryDay() {
-  const title = (document.getElementById('diaryTitle') || {}).value || '';
-  const text = (document.getElementById('diaryText') || {}).value || '';
-  const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  if (!data[activeDiaryDay]) data[activeDiaryDay] = { title: '', text: '', photos: [] };
-  data[activeDiaryDay].title = title;
-  data[activeDiaryDay].text = text;
-  localStorage.setItem('diaryData', JSON.stringify(data));
-  const btn = document.getElementById('saveDiary');
-  if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => btn.textContent = '💾 儲存日記', 1500); }
+function renderDiary() {
+  renderDiaryDayTabs();
+  renderDiaryContent();
 }
-
-// 日記返回按鈕
-document.getElementById('diary-back-btn')?.addEventListener('click', () => renderDiary());
 
 function addDiaryPhoto(base64) {
   const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  if (!data[activeDiaryDay]) data[activeDiaryDay] = { title: '', text: '', photos: [] };
+  if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
   data[activeDiaryDay].photos.push(base64);
   localStorage.setItem('diaryData', JSON.stringify(data));
   renderDiaryPhotos(data[activeDiaryDay].photos);
@@ -2367,26 +2444,121 @@ function renderDiaryPhotos(photos) {
   grid.querySelectorAll('.photo-delete').forEach(btn => {
     btn.addEventListener('click', () => {
       const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-      if (data[activeDiaryDay]) {
-        data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
-        localStorage.setItem('diaryData', JSON.stringify(data));
-        renderDiaryPhotos(data[activeDiaryDay].photos);
-      }
+      data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
+      localStorage.setItem('diaryData', JSON.stringify(data));
+      renderDiaryContent();
     });
   });
+}
+
+// ════════════════════════════════════════════
+//  WEATHER
+// ════════════════════════════════════════════
+const WEATHER_LAT = 35.7148, WEATHER_LNG = 139.7967;
+
+function wmoWeather(code) {
+  if (code === 0) return ['☀️','晴']; if (code <= 2) return ['🌤','多雲']; if (code === 3) return ['☁️','陰'];
+  if (code <= 49) return ['🌫','霧']; if (code <= 59) return ['🌦','毛毛雨']; if (code <= 69) return ['🌧','雨'];
+  if (code <= 79) return ['❄️','雪']; if (code <= 82) return ['🌧','陣雨']; if (code <= 86) return ['🌨','陣雪'];
+  if (code <= 99) return ['⛈','雷雨']; return ['🌡', String(code)];
+}
+function tenkiEmoji(c) {
+  if (!c) return '🌡'; if (/晴/.test(c)) return '☀️'; if (/くもり|曇/.test(c)) return '☁️';
+  if (/雷/.test(c)) return '⛈'; if (/雪/.test(c)) return '❄️'; if (/雨/.test(c)) return '🌧'; return '🌡';
+}
+
+function openWeatherModal() {
+  document.getElementById('weatherModal').style.display = 'flex';
+  loadHourlyWeather();
+  loadWeeklyWeather();
+}
+function closeWeatherModal() {
+  document.getElementById('weatherModal').style.display = 'none';
+}
+
+async function loadWeatherCardPreview() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&current_weather=true&timezone=Asia%2FTokyo`;
+    const data = await (await fetch(url)).json();
+    const cw = data.current_weather;
+    const [emoji] = wmoWeather(cw.weathercode);
+    const iconEl = document.getElementById('weatherCardIcon');
+    const descEl = document.getElementById('weatherCardDesc');
+    if (iconEl) iconEl.textContent = emoji;
+    if (descEl) descEl.textContent = `${Math.round(cw.temperature)}° · 東京淺草`;
+  } catch(e) { /* keep default */ }
+}
+
+async function loadHourlyWeather() {
+  const strip = document.getElementById('hourlyStrip');
+  if (!strip) return;
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&hourly=temperature_2m,precipitation_probability,weathercode&timezone=Asia%2FTokyo&forecast_days=2`;
+    const h = (await (await fetch(url)).json()).hourly;
+    const now = new Date(), nowH = now.getHours(), todayStr = now.toISOString().slice(0,10);
+    const si = h.time.findIndex(t => t.startsWith(todayStr) && parseInt(t.slice(11,13)) >= nowH);
+    if (si === -1) { strip.innerHTML = '<div class="weather-loading">資料暫時無法取得</div>'; return; }
+    strip.innerHTML = h.time.slice(si, si+24).map((t, i) => {
+      const idx = si+i, [emoji] = wmoWeather(h.weathercode[idx]);
+      return `<div class="hourly-item${i===0?' hourly-now':''}">
+        <div class="hi-time">${i===0?'現在':t.slice(11,16)}</div>
+        <div class="hi-icon">${emoji}</div>
+        <div class="hi-temp">${Math.round(h.temperature_2m[idx])}°</div>
+        <div class="hi-rain">💧${h.precipitation_probability[idx]??'--'}%</div>
+      </div>`;
+    }).join('');
+  } catch(e) { strip.innerHTML = '<div class="weather-loading">載入失敗</div>'; }
+}
+
+async function loadWeeklyWeather() {
+  const row = document.getElementById('weeklyRow');
+  if (!row) return;
+  const DN = ['日','一','二','三','四','五','六'];
+  try {
+    const tj = await (await fetch('/api/tenki-weekly')).json();
+    if (tj.days && tj.days.length > 0) {
+      row.innerHTML = tj.days.slice(0,7).map(d => {
+        const emoji = tenkiEmoji(d.condition);
+        const dt = new Date(d.date+'T12:00:00+09:00');
+        const label = `${dt.getMonth()+1}/${dt.getDate()}(${DN[dt.getDay()]})`;
+        return `<div class="weekly-item">
+          <div class="wi-date">${label}</div><div class="wi-icon">${emoji}</div>
+          <div class="wi-cond">${d.condition||''}</div>
+          <div class="wi-temp"><span class="temp-hi">${d.hi??'--'}°</span><span class="temp-sep">/</span><span class="temp-lo">${d.lo??'--'}°</span></div>
+          <div class="wi-rain">💧${d.rainPct??'--'}%</div>
+        </div>`;
+      }).join('');
+      return;
+    }
+  } catch(e) { /* fall through */ }
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=7`;
+    const d = (await (await fetch(url)).json()).daily;
+    row.innerHTML = d.time.map((date, i) => {
+      const [emoji, cond] = wmoWeather(d.weathercode[i]);
+      const dt = new Date(date+'T12:00:00+09:00');
+      const label = `${dt.getMonth()+1}/${dt.getDate()}(${DN[dt.getDay()]})`;
+      return `<div class="weekly-item">
+        <div class="wi-date">${label}</div><div class="wi-icon">${emoji}</div>
+        <div class="wi-cond">${cond}</div>
+        <div class="wi-temp"><span class="temp-hi">${Math.round(d.temperature_2m_max[i])}°</span><span class="temp-sep">/</span><span class="temp-lo">${Math.round(d.temperature_2m_min[i])}°</span></div>
+        <div class="wi-rain">💧${d.precipitation_probability_max[i]??'--'}%</div>
+      </div>`;
+    }).join('');
+  } catch(e) { row.innerHTML = '<div class="weather-loading">一週天氣載入失敗</div>'; }
 }
 
 // ════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════
 (async () => {
-  try { await loadItinerary(); } catch(e) { console.error('[init] loadItinerary:', e); ensureDays(); ensureFlights(); renderItinerary(); }
+  await loadItinerary();
   loadTripForecast();
-  try { await loadPlaces(); } catch(e) { console.error('[init] loadPlaces:', e); }
-  try { await loadExpenses(); } catch(e) {}
-  try { initPrepChecklists(); } catch(e) { console.error('[init] initPrepChecklists:', e); }
-  try { renderShoppingList(); } catch(e) { console.error('[init] renderShoppingList:', e); }
+  await loadPlaces();
+  await loadExpenses();
+  initPrepChecklists();
+  renderShoppingList();
   updateCountdown();
   updatePrepRing();
-  try { await syncPull(); } catch(e) {}
+  await syncPull();
 })();

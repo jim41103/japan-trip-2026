@@ -1,14 +1,10 @@
-const CACHE = 'tokyo-trip-2026-v43';
+const CACHE = 'tokyo-trip-2026-v44';
 // HTML 不放入快取，永遠從網路取最新版
-const STATIC = ['/style.css?v=43', '/app.js?v=43', '/manifest.json', '/icon.svg'];
+const STATIC = ['/style.css?v=44', '/app.js?v=44', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
   self.skipWaiting();
-});
-
-self.addEventListener('message', e => {
-  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
