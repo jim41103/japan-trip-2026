@@ -20,8 +20,8 @@
   --text-muted: #7A6848;
   --restaurant: #E63B2E;
   --attraction: #2A6FC9;
-  --header-h: 52px;
-  --weather-h: 32px;
+  --header-h: 56px;
+  --weather-h: 0px;
   --tabs-h: 40px;
   --map-panel-w: 420px;
   --places-list-h: 220px;
@@ -173,7 +173,22 @@ header {
 .snoopy-badge { font-size: 20px; }
 header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .date-range { font-size: 12px; opacity: .7; }
-.header-actions { display: flex; gap: 8px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── 合併天氣到 Header ── */
+.header-weather {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: rgba(255,255,255,.85);
+  cursor: pointer; padding: 4px 10px; border-radius: 20px;
+  background: rgba(255,255,255,.08); border: none; color: rgba(255,255,255,.85);
+  white-space: nowrap; flex-shrink: 1; min-width: 0; overflow: hidden;
+  transition: background .15s;
+}
+.header-weather:hover { background: rgba(255,255,255,.18); }
+.header-weather #wb-temp { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-weather #wb-tomorrow { color: rgba(255,255,255,.65); font-size: 11px; }
+.header-weather .wb-divider { color: rgba(255,255,255,.3); }
+.header-weather #wb-loc { color: rgba(255,255,255,.4); font-size: 11px; }
 
 /* Buttons */
 .btn {
@@ -1061,7 +1076,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   z-index: 1;
 }
 .landing-header { text-align: center; }
-.landing-logo { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: 0.05em; }
+.landing-logo { font-size: 2.4rem; font-weight: 900; color: #ffe082; letter-spacing: 0.05em; text-shadow: 0 2px 8px rgba(0,0,0,.9), 0 4px 24px rgba(0,0,0,.7); }
 .landing-subtitle { font-size: 1rem; color: rgba(255,255,255,0.55); margin-top: 0.25rem; }
 .landing-countdown { font-size: 1.1rem; color: #ffb347; margin-top: 0.5rem; font-weight: 700; }
 .landing-cards {
@@ -1562,8 +1577,11 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 
 /* ── 航班卡片強制左對齊 ── */
-.iplace-locked .iplace-name { text-align: left; }
-.iplace-locked .iplace-info { text-align: left; }
+.iplace-locked .iplace-name  { text-align: left; }
+.iplace-locked .iplace-info  { text-align: left; width: 100%; }
+.iplace-locked-note          { text-align: left; }
+.iplace-locked .iplace-bottom { text-align: left; }
+.iplace-locked .iplace-top   { justify-content: flex-start; }
 
 /* ── 地點庫拖曳樣式 ── */
 #places-list li { cursor: grab; }
