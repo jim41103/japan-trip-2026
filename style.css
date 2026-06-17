@@ -4,22 +4,23 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #FFF8DC;
-  --bg-main: #F5EFD8;
+  /* 日系和風配色：和紙 / 墨 / 茜 / 藤 */
+  --bg: #FAF6EE;            /* 和紙白 */
+  --bg-main: #F2EBD9;       /* 生成色 */
   --bg-card: #FFFFFF;
   --surface: #FFFFFF;
-  --border: #D4C4A0;
-  --border-dark: #B8A882;
-  --primary: #E63B2E;
-  --primary-dark: #B71C1C;
-  --black: #1A1A1A;
-  --accent: #F5C518;
-  --blue: #2A6FC9;
-  --text: #1A1A1A;
-  --text-main: #1A1A1A;
-  --text-muted: #7A6848;
-  --restaurant: #E63B2E;
-  --attraction: #2A6FC9;
+  --border: #D9CDB5;        /* 淡茶色 */
+  --border-dark: #B49E78;
+  --primary: #BC002D;       /* 茜色（國旗紅） */
+  --primary-dark: #8E001F;
+  --black: #2B2B2B;         /* 墨色 */
+  --accent: #D9A441;        /* 山吹（金） */
+  --blue: #4A6FA5;          /* 紺青 */
+  --text: #2B2B2B;
+  --text-main: #2B2B2B;
+  --text-muted: #8A7B5C;
+  --restaurant: #BC002D;
+  --attraction: #4A6FA5;
   --header-h: 56px;
   --weather-h: 0px;
   --tabs-h: 40px;
@@ -168,7 +169,7 @@ header {
   flex-shrink: 0;
   border-bottom: 3px solid var(--primary);
 }
-.header-title { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.header-title { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; margin-right: auto; }
 .header-title:active { opacity: 0.7; }
 .snoopy-badge { font-size: 20px; }
 header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
@@ -177,18 +178,19 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* ── 合併天氣到 Header ── */
 .header-weather {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 12px; color: rgba(255,255,255,.85);
-  cursor: pointer; padding: 4px 10px; border-radius: 20px;
-  background: rgba(255,255,255,.08); border: none; color: rgba(255,255,255,.85);
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; line-height: 1; color: rgba(255,255,255,.85);
+  cursor: pointer; padding: 6px 12px; border-radius: 20px;
+  background: rgba(255,255,255,.08); border: none;
   white-space: nowrap; flex-shrink: 1; min-width: 0; overflow: hidden;
   transition: background .15s;
 }
 .header-weather:hover { background: rgba(255,255,255,.18); }
-.header-weather #wb-temp { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.header-weather #wb-tomorrow { color: rgba(255,255,255,.65); font-size: 11px; }
+.header-weather > span { display: inline-flex; align-items: center; line-height: 1; }
+.header-weather #wb-temp { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-weather #wb-tomorrow { color: rgba(255,255,255,.65); }
 .header-weather .wb-divider { color: rgba(255,255,255,.3); }
-.header-weather #wb-loc { color: rgba(255,255,255,.4); font-size: 11px; }
+.header-weather #wb-loc { color: rgba(255,255,255,.4); }
 
 /* Buttons */
 .btn {
@@ -442,7 +444,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .itinerary-actions { display: flex; gap: 8px; align-items: center; }
 #itinerary-days {
   flex: 1; overflow-x: auto; overflow-y: hidden;
-  display: flex; gap: 12px; padding: 12px;
+  display: flex; gap: 10px; padding: 8px 10px;
 }
 
 /* ── Day Column ── */
@@ -580,8 +582,9 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #section-prep { display: none; overflow-y: auto; background: var(--bg); }
 #section-prep.active { display: block; }
 .prep-container {
-  max-width: 760px; margin: 0 auto; padding: 20px 16px;
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;
+  max-width: 1400px; margin: 0 auto; padding: 16px 20px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;
+  align-items: start;
 }
 .prep-card {
   background: var(--surface); border-radius: 12px;
@@ -617,11 +620,27 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 ════════════════════════════════════════════ */
 #section-shopping { display: none; overflow-y: auto; background: var(--bg); }
 #section-shopping.active { display: block; }
-.shop-container { max-width: 800px; margin: 0 auto; padding: 16px; }
+.shop-container { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
 .shop-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .shop-header h2 { font-size: 16px; font-weight: 800; }
 .shop-stats { font-size: 12px; color: var(--text-muted); font-weight: 700; }
-#shop-categories { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+#shop-categories {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px; margin-bottom: 16px; align-items: start;
+}
+.shop-cat-add {
+  display: flex; gap: 6px; padding: 10px 12px;
+  border-top: 1px dashed var(--border); background: #fcfaf3;
+}
+.shop-cat-add input {
+  flex: 1; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 16px;
+  font-size: 12px; outline: none; background: #fff;
+}
+.shop-cat-add input:focus { border-color: var(--primary); }
+.shop-cat-add button {
+  background: var(--primary); color: #fff; border: none; border-radius: 16px;
+  padding: 4px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
 .shop-cat-block {
   background: var(--surface); border-radius: 12px; border: 1.5px solid var(--border);
   overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,.05);
@@ -1249,6 +1268,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--border);
   overflow-x: auto; flex-shrink: 0;
 }
+.forecast-bar:empty { display: none; }
 .forecast-day {
   display: flex; flex-direction: column; align-items: center;
   min-width: 62px; gap: 1px; padding: 0.4rem 0.5rem;

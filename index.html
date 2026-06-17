@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=45" />
+  <link rel="stylesheet" href="style.css?v=46" />
 </head>
 <body>
 
@@ -181,10 +181,6 @@
     <span id="wb-tomorrow"></span>
     <span id="wb-loc"></span>
   </button>
-  <div class="header-actions">
-    <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 同步中</span>
-    <button id="btn-export" class="btn btn-accent">⬇ 儲存</button>
-  </div>
 </header>
 
 <!-- ════════════════════════════════════════════
@@ -245,6 +241,8 @@
       <div class="itinerary-actions">
         <button id="btn-map-toggle"  class="btn btn-outline btn-sm">🗺 地圖</button>
         <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
+        <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 已同步</span>
+        <button id="btn-export" class="btn btn-accent btn-sm">⬇ 儲存</button>
       </div>
     </div>
 
@@ -374,18 +372,6 @@
       <span id="shopTotalSpent">¥ 0</span>
     </div>
     <div id="shop-categories"></div>
-    <!-- 新增區 -->
-    <div class="shop-add-bar">
-      <select id="shop-new-cat">
-        <option value="medicine">💊 藥妝</option>
-        <option value="food">🍬 食品/零食</option>
-        <option value="fashion">👗 服飾</option>
-        <option value="souvenir">🎁 伴手禮</option>
-        <option value="other">📦 其他</option>
-      </select>
-      <input id="shop-new-name" type="text" placeholder="商品名稱" maxlength="40">
-      <button id="shop-add-btn" class="btn btn-accent">＋</button>
-    </div>
   </div>
 </div><!-- /section-shopping -->
 
@@ -631,6 +617,6 @@
   </div>
 </div>
 
-<script src="app.js?v=45"></script>
+<script src="app.js?v=46"></script>
 </body>
 </html>

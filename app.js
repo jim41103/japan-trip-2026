@@ -522,18 +522,11 @@ function renderItinerary() {
     col.dataset.date = date;
     const density = getDayDensity(day.places || []);
     col.innerHTML = `
-      <div class="day-header">
+      <div class="day-header" style="border-left:4px solid ${DAY_COLORS[date] || '#888'}">
         <span>${DAY_SHORT[date] || day.label}<span class="density-pill ${density.cls}">${density.label}</span></span>
         <div class="day-header-btns">
           <button class="btn-optimize" onclick="optimizeDay('${date}')" title="依地理位置自動排序當天行程順序">🗺</button>
-          <button class="btn-add-activity" data-date="${date}" title="新增行程">＋ 新增</button>
         </div>
-      </div>
-      <div class="day-add-form" id="add-form-${date}" style="display:none">
-        <input type="time" class="add-form-time" value="09:00">
-        <input type="text" class="add-form-name" placeholder="活動名稱…" maxlength="40">
-        <button class="add-form-confirm" data-date="${date}">✓</button>
-        <button class="add-form-cancel" data-date="${date}">✕</button>
       </div>
       <div class="day-places" id="day-${date}"></div>
       <div class="day-notes-wrap">
@@ -581,34 +574,6 @@ function renderItinerary() {
     col.querySelector('.day-notes').addEventListener('blur', () => {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
       if (itinerary[date]) itinerary[date].notes = txt;
-    });
-
-    // 新增行程 inline form
-    col.querySelector('.btn-add-activity').addEventListener('click', () => {
-      const form = document.getElementById(`add-form-${date}`);
-      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-      if (form.style.display === 'flex') form.querySelector('.add-form-name').focus();
-    });
-    col.querySelector('.add-form-cancel').addEventListener('click', () => {
-      document.getElementById(`add-form-${date}`).style.display = 'none';
-    });
-    col.querySelector('.add-form-confirm').addEventListener('click', () => {
-      const form = document.getElementById(`add-form-${date}`);
-      const time = form.querySelector('.add-form-time').value;
-      const name = form.querySelector('.add-form-name').value.trim();
-      if (!name) { form.querySelector('.add-form-name').focus(); return; }
-      if (!itinerary[date].places) itinerary[date].places = [];
-      itinerary[date].places.push({ name, time, type: 'other', description: '', lat: 0, lng: 0 });
-      renderDayPlaces(placesList, date);
-      drawRouteLines();
-      if (typeof renderTimelineView === 'function' && timelineMode) renderTimelineView();
-      form.querySelector('.add-form-name').value = '';
-      form.style.display = 'none';
-      showToast(`已新增「${name}」✓`);
-    });
-    col.querySelector('.add-form-name').addEventListener('keydown', e => {
-      if (e.key === 'Enter') col.querySelector(`.add-form-confirm[data-date="${date}"]`).click();
-      if (e.key === 'Escape') col.querySelector(`.add-form-cancel[data-date="${date}"]`).click();
     });
 
   });
@@ -664,12 +629,7 @@ function makePlaceCard(place, date, pIdx) {
     card.dataset.note = place.note || '';
     card.dataset.icon = place.icon || '✈';
     card.innerHTML = `
-      <div class="iplace-top">
-        <span class="iplace-icon">${place.icon || '✈'}</span>
-        <div class="iplace-info" style="min-width:0">
-          <div class="iplace-name" style="font-size:11px;white-space:normal;line-height:1.3;text-align:left">${escHtml(place.name)}</div>
-        </div>
-      </div>
+      <div class="iplace-name" style="font-size:11px;white-space:normal;line-height:1.35;text-align:left">${escHtml(place.name)}</div>
       ${place.note ? `<div class="iplace-locked-note">${escHtml(place.note)}</div>` : ''}
       <div class="iplace-bottom">
         <span class="iplace-time-badge">${escHtml(place.time || '')}</span>
@@ -880,14 +840,15 @@ async function saveItinerary() {
 // ════════════════════════════════════════════
 //  FEATURE 1: ROUTE CONNECTIONS ON MAP
 // ════════════════════════════════════════════
+// 日系色：桜・山吹・若竹・露草・藤・茜・鼠
 const DAY_COLORS = {
-  '2026-08-03': '#E74C3C',
-  '2026-08-04': '#E67E22',
-  '2026-08-05': '#27AE60',
-  '2026-08-06': '#2980B9',
-  '2026-08-07': '#8E44AD',
-  '2026-08-08': '#16A085',
-  '2026-08-09': '#D35400',
+  '2026-08-03': '#E89DA8', // 桜色
+  '2026-08-04': '#E8A33D', // 山吹色
+  '2026-08-05': '#5B9F6D', // 若竹色
+  '2026-08-06': '#3C7BC4', // 露草色
+  '2026-08-07': '#8A6FB0', // 藤色
+  '2026-08-08': '#B7282E', // 茜色
+  '2026-08-09': '#3A3A3A', // 墨鼠色
 };
 let routePolylines = {};
 let routeNumMarkers = {};
@@ -907,14 +868,14 @@ function drawRouteLines() {
 
     if (places.length >= 2) {
       routePolylines[date] = L.polyline(places.map(p => [p.lat, p.lng]), {
-        color, weight: 3, opacity: 0.6, dashArray: '8 5',
+        color, weight: 4, opacity: 0.85, dashArray: '10 6',
       }).addTo(map);
     }
     routeNumMarkers[date] = places.map((p, i) => {
       const icon = L.divIcon({
         className: '',
-        html: `<div style="width:22px;height:22px;border-radius:50%;background:${color};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)">${i+1}</div>`,
-        iconSize:[22,22], iconAnchor:[11,11],
+        html: `<div style="width:26px;height:26px;border-radius:50%;background:${color};color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)">${i+1}</div>`,
+        iconSize:[26,26], iconAnchor:[13,13],
       });
       return L.marker([p.lat, p.lng], { icon, zIndexOffset: 500 }).addTo(map);
     });
@@ -1554,9 +1515,9 @@ function renderShoppingList() {
 
   Object.entries(SHOP_CAT).forEach(([cat, catLabel]) => {
     const items = byCat[cat] || [];
-    if (items.length === 0) return;
     const block = document.createElement('div');
     block.className = 'shop-cat-block';
+    block.dataset.cat = cat;
     const boughtCount = items.filter(i=>i.bought).length;
     block.innerHTML = `
       <div class="shop-cat-header">
@@ -1569,7 +1530,11 @@ function renderShoppingList() {
           <span class="shop-item-name">${escHtml(item.name)}</span>
           <input type="number" class="shop-price-input" placeholder="¥" min="0" step="100" value="${item.price||''}" style="width:68px;font-size:11px;padding:2px 5px;border:1px solid var(--border);border-radius:8px;background:#fff;outline:none">
           <button class="shop-item-del">×</button>
-        </div>`).join('')}`;
+        </div>`).join('')}
+      <div class="shop-cat-add">
+        <input type="text" placeholder="新增到「${catLabel}」…" maxlength="40">
+        <button>＋</button>
+      </div>`;
 
     block.querySelectorAll('.shop-item').forEach(row => {
       const id = parseInt(row.dataset.id);
@@ -1588,23 +1553,23 @@ function renderShoppingList() {
         }
       });
     });
+
+    const addInput = block.querySelector('.shop-cat-add input');
+    const addBtn   = block.querySelector('.shop-cat-add button');
+    const doAdd = () => {
+      const name = addInput.value.trim();
+      if (!name) { addInput.focus(); return; }
+      shopItems.push({ id: Date.now(), cat, name, bought: false });
+      saveShopItems(); renderShoppingList();
+      showToast(`已加入「${name}」✓`);
+    };
+    addBtn.addEventListener('click', doAdd);
+    addInput.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+
     container.appendChild(block);
   });
   recalcShopBudget();
 }
-
-document.getElementById('shop-add-btn').addEventListener('click', () => {
-  const cat  = document.getElementById('shop-new-cat').value;
-  const name = document.getElementById('shop-new-name').value.trim();
-  if (!name) { showToast('請輸入商品名稱'); return; }
-  shopItems.push({ id: Date.now(), cat, name, bought: false });
-  saveShopItems(); renderShoppingList();
-  document.getElementById('shop-new-name').value = '';
-  showToast('已加入購物清單 ✓');
-});
-document.getElementById('shop-new-name').addEventListener('keydown', e => {
-  if (e.key==='Enter') document.getElementById('shop-add-btn').click();
-});
 
 // ════════════════════════════════════════════
 //  MOBILE NAV
