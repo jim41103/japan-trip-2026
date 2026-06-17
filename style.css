@@ -4,23 +4,23 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* 日系和風配色：和紙 / 墨 / 茜 / 藤 */
-  --bg: #FAF6EE;            /* 和紙白 */
-  --bg-main: #F2EBD9;       /* 生成色 */
-  --bg-card: #FFFFFF;
-  --surface: #FFFFFF;
-  --border: #D9CDB5;        /* 淡茶色 */
-  --border-dark: #B49E78;
-  --primary: #BC002D;       /* 茜色（國旗紅） */
-  --primary-dark: #8E001F;
-  --black: #2B2B2B;         /* 墨色 */
-  --accent: #D9A441;        /* 山吹（金） */
-  --blue: #4A6FA5;          /* 紺青 */
-  --text: #2B2B2B;
-  --text-main: #2B2B2B;
-  --text-muted: #8A7B5C;
-  --restaurant: #BC002D;
-  --attraction: #4A6FA5;
+  /* 暖色和風配色：木質、茶、土、茜 */
+  --bg: #F0E5D0;            /* 暖米色（主背景） */
+  --bg-main: #E8D9BD;       /* 焦糖米 */
+  --bg-card: #FBF3E0;       /* 淡奶油 */
+  --surface: #FBF3E0;       /* 卡片表面（不再純白） */
+  --border: #C9B58E;        /* 茶系邊框 */
+  --border-dark: #9C8358;
+  --primary: #B23A2C;       /* 茜紅（暖紅） */
+  --primary-dark: #862519;
+  --black: #3A2E1F;         /* 暖墨色（不再純黑） */
+  --accent: #D9943C;        /* 暖琥珀 */
+  --blue: #5A7CA3;          /* 偏暖的紺青 */
+  --text: #3A2E1F;
+  --text-main: #3A2E1F;
+  --text-muted: #8A6F45;
+  --restaurant: #B23A2C;
+  --attraction: #5A7CA3;
   --header-h: 56px;
   --weather-h: 0px;
   --tabs-h: 40px;
@@ -549,7 +549,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   padding: 6px 8px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
-  background: #FDFCF5;
+  background: var(--bg-main);
 }
 .day-notes-label { font-size: 9px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 .day-notes {
@@ -563,10 +563,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ── Hotel footer ── */
 .day-hotel-footer {
   border-top: 1px dashed var(--border); padding: 6px 8px;
-  background: #FFF8E6; flex-shrink: 0;
+  background: #E8D2A6; flex-shrink: 0;
 }
 .hotel-card {
-  background: #FFF3E0; border: 1px solid #FFD180; border-radius: 8px;
+  background: #D9B57E; border: 1px solid #B48C50; border-radius: 8px;
   padding: 5px 9px; display: flex; align-items: center; gap: 6px;
 }
 .hotel-icon { font-size: 13px; }
@@ -630,7 +630,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .shop-cat-add {
   display: flex; gap: 6px; padding: 10px 12px;
-  border-top: 1px dashed var(--border); background: #fcfaf3;
+  border-top: 1px dashed var(--border); background: var(--bg-main);
 }
 .shop-cat-add input {
   flex: 1; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 16px;
@@ -1096,8 +1096,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .landing-header { text-align: center; }
 .landing-logo { font-size: 2.4rem; font-weight: 900; color: #ffe082; letter-spacing: 0.05em; text-shadow: 0 2px 8px rgba(0,0,0,.9), 0 4px 24px rgba(0,0,0,.7); }
-.landing-subtitle { font-size: 1rem; color: rgba(255,255,255,0.55); margin-top: 0.25rem; }
-.landing-countdown { font-size: 1.1rem; color: #ffb347; margin-top: 0.5rem; font-weight: 700; }
+.landing-subtitle { font-size: 1rem; color: #ffe082; margin-top: 0.25rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,.9), 0 4px 18px rgba(0,0,0,.6); }
+.landing-countdown { font-size: 1.1rem; color: #ffb347; margin-top: 0.5rem; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,.85), 0 4px 16px rgba(0,0,0,.55); }
 .landing-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1138,27 +1138,28 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   to   { opacity: 0; transform: scale(1.03); }
 }
 
-/* ── FLOATING HOME BUTTON ── */
+/* ── FLOATING HOME BUTTON（與 AI 助手並排、同大小） ── */
 #homeBtn {
   position: fixed;
-  bottom: 5rem;
-  left: 1.2rem;
-  width: 46px;
-  height: 46px;
+  bottom: 2rem;
+  right: 5.5rem;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: rgba(30,20,10,0.85);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: linear-gradient(135deg, #C97B5F, #8B4513);
+  border: none;
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   cursor: pointer;
-  z-index: 400;
+  z-index: 450;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-  transition: transform 0.15s, background 0.15s;
+  box-shadow: 0 4px 20px rgba(139,69,19,0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+  line-height: 1;
 }
-#homeBtn:hover { transform: scale(1.1); background: rgba(60,40,10,0.95); }
+#homeBtn:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(139,69,19,0.6); }
 
 /* ── FLOATING AI BUTTON ── */
 #floatAIBtn {

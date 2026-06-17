@@ -15,7 +15,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=46" />
+  <link rel="stylesheet" href="style.css?v=47" />
 </head>
 <body>
 
@@ -140,11 +140,6 @@
       <span class="landing-card-title">購物清單</span>
       <span class="landing-card-desc">藥妝 · 零食 · 伴手禮</span>
     </button>
-    <button class="landing-card" data-tab="transport">
-      <span class="landing-card-icon">🚃</span>
-      <span class="landing-card-title">交通</span>
-      <span class="landing-card-desc">搜尋路線 · 乗換案内</span>
-    </button>
     <button class="landing-card" data-tab="ledger">
       <span class="landing-card-icon">💴</span>
       <span class="landing-card-title">記帳</span>
@@ -190,7 +185,6 @@
   <button class="page-tab active" data-page="itinerary">🗺 行程</button>
   <button class="page-tab" data-page="prep">🎒 行前準備</button>
   <button class="page-tab" data-page="shopping">🛍 購物清單</button>
-  <button class="page-tab" data-page="transport">🚃 交通</button>
   <button class="page-tab" data-page="ledger" id="tab-expense">💴 記帳</button>
 </nav>
 
@@ -376,102 +370,6 @@
 </div><!-- /section-shopping -->
 
 <!-- ════════════════════════════════════════════
-     SECTION: 交通搜尋
-════════════════════════════════════════════ -->
-<div id="section-transport" class="tab-section page" style="display:none">
-  <div class="transit-wrap">
-    <div class="transit-header">
-      <span class="transit-icon">🚃</span>
-      <span class="transit-title-text">日本交通搜尋</span>
-      <span class="transit-sub">由乗換案内提供路線</span>
-    </div>
-
-    <!-- 自動填入按鈕 -->
-    <button id="fillFromItinerary" class="fill-from-itinerary-btn" title="從今日行程第一個地點自動填入出發站">
-      📍 從今日行程自動填入出發地
-    </button>
-
-    <!-- 出發地 / 目的地（含自動完成） -->
-    <div class="transit-route-row">
-      <div class="transit-field transit-ac-wrap">
-        <label class="transit-label">出發地</label>
-        <input id="transit-from" class="transit-input" type="text" placeholder="中文/日文/英文 站名" autocomplete="off">
-        <div id="transit-from-sugg" class="transit-sugg hidden"></div>
-      </div>
-      <button id="transit-swap" class="transit-swap-btn" title="交換">⇅</button>
-      <div class="transit-field transit-ac-wrap">
-        <label class="transit-label">目的地</label>
-        <input id="transit-to" class="transit-input" type="text" placeholder="中文/日文/英文 站名" autocomplete="off">
-        <div id="transit-to-sugg" class="transit-sugg hidden"></div>
-      </div>
-    </div>
-
-    <!-- 日期 / 時間 / 出發到著 -->
-    <div class="transit-dt-row">
-      <select id="transit-date" class="transit-select">
-        <option value="20260803">8/3 (一)</option>
-        <option value="20260804">8/4 (二)</option>
-        <option value="20260805">8/5 (三)</option>
-        <option value="20260806">8/6 (四)</option>
-        <option value="20260807">8/7 (五)</option>
-        <option value="20260808">8/8 (六)</option>
-        <option value="20260809">8/9 (日)</option>
-      </select>
-      <input id="transit-time" class="transit-time-input" type="time" value="09:00">
-      <select id="transit-way" class="transit-select transit-way-sel">
-        <option value="1">出發</option>
-        <option value="2">到著</option>
-      </select>
-    </div>
-
-    <!-- 快選站點（改為日文名供 Yahoo 使用） -->
-    <div class="transit-quick-wrap">
-      <div class="transit-quick-label">常用站點</div>
-      <div class="transit-quick-grid" id="transit-quick-grid">
-        <button class="transit-q-btn" data-station="新宿">新宿</button>
-        <button class="transit-q-btn" data-station="渋谷">澀谷</button>
-        <button class="transit-q-btn" data-station="池袋">池袋</button>
-        <button class="transit-q-btn" data-station="浅草">淺草</button>
-        <button class="transit-q-btn" data-station="上野">上野</button>
-        <button class="transit-q-btn" data-station="秋葉原">秋葉原</button>
-        <button class="transit-q-btn" data-station="東京">東京駅</button>
-        <button class="transit-q-btn" data-station="原宿">原宿</button>
-        <button class="transit-q-btn" data-station="表参道">表參道</button>
-        <button class="transit-q-btn" data-station="銀座">銀座</button>
-        <button class="transit-q-btn" data-station="お台場海浜公園">台場</button>
-        <button class="transit-q-btn" data-station="築地">築地</button>
-        <button class="transit-q-btn" data-station="中目黒">中目黑</button>
-        <button class="transit-q-btn" data-station="下北沢">下北澤</button>
-        <button class="transit-q-btn" data-station="谷中">谷中</button>
-        <button class="transit-q-btn" data-station="高円寺">高圓寺</button>
-        <button class="transit-q-btn" data-station="吉祥寺">吉祥寺</button>
-        <button class="transit-q-btn" data-station="六本木">六本木</button>
-        <button class="transit-q-btn" data-station="品川">品川</button>
-        <button class="transit-q-btn" data-station="羽田空港第3ターミナル">羽田機場</button>
-      </div>
-    </div>
-
-    <!-- 說明 -->
-    <div class="transit-hint">支援中文/日文/英文輸入，點站名快速填入欄位</div>
-
-    <!-- 搜尋按鈕 -->
-    <button id="transit-search-btn" class="transit-search-btn">🔍 搜尋路線</button>
-
-    <!-- 結果區 -->
-    <div id="transit-results" class="transit-results hidden"></div>
-
-    <!-- 內嵌結果面板 -->
-    <div id="transitResultPanel" style="display:none;margin-top:1rem;"></div>
-
-    <!-- 最近搜尋 -->
-    <div id="transit-history-wrap" class="transit-history-wrap hidden">
-      <div class="transit-quick-label">最近搜尋</div>
-      <div id="transit-history-list" class="transit-history-list"></div>
-    </div>
-  </div>
-</div><!-- /section-transport -->
-
-<!-- ════════════════════════════════════════════
      SECTION: 記帳（原 expense modal → section）
 ════════════════════════════════════════════ -->
 <div id="section-ledger" class="tab-section page" style="display:none">
@@ -617,6 +515,6 @@
   </div>
 </div>
 
-<script src="app.js?v=46"></script>
+<script src="app.js?v=47"></script>
 </body>
 </html>
