@@ -2,8 +2,8 @@
   {
     "name": "北村相機店",
     "description": "",
-    "lat": 22.5231028,
-    "lng": 113.3579104,
+    "lat": 35.7030325,
+    "lng": 139.7023237,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%8C%97%E6%9D%91%E7%9B%B8%E6%A9%9F%E5%BA%97/data=!4m2!3m1!1s0x60188d259476d7a3:0xce5e2b48f1a9955"
   },
@@ -24,10 +24,26 @@
     "googleMapsUrl": "https://www.google.com/maps/place/%E6%BE%80%E8%B0%B7PARCO/data=!4m2!3m1!1s0x60188ca8e2fe2173:0x1adbb1909538391b"
   },
   {
+    "name": "ALPEN RUN MEIJI PARK",
+    "description": "",
+    "lat": 35.7108173,
+    "lng": 139.7318069,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/ALPEN+RUN+MEIJI+PARK/data=!4m2!3m1!1s0x60188d0079076669:0xfff06bc289b388e"
+  },
+  {
+    "name": "Wagyu Itto Yakiniku Bouya - Nihonbashi",
+    "description": "",
+    "lat": 35.6866792,
+    "lng": 139.7743497,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Wagyu+Itto+Yakiniku+Bouya+-+Nihonbashi/data=!4m2!3m1!1s0x60188955a3d01e79:0xa4efd5c6f6b61778"
+  },
+  {
     "name": "Putali Cafe",
     "description": "",
-    "lat": 27.7068451,
-    "lng": 85.3227269,
+    "lat": 35.7323479,
+    "lng": 139.7194017,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Putali+Cafe/data=!4m2!3m1!1s0x60188d65768187f3:0xdbe866826313ffd1"
   },
@@ -38,6 +54,30 @@
     "lng": 138.7735677,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/search/35.51374,138.77357"
+  },
+  {
+    "name": "The Front Room Deli Restaurant Marunouchi",
+    "description": "",
+    "lat": 35.6684617,
+    "lng": 139.7470283,
+    "type": "restaurant",
+    "googleMapsUrl": "https://www.google.com/maps/place/The+Front+Room+Deli+Restaurant+Marunouchi/data=!4m2!3m1!1s0x60188b91f72ecd45:0xd443b1b75ea0df0a"
+  },
+  {
+    "name": "KURAMAE CANNELE",
+    "description": "",
+    "lat": 35.7464973,
+    "lng": 139.8260446,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/KURAMAE+CANNELE/data=!4m2!3m1!1s0x60188f0828c4763f:0x91ae29bef9cab478"
+  },
+  {
+    "name": "MINISTOP Ueno Ikenohatata",
+    "description": "",
+    "lat": 35.7123598,
+    "lng": 139.7682271,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/MINISTOP+Ueno+Ikenohatata/data=!4m2!3m1!1s0x60188c267c7c1e15:0xa8b706aee8804ca4"
   },
   {
     "name": "Tonkatsu Hinata",
@@ -58,8 +98,8 @@
   {
     "name": "大石公園",
     "description": "",
-    "lat": 26.208116,
-    "lng": 127.705367,
+    "lat": 35.5226353,
+    "lng": 138.7464318,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E5%A4%A7%E7%9F%B3%E5%85%AC%E5%9C%92/data=!4m2!3m1!1s0x60195fa68c0b2b95:0xa22e530b3a652904"
   },
@@ -122,8 +162,8 @@
   {
     "name": "Hirano beach",
     "description": "",
-    "lat": 24.5640465,
-    "lng": 124.2878693,
+    "lat": 35.4212261,
+    "lng": 138.8942756,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hirano+beach/data=!4m2!3m1!1s0x60196fec8ed01c37:0xaea15f41d50a234a"
   },
@@ -1034,8 +1074,8 @@
   {
     "name": "NUMBER SUGAR",
     "description": "伴手禮",
-    "lat": 26.2948416,
-    "lng": -98.1814321,
+    "lat": 35.6664907,
+    "lng": 139.7061697,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/NUMBER+SUGAR/data=!4m2!3m1!1s0x60188ca6aa1af26f:0x4d50f93c26c90c6d"
   },
