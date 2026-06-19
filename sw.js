@@ -1,6 +1,8 @@
-const CACHE = 'tokyo-trip-2026-v47';
-// HTML 不放入快取，永遠從網路取最新版
-const STATIC = ['/style.css?v=47', '/app.js?v=47', '/manifest.json', '/icon.svg'];
+const CACHE = 'tokyo-trip-2026-v48';
+// HTML 與資料檔（places/itinerary）不放入快取，永遠從網路取最新版
+const STATIC = ['/style.css?v=48', '/app.js?v=48', '/manifest.json', '/icon.svg'];
+// 這些路徑永遠走 network-first（即時反映 CSV / 行程更新）
+const NETWORK_FIRST = ['/places.json', '/itinerary.json', '/expenses.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
@@ -19,9 +21,16 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.pathname.startsWith('/api/')) return;
-  // HTML（含根目錄）：network-first，確保永遠拿最新版
-  if (e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  // HTML 與資料檔：network-first（拿不到才用快取備援）
+  const isHtml = e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html');
+  const isData = NETWORK_FIRST.includes(url.pathname);
+  if (isHtml || isData) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res.ok && isData) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
     return;
   }
   // JS/CSS/圖示：cache-first
