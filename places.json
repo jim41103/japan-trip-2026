@@ -1,11 +1,59 @@
 [
   {
-    "name": "Mizno Hotel",
+    "name": "北村相機店",
     "description": "",
-    "lat": 35.5138928,
-    "lng": 138.7735067,
+    "lat": 22.5231028,
+    "lng": 113.3579104,
     "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Mizno+Hotel/data=!4m2!3m1!1s0x60195e3beebcc89b:0xd46130c1cbe21159"
+    "googleMapsUrl": "https://www.google.com/maps/place/%E5%8C%97%E6%9D%91%E7%9B%B8%E6%A9%9F%E5%BA%97/data=!4m2!3m1!1s0x60188d259476d7a3:0xce5e2b48f1a9955"
+  },
+  {
+    "name": "Snoopy Town",
+    "description": "",
+    "lat": 35.6120358,
+    "lng": 139.6285039,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Snoopy+Town/data=!4m2!3m1!1s0x60188ca39a3def85:0xa1b7a4b7d8a0c1e8"
+  },
+  {
+    "name": "澀谷PARCO",
+    "description": "",
+    "lat": 35.6619271,
+    "lng": 139.6987487,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%BE%80%E8%B0%B7PARCO/data=!4m2!3m1!1s0x60188ca8e2fe2173:0x1adbb1909538391b"
+  },
+  {
+    "name": "Putali Cafe",
+    "description": "",
+    "lat": 27.7068451,
+    "lng": 85.3227269,
+    "type": "restaurant",
+    "googleMapsUrl": "https://www.google.com/maps/place/Putali+Cafe/data=!4m2!3m1!1s0x60188d65768187f3:0xdbe866826313ffd1"
+  },
+  {
+    "name": "35°30'49.5\"N 138°46'24.9\"E",
+    "description": "",
+    "lat": 35.5136952,
+    "lng": 138.7735677,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/search/35.51374,138.77357"
+  },
+  {
+    "name": "Tonkatsu Hinata",
+    "description": "",
+    "lat": 35.7129608,
+    "lng": 139.7075222,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Tonkatsu+Hinata/data=!4m2!3m1!1s0x60188d3c1e2727c5:0x8dbc95358389cff2"
+  },
+  {
+    "name": "Tatsumi",
+    "description": "",
+    "lat": 35.6485139,
+    "lng": 139.8119175,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Tatsumi/data=!4m2!3m1!1s0x60188b4ec59e92eb:0x7bd3e419dd7de91d"
   },
   {
     "name": "大石公園",
@@ -72,100 +120,12 @@
     "googleMapsUrl": "https://www.google.com/maps/place/HOTEL+FUJiTORiiGATE+-%E3%83%9B%E3%83%86%E3%83%AB%E5%AF%8C%E5%A3%AB%E3%83%88%E3%83%AA%E3%82%A4%E3%82%B2%E3%83%BC%E3%83%88-/data=!4m2!3m1!1s0x60196153e8ecd82d:0x6430cb81f7c21d92"
   },
   {
-    "name": "Fuji Grand Villa - Toki",
-    "description": "",
-    "lat": 35.4425029,
-    "lng": 138.7535113,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Fuji+Grand+Villa+-+Toki/data=!4m2!3m1!1s0x601961a3f7b29a03:0x12722641fcadcda5"
-  },
-  {
-    "name": "Highland Resort Hotel & Spa",
-    "description": "",
-    "lat": 35.4848624,
-    "lng": 138.7778774,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Highland+Resort+Hotel+%26+Spa/data=!4m2!3m1!1s0x601961fcb89e1c81:0x77e870c6ec870b"
-  },
-  {
-    "name": "Fuji Kawaguchiko Resort Hotel",
-    "description": "",
-    "lat": 35.4223099,
-    "lng": 138.7564963,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Fuji+Kawaguchiko+Resort+Hotel/data=!4m2!3m1!1s0x60196180f4819c19:0x991389c778175524"
-  },
-  {
-    "name": "HOTEL MYSTAYS Fuji Onsen Resort",
-    "description": "",
-    "lat": 35.4921641,
-    "lng": 138.7796593,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/HOTEL+MYSTAYS+Fuji+Onsen+Resort/data=!4m2!3m1!1s0x601960bd81e68ab7:0x6ba2ecbc45de1b46"
-  },
-  {
-    "name": "The Garden Resort & Condominium",
-    "description": "",
-    "lat": 35.4223047,
-    "lng": 138.7342785,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/The+Garden+Resort+%26+Condominium/data=!4m2!3m1!1s0x601961eddf6ada27:0xd30346e2a1fd388f"
-  },
-  {
-    "name": "Godere hotel 富士山中湖 Tabist",
-    "description": "",
-    "lat": 35.4413131,
-    "lng": 138.8551529,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Godere+hotel+%E5%AF%8C%E5%A3%AB%E5%B1%B1%E4%B8%AD%E6%B9%96+Tabist/data=!4m2!3m1!1s0x601965bf29ff3895:0x47275bc9aeb3f2b"
-  },
-  {
-    "name": "Sunnide Resort Yamanashi",
-    "description": "",
-    "lat": 35.5225704,
-    "lng": 138.7541729,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Sunnide+Resort+Yamanashi/data=!4m2!3m1!1s0x60195fa845efaff3:0x715a11013577661d"
-  },
-  {
-    "name": "Ubuya",
-    "description": "",
-    "lat": 35.5126392,
-    "lng": 138.7689961,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Ubuya/data=!4m2!3m1!1s0x60195e3752af872b:0xfe53e78fbe247853"
-  },
-  {
-    "name": "The Noborisaka Village",
-    "description": "",
-    "lat": 35.4575899,
-    "lng": 138.7608606,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/The+Noborisaka+Village/data=!4m2!3m1!1s0x601961005caf37fd:0xf1f8123f43614cce"
-  },
-  {
-    "name": "河口湖拍富士山倒影較無人景點",
-    "description": "",
-    "lat": 35.5329932,
-    "lng": 138.7593114,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B2%B3%E5%8F%A3%E6%B9%96%E6%8B%8D%E5%AF%8C%E5%A3%AB%E5%B1%B1%E5%80%92%E5%BD%B1%E8%BC%83%E7%84%A1%E4%BA%BA%E6%99%AF%E9%BB%9E/data=!4m2!3m1!1s0x60195f0020a7fa0f:0x330a8f881cb32f47"
-  },
-  {
     "name": "Hirano beach",
     "description": "",
     "lat": 24.5640465,
     "lng": 124.2878693,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Hirano+beach/data=!4m2!3m1!1s0x60196fec8ed01c37:0xaea15f41d50a234a"
-  },
-  {
-    "name": "Comfort Hotel Tokyo Higashi-Kanda",
-    "description": "",
-    "lat": 35.6945707,
-    "lng": 139.7797258,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Comfort+Hotel+Tokyo+Higashi-Kanda/data=!4m2!3m1!1s0x60188eac45adc3cf:0x7f626701f4c4e0e3"
   },
   {
     "name": "淺草田原町站前APA飯店",
@@ -336,22 +296,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Totoken+Nihonbashi+Hamacho/data=!4m2!3m1!1s0x601889059922c3d7:0xacc31e8a176c26e0"
   },
   {
-    "name": "Mitsugu (Mitsuhachimangu)",
-    "description": "狗狗神社",
-    "lat": 34.6713314,
-    "lng": 135.4992746,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Mitsugu+(Mitsuhachimangu)/data=!4m2!3m1!1s0x6000e71109d905f1:0xacb87b57871f1fbc"
-  },
-  {
-    "name": "Hitachi Station",
-    "description": "",
-    "lat": 36.5908428,
-    "lng": 140.6620685,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Hitachi+Station/data=!4m2!3m1!1s0x60218034dd4a1fd1:0xff4caa067d8ec9cc"
-  },
-  {
     "name": "The North Face Standard",
     "description": "",
     "lat": 35.6673191,
@@ -384,22 +328,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Sukiyaki-Botan/data=!4m2!3m1!1s0x60188c1cb4a13bf7:0x975852da64be8fc7"
   },
   {
-    "name": "Shinjiko Shijimi Chūkasoba Kohaku Main Store",
-    "description": "蕎麥麵",
-    "lat": 35.5512472,
-    "lng": 139.7111871,
-    "type": "restaurant",
-    "googleMapsUrl": "https://www.google.com/maps/place/Shinjiko+Shijimi+Ch%C5%ABkasoba+Kohaku+Main+Store/data=!4m2!3m1!1s0x601861d14a9591d9:0xcd7fdc76ad127c78"
-  },
-  {
-    "name": "玉出超市 天神橋店",
-    "description": "",
-    "lat": 34.7046397,
-    "lng": 135.5112419,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E7%8E%89%E5%87%BA%E8%B6%85%E5%B8%82+%E5%A4%A9%E7%A5%9E%E6%A9%8B%E5%BA%97/data=!4m2!3m1!1s0x6000e6c72c77bd8f:0x182ff91b3da153de"
-  },
-  {
     "name": "鰻之成瀨 六本木店",
     "description": "鰻魚飯",
     "lat": 35.6613,
@@ -414,14 +342,6 @@
     "lng": 139.7592458,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/YAKINIKU+A+FIVE+%E5%BE%B3+%E9%8A%80%E5%BA%A7%E5%85%AB%E4%B8%81%E7%9B%AE%E5%BA%97/data=!4m2!3m1!1s0x60188be9339e632f:0xdd8673f0d73a095e"
-  },
-  {
-    "name": "fruits and season",
-    "description": "純水果三明治",
-    "lat": 35.6471219,
-    "lng": 139.7076835,
-    "type": "restaurant",
-    "googleMapsUrl": "https://www.google.com/maps/place/fruits+and+season/data=!4m2!3m1!1s0x60188ba26c92d6c1:0x7c84a3242da9a124"
   },
   {
     "name": "Higashiyotsugihinan Bridge",
@@ -712,28 +632,12 @@
     "googleMapsUrl": "https://www.google.com/maps/place/7-Eleven/data=!4m2!3m1!1s0x60188bbba532d199:0x88640a266a56c674"
   },
   {
-    "name": "Hotel Metropolitan Kawasaki",
-    "description": "",
-    "lat": 35.5495839,
-    "lng": 139.7439267,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Hotel+Metropolitan+Kawasaki/data=!4m2!3m1!1s0x60186117c7654a85:0xb32d89ee21fea816"
-  },
-  {
     "name": "Togoshi Ginza Shopping Street",
     "description": "",
     "lat": 35.615263,
     "lng": 139.716924,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Togoshi+Ginza+Shopping+Street/data=!4m2!3m1!1s0x60188aec066b75d3:0xa38ab313b484ee6f"
-  },
-  {
-    "name": "Todoroki Ravine Park",
-    "description": "",
-    "lat": 35.6050425,
-    "lng": 139.6458249,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Todoroki+Ravine+Park/data=!4m2!3m1!1s0x6018f45405495069:0x71ab45cd45edb2b9"
   },
   {
     "name": "センタービーフ渋谷道玄坂店",
@@ -758,14 +662,6 @@
     "lng": 139.7753067,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%8E%A9%E5%85%B7%E5%BA%97+Yamashiroya/data=!4m2!3m1!1s0x60188e9e5f5ed73f:0x9710bfada7b2ccf1"
-  },
-  {
-    "name": "Prince Smart Inn Naha",
-    "description": "",
-    "lat": 26.2205677,
-    "lng": 127.6822679,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Prince+Smart+Inn+Naha/data=!4m2!3m1!1s0x34e569a51c7de5af:0xccb879303111f69c"
   },
   {
     "name": "Life Supermarket",
@@ -1136,14 +1032,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Nenrinya+Ginza+Main+Store/data=!4m2!3m1!1s0x60188be645ab25f9:0x9354261d818ef67"
   },
   {
-    "name": "Hamacho Hotel",
-    "description": "飯店",
-    "lat": 35.6846688,
-    "lng": 139.7894576,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Hamacho+Hotel/data=!4m2!3m1!1s0x60188923f381447d:0x5ea606162b2a3747"
-  },
-  {
     "name": "NUMBER SUGAR",
     "description": "伴手禮",
     "lat": 26.2948416,
@@ -1360,46 +1248,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Streamer+Coffee+Company+Nakameguro/data=!4m2!3m1!1s0x60188b526e70e4f5:0x174f197028b3abf9"
   },
   {
-    "name": "Super Hotel LOHAS Ikebukuro-Eki Kitaguchi",
-    "description": "飯店",
-    "lat": 35.7351173,
-    "lng": 139.7104196,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Super+Hotel+LOHAS+Ikebukuro-Eki+Kitaguchi/data=!4m2!3m1!1s0x60188d5fc9a24837:0x13b59c443c939adc"
-  },
-  {
-    "name": "Keisei Richmond Hotel Tokyo Kinshicho",
-    "description": "飯店",
-    "lat": 35.6936367,
-    "lng": 139.8149441,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Keisei+Richmond+Hotel+Tokyo+Kinshicho/data=!4m2!3m1!1s0x601888d88d1ab3bd:0x254b91a22fe762a"
-  },
-  {
-    "name": "Dormy Inn EXPRESS Asakusa",
-    "description": "飯店",
-    "lat": 35.7119557,
-    "lng": 139.7989133,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Dormy+Inn+EXPRESS+Asakusa/data=!4m2!3m1!1s0x60188ec4185727b3:0x40c25a2958f6c605"
-  },
-  {
-    "name": "東京押上 京成Richmond酒店",
-    "description": "飯店",
-    "lat": 35.7109288,
-    "lng": 139.8141536,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E6%8A%BC%E4%B8%8A+%E4%BA%AC%E6%88%90Richmond%E9%85%92%E5%BA%97/data=!4m2!3m1!1s0x60188f29dc6aaaab:0x818d154dbdc242f4"
-  },
-  {
-    "name": "相鐵FRESA INN 銀座三丁目",
-    "description": "飯店",
-    "lat": 35.6719028,
-    "lng": 139.7677259,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E7%9B%B8%E9%90%B5FRESA+INN+%E9%8A%80%E5%BA%A7%E4%B8%89%E4%B8%81%E7%9B%AE/data=!4m2!3m1!1s0x60188be14b6f1dff:0x6bcdcf7987ec3017"
-  },
-  {
     "name": "木曽路 新宿三丁目店",
     "description": "壽喜燒",
     "lat": 35.6917956,
@@ -1424,44 +1272,12 @@
     "googleMapsUrl": "https://www.google.com/maps/place/%E9%BB%91%E6%AF%9B%E5%92%8C%E7%89%9B%E5%A3%BD%E5%96%9C%E7%87%92+%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%80%E9%87%8C/data=!4m2!3m1!1s0x601889004d1c4c01:0xd546648fc9d92bad"
   },
   {
-    "name": "淺草東武飯店",
-    "description": "飯店",
-    "lat": 35.7113848,
-    "lng": 139.7974249,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E6%9D%B1%E6%AD%A6%E9%A3%AF%E5%BA%97/data=!4m2!3m1!1s0x60188ec6bfc844f1:0xa504c87458de5cac"
-  },
-  {
-    "name": "東京大飯店",
-    "description": "飯店",
-    "lat": 35.6528995,
-    "lng": 139.7511944,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E5%A4%A7%E9%A3%AF%E5%BA%97/data=!4m2!3m1!1s0x601894cfb6995555:0xe22fcb28cdea920d"
-  },
-  {
-    "name": "Sotetsu Grand Fresa Takadanobaba",
-    "description": "飯店",
-    "lat": 35.7125479,
-    "lng": 139.7049787,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Sotetsu+Grand+Fresa+Takadanobaba/data=!4m2!3m1!1s0x60188dac5afb489d:0xa86cab26b1dd8550"
-  },
-  {
     "name": "Iriya Plus Café Custom Warehouse",
     "description": "法式吐司團子",
     "lat": 35.7086586,
     "lng": 139.7918538,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Iriya+Plus+Caf%C3%A9+Custom+Warehouse/data=!4m2!3m1!1s0x60188eb8ec0b643b:0xa64ce2ae102de86c"
-  },
-  {
-    "name": "相鐵FRESA INN 東京錦糸町",
-    "description": "飯店",
-    "lat": 35.6959044,
-    "lng": 139.8116894,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E7%9B%B8%E9%90%B5FRESA+INN+%E6%9D%B1%E4%BA%AC%E9%8C%A6%E7%B3%B8%E7%94%BA/data=!4m2!3m1!1s0x6018892865ada1e5:0x91358530ff5dd8dd"
   },
   {
     "name": "五代目 花山烏冬 銀座店",
@@ -1654,14 +1470,6 @@
     "lng": 139.6953601,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E8%B1%AC%E6%8E%92%E4%B8%BC%E5%B1%8B+%E7%91%9E%E5%85%86/data=!4m2!3m1!1s0x60188cac12069909:0x41c48d07160668ef"
-  },
-  {
-    "name": "炸豬排檍 橫濱馬車道店",
-    "description": "豬排",
-    "lat": 35.4479087,
-    "lng": 139.6358339,
-    "type": "restaurant",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E7%82%B8%E8%B1%AC%E6%8E%92%E6%AA%8D+%E6%A9%AB%E6%BF%B1%E9%A6%AC%E8%BB%8A%E9%81%93%E5%BA%97/data=!4m2!3m1!1s0x60185db24c0f7697:0x9f2903774d3cf148"
   },
   {
     "name": "Tonkatsu Yamabe",
