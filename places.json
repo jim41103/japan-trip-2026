@@ -106,8 +106,8 @@
   {
     "name": "Manpuku",
     "description": "",
-    "lat": 35.6712727,
-    "lng": 139.7694684,
+    "lat": 35.520757,
+    "lng": 138.7787063,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Manpuku/data=!4m2!3m1!1s0x60195e3fef963ef3:0x3f30a1bbed4bed27"
   },
@@ -666,8 +666,8 @@
   {
     "name": "7-Eleven",
     "description": "看東京鐵塔的711",
-    "lat": 42.1569633,
-    "lng": 142.7901407,
+    "lat": 35.6531129,
+    "lng": 139.7454027,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/7-Eleven/data=!4m2!3m1!1s0x60188bbba532d199:0x88640a266a56c674"
   },
@@ -706,8 +706,8 @@
   {
     "name": "Life Supermarket",
     "description": "超市",
-    "lat": 35.0254687,
-    "lng": 135.7731768,
+    "lat": 35.7103239,
+    "lng": 139.8137867,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Life+Supermarket/data=!4m2!3m1!1s0x60188ed61d5f87b9:0x470c90ca25a00815"
   },
@@ -882,8 +882,8 @@
   {
     "name": "Kotaro",
     "description": "居酒屋",
-    "lat": 36.1415534,
-    "lng": 137.254485,
+    "lat": 35.655532,
+    "lng": 139.699215,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Kotaro/data=!4m2!3m1!1s0x60188b5723b0b379:0x81de666a149162bb"
   },
@@ -938,8 +938,8 @@
   {
     "name": "Nakamura Tokichi",
     "description": "パフェ",
-    "lat": 34.9860482,
-    "lng": 135.7582531,
+    "lat": 35.6698846,
+    "lng": 139.7644489,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/Nakamura+Tokichi/data=!4m2!3m1!1s0x60188be64571fda3:0x8a9f866d39f58be9"
   },
