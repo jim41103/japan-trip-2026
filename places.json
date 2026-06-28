@@ -1,5 +1,37 @@
 [
   {
+    "name": "Beans Farm",
+    "description": "",
+    "lat": 35.5868194,
+    "lng": 139.4628406,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Beans+Farm/data=!4m2!3m1!1s0x6018fb96a0b0f6e1:0xf64ce4236716d855"
+  },
+  {
+    "name": "Tomica Shop Tokyo Character Street",
+    "description": "",
+    "lat": 35.6830156,
+    "lng": 139.7684168,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Tomica+Shop+Tokyo+Character+Street/data=!4m2!3m1!1s0x60188bfeba8313b7:0x9834e596505f1f6b"
+  },
+  {
+    "name": "Kiddy Land",
+    "description": "",
+    "lat": 35.6676239,
+    "lng": 139.706478,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Kiddy+Land/data=!4m2!3m1!1s0x60188ca3f58f5bbb:0x6d0eaa1443f99189"
+  },
+  {
+    "name": "渋谷スクランブル交差点",
+    "description": "",
+    "lat": 35.6457018,
+    "lng": 139.7538393,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B8%8B%E8%B0%B7%E3%82%B9%E3%82%AF%E3%83%A9%E3%83%B3%E3%83%96%E3%83%AB%E4%BA%A4%E5%B7%AE%E7%82%B9/data=!4m2!3m1!1s0x60188bcaeb0cd12b:0x20e563a2e0aec969"
+  },
+  {
     "name": "HELLY HANSEN 原宿店",
     "description": "",
     "lat": 35.6649686,
