@@ -1,5 +1,133 @@
 [
   {
+    "name": "豐島屋 鎌倉本店",
+    "description": "",
+    "lat": 35.3204614,
+    "lng": 139.5525614,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E8%B1%90%E5%B3%B6%E5%B1%8B+%E9%8E%8C%E5%80%89%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x601845c15b4cbb8b:0x550696ec608c0231"
+  },
+  {
+    "name": "鎌倉豆屋 小町通店",
+    "description": "",
+    "lat": 35.322614,
+    "lng": 139.552717,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E9%8E%8C%E5%80%89%E8%B1%86%E5%B1%8B+%E5%B0%8F%E7%94%BA%E9%80%9A%E5%BA%97/data=!4m2!3m1!1s0x601845c0da47650b:0x68c857ebe0aed7c0"
+  },
+  {
+    "name": "Giraffa Curry Pan",
+    "description": "",
+    "lat": 35.3346018,
+    "lng": 139.5557851,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Giraffa+Curry+Pan/data=!4m2!3m1!1s0x601845bb2916d811:0xd2503293d0d989d6"
+  },
+  {
+    "name": "鶴岡八幡宮",
+    "description": "",
+    "lat": 35.3260803,
+    "lng": 139.5564251,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E9%B6%B4%E5%B2%A1%E5%85%AB%E5%B9%A1%E5%AE%AE/data=!4m2!3m1!1s0x601845b87890aa89:0xa867ad10105036b5"
+  },
+  {
+    "name": "KANNON COFFEE kamakura",
+    "description": "",
+    "lat": 35.3129258,
+    "lng": 139.5349792,
+    "type": "restaurant",
+    "googleMapsUrl": "https://www.google.com/maps/place/KANNON+COFFEE+kamakura/data=!4m2!3m1!1s0x601845f3d82f5415:0xe5728b9dd0550604"
+  },
+  {
+    "name": "鎌倉大佛殿高德院",
+    "description": "",
+    "lat": 35.3168255,
+    "lng": 139.5357098,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E9%8E%8C%E5%80%89%E5%A4%A7%E4%BD%9B%E6%AE%BF%E9%AB%98%E5%BE%B7%E9%99%A2/data=!4m2!3m1!1s0x601845f2df49bc05:0x1ec393b02d6bef4c"
+  },
+  {
+    "name": "淺草寺",
+    "description": "",
+    "lat": 35.7147045,
+    "lng": 139.7967275,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B7%BA%E8%8D%89%E5%AF%BA/data=!4m2!3m1!1s0x60188ec1a4463df1:0x6c0d289a8292810d"
+  },
+  {
+    "name": "上野動物園 Ueno Zoo",
+    "description": "",
+    "lat": 35.7168284,
+    "lng": 139.7701544,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E4%B8%8A%E9%87%8E%E5%8B%95%E7%89%A9%E5%9C%92+Ueno+Zoo/data=!4m2!3m1!1s0x60188c28f7766d7f:0x76b8b5efa1988ef4"
+  },
+  {
+    "name": "HARBS 上野店",
+    "description": "",
+    "lat": 35.7069091,
+    "lng": 139.7729883,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/HARBS+%E4%B8%8A%E9%87%8E%E5%BA%97/data=!4m2!3m1!1s0x60188ea000e8f799:0x39e19a52c1a6247f"
+  },
+  {
+    "name": "全家 西淺草一丁目店",
+    "description": "",
+    "lat": 35.711538,
+    "lng": 139.7917948,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E5%85%A8%E5%AE%B6+%E8%A5%BF%E6%B7%BA%E8%8D%89%E4%B8%80%E4%B8%81%E7%9B%AE%E5%BA%97/data=!4m2!3m1!1s0x60188ebf13edb80b:0xae1f77116fd66e80"
+  },
+  {
+    "name": "7-Eleven",
+    "description": "看東京鐵塔的711",
+    "lat": 35.6531129,
+    "lng": 139.7454027,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/7-Eleven/data=!4m2!3m1!1s0x60188eb92ac55555:0x531475166606cd4d"
+  },
+  {
+    "name": "LAWSON 台東西淺草二丁目店",
+    "description": "",
+    "lat": 35.712486,
+    "lng": 139.791933,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/LAWSON+%E5%8F%B0%E6%9D%B1%E8%A5%BF%E6%B7%BA%E8%8D%89%E4%BA%8C%E4%B8%81%E7%9B%AE%E5%BA%97/data=!4m2!3m1!1s0x60188ebfa042bb3f:0xb7778437f5c81827"
+  },
+  {
+    "name": "Uniqlo Tokyo",
+    "description": "",
+    "lat": 35.67377,
+    "lng": 139.765115,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Uniqlo+Tokyo/data=!4m2!3m1!1s0x60188be5ac9444e1:0x3be1b0c166da508b"
+  },
+  {
+    "name": "無印良品 銀座旗艦店",
+    "description": "",
+    "lat": 35.6396951,
+    "lng": 139.7336157,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E7%84%A1%E5%8D%B0%E8%89%AF%E5%93%81+%E9%8A%80%E5%BA%A7%E6%97%97%E8%89%A6%E5%BA%97/data=!4m2!3m1!1s0x60188baa38aecf7d:0xab5a3452172b5f9"
+  },
+  {
+    "name": "Fish Market Tsukiji Outer Market",
+    "description": "",
+    "lat": 35.6295142,
+    "lng": 139.7108382,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Fish+Market+Tsukiji+Outer+Market/data=!4m2!3m1!1s0x60188b21cd0b675b:0xa26e24a1bf97025c"
+  },
+  {
+    "name": "Marion Crêpes Takeshita Street",
+    "description": "",
+    "lat": 35.6711957,
+    "lng": 139.7050169,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Marion+Cr%C3%AApes+Takeshita+Street/data=!4m2!3m1!1s0x60188cbb3777fb3d:0x6d22890a2f23e178"
+  },
+  {
     "name": "Beans Farm",
     "description": "",
     "lat": 35.5868194,
@@ -808,14 +936,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Life/data=!4m2!3m1!1s0x60188e953ff5db9f:0xa26d5e59216f62a3"
   },
   {
-    "name": "Tosei Hotel Cocone Ueno Okachimachi",
-    "description": "飯店",
-    "lat": 35.7064469,
-    "lng": 139.7731452,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Tosei+Hotel+Cocone+Ueno+Okachimachi/data=!4m2!3m1!1s0x60188f502aa9b107:0xad19bb029c6848c"
-  },
-  {
     "name": "炭火串焼き こうめさん",
     "description": "",
     "lat": 35.6469143,
@@ -1534,14 +1654,6 @@
     "lng": 139.7937095,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%B1%B3%E4%B9%85%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x60188eeaadfd553b:0x3625458b60493b8c"
-  },
-  {
-    "name": "人形町今半 人形町本店",
-    "description": "壽喜燒",
-    "lat": 35.6857703,
-    "lng": 139.7836715,
-    "type": "restaurant",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A+%E4%BA%BA%E5%BD%A2%E7%94%BA%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x6018894fd1c12f2f:0x306acc4e4e9ed1cf"
   },
   {
     "name": "淺草今半 國際通本店",
