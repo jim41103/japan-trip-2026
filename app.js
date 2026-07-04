@@ -4,11 +4,26 @@
 const HOTEL = {
   name: '淺草田原町站前APA飯店',
   description: '住宿', lat: 35.710269, lng: 139.7901016, type: 'hotel',
+  googleMapsUrl: 'https://www.google.com/maps/place/APA+Hotel+Asakusa+Tawaramachi+Ekimae/@35.710269,139.7901016,17z',
+  address: '〒111-0031 東京都台東区千束1-6-3',
+  phone: '+81-3-5806-1611',
+  checkIn: '15:00',
+  checkOut: '10:00',
+  wifi: '館內免費 Wi-Fi（房間內見指示卡）',
+  station: '銀座線「田原町駅」步行 4 分鐘',
+  confirmationCode: '',
 };
 const HOTEL_0808 = {
   name: 'HOTEL FUJiTORiiGATE',
   description: '住宿', lat: 35.4828938, lng: 138.7967342, type: 'hotel',
   googleMapsUrl: 'https://maps.app.goo.gl/xDJqon45c7W1vL2HA',
+  address: '〒401-0304 山梨県南都留郡富士河口湖町船津3557',
+  phone: '+81-555-72-8880',
+  checkIn: '15:00',
+  checkOut: '11:00',
+  wifi: '館內免費 Wi-Fi',
+  station: '富士急行「河口湖駅」搭接駁車 5 分鐘',
+  confirmationCode: '',
 };
 const NEARBY_RADIUS_KM = 1.0;
 const DAY_SHORT = {
@@ -22,11 +37,36 @@ const CAT_LABEL  = { food:'餐飲', ticket:'票券', transport:'交通', shoppin
 const SHOP_CAT   = { medicine:'💊 藥妝', food:'🍬 食品/零食', fashion:'👗 服飾', souvenir:'🎁 伴手禮', other:'📦 其他' };
 
 // ════════════════════════════════════════════
+//  LOCALSTORAGE SCHEMA VERSION（改資料結構時遞增）
+// ════════════════════════════════════════════
+const SCHEMA_VERSION = 2;
+(function migrateSchema() {
+  const stored = parseInt(localStorage.getItem('__schema_version') || '0', 10);
+  if (stored === SCHEMA_VERSION) return;
+  try {
+    // v1 → v2 migration example（未來加 migration 邏輯）
+    // if (stored < 2) { ... }
+
+    // 驗證關鍵 key 的 JSON 完整性（壞掉就重置）
+    ['shopItems', 'diaryData', 'expenses'].forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) { try { JSON.parse(v); } catch { localStorage.removeItem(k); console.warn(`已重置損毀的 ${k}`); } }
+    });
+    localStorage.setItem('__schema_version', String(SCHEMA_VERSION));
+  } catch (e) { console.error('schema migration failed:', e); }
+})();
+
+// ════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════
 let allPlaces = [], filteredPlaces = [], itinerary = {}, notionPages = [], expenses = [];
 let markers = {}, activeFilter = 'all', activeNotionTab = 0;
-let shopItems = JSON.parse(localStorage.getItem('shopItems') || 'null') || defaultShopItems();
+let shopItems = (() => {
+  try {
+    const raw = localStorage.getItem('shopItems');
+    return raw ? JSON.parse(raw) : defaultShopItems();
+  } catch { return defaultShopItems(); }
+})();
 
 // ════════════════════════════════════════════
 //  SPLASH → LANDING
@@ -291,18 +331,27 @@ async function loadPlaces() {
   } catch (e) { console.error('載入地點失敗', e); }
 }
 
+let markerCluster = null;
 function renderMarkers() {
-  Object.values(markers).forEach(m => map.removeLayer(m));
+  if (markerCluster) map.removeLayer(markerCluster);
   markers = {};
+  markerCluster = L.markerClusterGroup({
+    maxClusterRadius: 45,
+    disableClusteringAtZoom: 15,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    chunkedLoading: true,
+  });
   filteredPlaces.forEach((place, idx) => {
     const marker = L.marker([place.lat, place.lng], { icon: makeIcon(place.type) })
-      .addTo(map)
       .bindPopup(buildPopupHTML(place, idx), { maxWidth: 270 });
     marker.on('click', () => highlightListItem(idx));
     markers[idx] = marker;
+    markerCluster.addLayer(marker);
   });
+  map.addLayer(markerCluster);
   if (filteredPlaces.length > 0) {
-    map.fitBounds(L.featureGroup(Object.values(markers)).getBounds().pad(0.1));
+    map.fitBounds(markerCluster.getBounds().pad(0.1));
   }
 }
 
@@ -376,7 +425,7 @@ function highlightListItem(idx) {
 function flyToPlace(idx) {
   const place = filteredPlaces[idx];
   map.flyTo([place.lat, place.lng], 15, { duration:0.8 });
-  markers[idx]?.openPopup();
+  markerCluster?.zoomToShowLayer(markers[idx], () => markers[idx]?.openPopup());
   highlightListItem(idx);
 }
 
@@ -460,6 +509,52 @@ const FLIGHT_RETURN = {
   lat: 0, lng: 0, description: '',
 };
 
+// ════════════════════════════════════════════
+//  HOTEL DETAILS MODAL
+// ════════════════════════════════════════════
+function showHotelDetails(key) {
+  const h = key === '0808' ? HOTEL_0808 : HOTEL;
+  const savedCode = localStorage.getItem(`hotel_code_${key}`) || '';
+  const savedWifiPw = localStorage.getItem(`hotel_wifi_${key}`) || '';
+  const modal = document.getElementById('hotelModal');
+  const body = document.getElementById('hotelModalBody');
+  body.innerHTML = `
+    <div class="hotel-detail-header">
+      <span class="hotel-detail-icon">🏨</span>
+      <div>
+        <div class="hotel-detail-name">${escHtml(h.name)}</div>
+        <div class="hotel-detail-station">${escHtml(h.station || '')}</div>
+      </div>
+    </div>
+    <div class="hotel-detail-grid">
+      <div class="hd-row"><span class="hd-label">📍 地址</span>
+        <span class="hd-value">${escHtml(h.address || '—')}</span></div>
+      <div class="hd-row"><span class="hd-label">📞 電話</span>
+        <a class="hd-value hd-link" href="tel:${escHtml(h.phone || '')}">${escHtml(h.phone || '—')}</a></div>
+      <div class="hd-row"><span class="hd-label">🕒 Check-in</span>
+        <span class="hd-value">${escHtml(h.checkIn || '—')} / Check-out ${escHtml(h.checkOut || '—')}</span></div>
+      <div class="hd-row"><span class="hd-label">📶 Wi-Fi</span>
+        <span class="hd-value">${escHtml(h.wifi || '—')}</span></div>
+      <div class="hd-row hd-editable"><span class="hd-label">🎫 訂房代碼</span>
+        <input class="hd-input" id="hd-code" placeholder="輸入訂房確認碼" value="${escHtml(savedCode)}"></div>
+      <div class="hd-row hd-editable"><span class="hd-label">🔑 Wi-Fi 密碼</span>
+        <input class="hd-input" id="hd-wifi" placeholder="入住後補上" value="${escHtml(savedWifiPw)}"></div>
+    </div>
+    <div class="hotel-detail-actions">
+      <a class="hd-btn hd-btn-primary" href="${h.googleMapsUrl}" target="_blank" rel="noopener">🗺 Google Maps 導航</a>
+      <a class="hd-btn hd-btn-outline" href="tel:${h.phone}">📞 撥打飯店</a>
+    </div>`;
+  // 儲存訂房代碼與 Wi-Fi 密碼
+  body.querySelector('#hd-code').addEventListener('input', e =>
+    localStorage.setItem(`hotel_code_${key}`, e.target.value));
+  body.querySelector('#hd-wifi').addEventListener('input', e =>
+    localStorage.setItem(`hotel_wifi_${key}`, e.target.value));
+  modal.style.display = 'flex';
+}
+function closeHotelModal() {
+  document.getElementById('hotelModal').style.display = 'none';
+}
+
 function ensureDays() {
   Object.keys(DAY_SHORT).forEach(date => {
     if (!itinerary[date]) {
@@ -534,10 +629,10 @@ function renderItinerary() {
         <textarea class="day-notes" data-date="${date}" placeholder="新增當日備注…" rows="2">${escHtml(day.notes||'')}</textarea>
       </div>
       ${date === '2026-08-09' ? '' : `<div class="day-hotel-footer">
-        <div class="hotel-card">
+        <div class="hotel-card" onclick="showHotelDetails('${date === '2026-08-08' ? '0808' : 'apa'}')" title="點擊查看訂房資訊">
           <span class="hotel-icon">🏨</span>
           <span class="hotel-name">${escHtml(date === '2026-08-08' ? HOTEL_0808.name : HOTEL.name)}</span>
-          <a class="hotel-gmaps" href="${date === '2026-08-08' ? HOTEL_0808.googleMapsUrl : googleMapsUrl(HOTEL)}" target="_blank" rel="noopener" title="在 Google Maps 查看">📍</a>
+          <a class="hotel-gmaps" href="${date === '2026-08-08' ? HOTEL_0808.googleMapsUrl : HOTEL.googleMapsUrl}" target="_blank" rel="noopener" title="在 Google Maps 開啟" onclick="event.stopPropagation()">📍</a>
           <span class="hotel-badge">住宿</span>
         </div>
       </div>`}`;
@@ -561,19 +656,24 @@ function renderItinerary() {
           renderDayPlaces(placesList, date);
           drawRouteLines();
           if (timelineMode) renderTimelineView();
+          markItineraryDirty();
         }
       },
       onEnd: function(evt) {
         if (!evt.from || evt.from.id !== 'places-list') {
           syncItineraryFromDOM();
+          markItineraryDirty();
         }
       },
     });
 
     // Notes auto-save
-    col.querySelector('.day-notes').addEventListener('blur', () => {
+    col.querySelector('.day-notes').addEventListener('input', () => {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
-      if (itinerary[date]) itinerary[date].notes = txt;
+      if (itinerary[date] && itinerary[date].notes !== txt) {
+        itinerary[date].notes = txt;
+        markItineraryDirty();
+      }
     });
 
   });
@@ -658,6 +758,7 @@ function makePlaceCard(place, date, pIdx) {
   card.querySelector('.iplace-time').addEventListener('change', function() {
     card.dataset.time = this.value;
     syncItineraryFromDOM();
+    markItineraryDirty();
     // 重新排序顯示
     const col = document.getElementById(`day-${date}`);
     if (col) renderDayPlaces(col, date);
@@ -726,6 +827,7 @@ function addToDay(placeIdx, date) {
     container.appendChild(makePlaceCard(place, date, itinerary[date].places.length - 1));
   }
   map.closePopup();
+  markItineraryDirty();
 }
 
 function showDayPicker(idx) {
@@ -742,6 +844,8 @@ function removeFromDay(date, pIdx) {
   itinerary[date].places.splice(pIdx, 1);
   const container = document.getElementById(`day-${date}`);
   if (container) renderDayPlaces(container, date);
+  drawRouteLines();
+  markItineraryDirty();
 }
 
 // ════════════════════════════════════════════
@@ -821,21 +925,66 @@ document.getElementById('close-nearby').addEventListener('click', () => {
 // ════════════════════════════════════════════
 //  SAVE ITINERARY
 // ════════════════════════════════════════════
-async function saveItinerary() {
+// 儲存狀態：'idle' | 'dirty' | 'saving' | 'saved' | 'error'
+let _saveState = 'idle';
+let _autoSaveTimer = null;
+const AUTO_SAVE_MS = 3000;
+
+function setSaveState(state) {
+  _saveState = state;
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  const map = {
+    idle:   ['☁ 已同步', 'ok'],
+    dirty:  ['✏️ 未儲存…', 'dirty'],
+    saving: ['⏳ 儲存中', 'saving'],
+    saved:  ['✅ 已儲存', 'ok'],
+    error:  ['⚠️ 儲存失敗（點擊重試）', 'error'],
+  };
+  const [txt, cls] = map[state] || map.idle;
+  el.textContent = txt;
+  el.dataset.state = cls;
+  el.style.cursor = state === 'error' ? 'pointer' : 'default';
+}
+
+// 每次行程變動呼叫此函式（debounce 3 秒後自動 sync）
+function markItineraryDirty() {
+  setSaveState('dirty');
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(() => saveItinerary(true), AUTO_SAVE_MS);
+}
+
+async function saveItinerary(silent = false) {
+  clearTimeout(_autoSaveTimer);
   syncItineraryFromDOM();
-  // 收集 notes
   Object.keys(itinerary).forEach(date => {
     const notesEl = document.querySelector(`.day-notes[data-date="${date}"]`);
     if (notesEl) itinerary[date].notes = notesEl.value;
   });
+  setSaveState('saving');
   try {
-    await fetch('/api/sync', {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch('/api/sync', {
       method: 'POST', headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ itinerary: JSON.stringify(itinerary) }),
+      signal: controller.signal,
     });
-    showToast('行程已儲存 ✓');
-  } catch (e) { alert('儲存失敗：' + e.message); }
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSaveState('saved');
+    if (!silent) showToast('行程已儲存 ✓');
+    setTimeout(() => { if (_saveState === 'saved') setSaveState('idle'); }, 2000);
+  } catch (e) {
+    setSaveState('error');
+    if (!silent) alert('儲存失敗：' + e.message + '\n（本機仍保有變動，之後可再試）');
+  }
 }
+
+// 錯誤時點擊 indicator 重試
+document.addEventListener('click', e => {
+  if (e.target?.id === 'sync-indicator' && _saveState === 'error') saveItinerary();
+});
 
 // ════════════════════════════════════════════
 //  FEATURE 1: ROUTE CONNECTIONS ON MAP
