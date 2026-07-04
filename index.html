@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=49" />
+  <link rel="stylesheet" href="style.css?v=50" />
 </head>
 <body>
 
@@ -158,9 +158,17 @@
       <span class="landing-card-title">天氣</span>
       <span class="landing-card-desc" id="weatherCardDesc">東京淺草天氣</span>
     </button>
+    <button class="landing-card" data-tab="phrases">
+      <span class="landing-card-icon">🗣</span>
+      <span class="landing-card-title">日語速查</span>
+      <span class="landing-card-desc">常用句 · 點餐 · 急難</span>
+    </button>
   </div>
 
 </div>
+
+<!-- 離線狀態橫幅 -->
+<div id="offline-banner">📡 離線模式 — 地圖瓦片已快取，其餘功能受限</div>
 
 <!-- ════════════════════════════════════════════
      HEADER（含天氣）
@@ -236,6 +244,7 @@
     <div id="itinerary-header">
       <h2>每日行程</h2>
       <div class="itinerary-actions">
+        <button id="btn-today"       class="btn btn-outline btn-sm" onclick="focusTodayColumn()" title="跳至今天">📅 今天</button>
         <button id="btn-map-toggle"  class="btn btn-outline btn-sm">🗺 地圖</button>
         <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
         <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 已同步</span>
@@ -398,9 +407,16 @@
       <span id="totalTWD" style="margin-left:8px;font-weight:700;color:var(--primary)"></span>
     </div>
 
-    <!-- 消費圓餅圖 -->
-    <div id="spendingChartWrap" style="max-width:280px;margin:0.75rem auto 0">
-      <canvas id="spendingChart" width="280" height="280"></canvas>
+    <!-- 消費圖表 -->
+    <div class="spending-charts-row">
+      <div class="chart-block">
+        <div class="chart-label">類別佔比</div>
+        <canvas id="spendingChart" width="200" height="200"></canvas>
+      </div>
+      <div class="chart-block chart-block-bar">
+        <div class="chart-label">每日消費</div>
+        <canvas id="dailyChart" width="320" height="200"></canvas>
+      </div>
     </div>
 
     <!-- 明細/拆帳 tabs -->
@@ -458,9 +474,33 @@
 </section>
 
 <!-- ════════════════════════════════════════════
+     SECTION: 日語速查
+════════════════════════════════════════════ -->
+<div id="section-phrases" class="tab-section page" style="display:none">
+  <div class="phrases-wrap">
+    <div class="phrases-header">
+      <h2>🗣 日語速查</h2>
+      <p class="phrases-hint">點擊卡片可複製日文到剪貼簿</p>
+    </div>
+    <div class="phrases-emergency-banner" onclick="showEmergencyPanel()">
+      🆘 急難電話速查（警察110 / 救護119 / 台灣辦事處）— 點擊查看
+    </div>
+    <div class="phrases-categories">
+      <button class="phrase-cat-btn active" data-cat="all">全部</button>
+      <button class="phrase-cat-btn" data-cat="basic">基本禮貌</button>
+      <button class="phrase-cat-btn" data-cat="food">點餐購物</button>
+      <button class="phrase-cat-btn" data-cat="transport">交通方向</button>
+      <button class="phrase-cat-btn" data-cat="emergency">緊急情況</button>
+    </div>
+    <div id="phrases-content" class="phrases-grid"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      FLOATING BUTTONS
 ════════════════════════════════════════════ -->
 <button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
+<button id="floatEmergencyBtn" title="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
 <button id="floatAIBtn" title="AI 旅遊助手" style="display:none">
   <span>✨</span>
   <small>AI助手</small>
@@ -499,6 +539,20 @@
 </div>
 
 <!-- ════════════════════════════════════════════
+     急難聯絡 Panel
+════════════════════════════════════════════ -->
+<div id="emergencyPanel" class="emergency-panel" style="display:none" onclick="if(event.target===this)closeEmergencyPanel()">
+  <div class="emg-inner">
+    <div class="emg-header">
+      <span>🆘 急難聯絡</span>
+      <button onclick="closeEmergencyPanel()">✕</button>
+    </div>
+    <div id="emergencyList"></div>
+    <p class="emg-tip">點擊可直接撥打電話</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      住宿詳細資訊 Modal
 ════════════════════════════════════════════ -->
 <div id="hotelModal" class="hotel-modal" style="display:none" onclick="if(event.target===this)closeHotelModal()">
@@ -528,6 +582,6 @@
   </div>
 </div>
 
-<script src="app.js?v=49"></script>
+<script src="app.js?v=50"></script>
 </body>
 </html>

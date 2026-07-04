@@ -1,6 +1,7 @@
-const CACHE = 'tokyo-trip-2026-v49';
-// HTML 與資料檔（places/itinerary）不放入快取，永遠從網路取最新版
-const STATIC = ['/style.css?v=49', '/app.js?v=49', '/manifest.json', '/icon.svg'];
+const CACHE = 'tokyo-trip-2026-v50';
+const TILE_CACHE = 'tokyo-osm-tiles-v1';
+// HTML 與資料檔不放入主快取，永遠從網路取最新版
+const STATIC = ['/style.css?v=50', '/app.js?v=50', '/manifest.json', '/icon.svg'];
 // 這些路徑永遠走 network-first（即時反映 CSV / 行程更新）
 const NETWORK_FIRST = ['/places.json', '/itinerary.json', '/expenses.json'];
 
@@ -12,7 +13,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k !== CACHE && k !== TILE_CACHE).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -21,6 +22,22 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.pathname.startsWith('/api/')) return;
+
+  // OSM 地圖瓦片：cache-first（讓地鐵無訊號時仍可看地圖）
+  if (url.hostname.endsWith('tile.openstreetmap.org')) {
+    e.respondWith(
+      caches.open(TILE_CACHE).then(async c => {
+        const cached = await c.match(e.request);
+        if (cached) return cached;
+        return fetch(e.request).then(res => {
+          if (res.ok) c.put(e.request, res.clone());
+          return res;
+        }).catch(() => new Response('', { status: 503 }));
+      })
+    );
+    return;
+  }
+
   // HTML 與資料檔：network-first（拿不到才用快取備援）
   const isHtml = e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html');
   const isData = NETWORK_FIRST.includes(url.pathname);

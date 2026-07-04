@@ -1735,4 +1735,123 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .temp-hi { color: #ff7043; }
 .temp-sep { color: rgba(255,255,255,0.3); margin: 0 1px; }
 .temp-lo { color: #64b5f6; }
+
+/* ════════════════════════════════════════════
+   v50 新增樣式
+════════════════════════════════════════════ */
+
+/* 離線橫幅 */
+#offline-banner {
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+  background: #E65100; color: #fff; text-align: center;
+  font-size: 12px; font-weight: 700; padding: 6px 16px;
+}
+#offline-banner.visible { display: block; }
+
+/* 今天欄位高亮 */
+.day-column.today-column {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary), 0 4px 16px rgba(178,58,44,0.18);
+}
+.day-column.today-column .day-header {
+  background: var(--primary);
+}
+
+/* 緊急聯絡浮動按鈕 */
+#floatEmergencyBtn {
+  position: fixed; bottom: 2rem; right: 9.8rem;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #D32F2F; color: #fff; border: none;
+  font-size: 1.3rem; cursor: pointer; z-index: 450;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(211,47,47,0.5);
+  transition: transform .2s, box-shadow .2s;
+}
+#floatEmergencyBtn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(211,47,47,0.7); }
+
+/* 急難聯絡 Panel */
+.emergency-panel {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(0,0,0,.55); display: flex;
+  align-items: flex-end; justify-content: center;
+  opacity: 0; transition: opacity .28s;
+}
+.emergency-panel.emg-open { opacity: 1; }
+.emg-inner {
+  width: 100%; max-width: 480px; background: var(--surface);
+  border-radius: 20px 20px 0 0; padding: 0 0 env(safe-area-inset-bottom);
+  transform: translateY(100%); transition: transform .28s cubic-bezier(.25,.46,.45,.94);
+}
+.emergency-panel.emg-open .emg-inner { transform: translateY(0); }
+.emg-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 10px; font-size: 15px; font-weight: 800;
+  border-bottom: 1px solid var(--border);
+}
+.emg-header button { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
+.emg-item {
+  display: flex; align-items: center; gap: 12px; padding: 13px 18px;
+  border-bottom: 1px solid #f0ebe0; text-decoration: none; color: var(--text);
+  transition: background .1s;
+}
+.emg-item:hover { background: var(--bg); }
+.emg-item:active { background: #FFE0E0; }
+.emg-emoji { font-size: 22px; flex-shrink: 0; }
+.emg-info { flex: 1; min-width: 0; }
+.emg-label { font-size: 13px; font-weight: 700; }
+.emg-desc { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.emg-tel { font-size: 14px; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+.emg-tip { text-align: center; font-size: 11px; color: var(--text-muted); padding: 10px; }
+
+/* 日語速查 Section */
+#section-phrases { overflow-y: auto; }
+#section-phrases.active { display: block; }
+.phrases-wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+.phrases-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+.phrases-header h2 { font-size: 16px; font-weight: 800; }
+.phrases-hint { font-size: 11px; color: var(--text-muted); }
+.phrases-emergency-banner {
+  background: #FFEBEE; border: 1.5px solid #EF9A9A; border-radius: 10px;
+  padding: 10px 14px; font-size: 12px; font-weight: 700; color: #C62828;
+  cursor: pointer; margin-bottom: 12px; text-align: center;
+  transition: background .15s;
+}
+.phrases-emergency-banner:hover { background: #FFCDD2; }
+.phrases-categories {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.phrase-cat-btn {
+  padding: 5px 14px; border: 1.5px solid var(--border); border-radius: 20px;
+  background: var(--surface); font-size: 12px; font-weight: 700;
+  cursor: pointer; color: var(--text-muted); transition: all .15s;
+}
+.phrase-cat-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+.phrase-cat-btn:hover:not(.active) { background: var(--bg); }
+.phrases-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;
+}
+.phrase-card {
+  background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 12px 14px; cursor: pointer; transition: all .15s; position: relative;
+}
+.phrase-card:hover { border-color: var(--primary); box-shadow: 0 2px 12px rgba(178,58,44,.12); }
+.phrase-card:active { background: #FFF0EE; }
+.phrase-jp { font-size: 16px; font-weight: 800; color: var(--black); margin-bottom: 3px; }
+.phrase-rom { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-style: italic; }
+.phrase-zh { font-size: 13px; color: var(--primary); font-weight: 700; }
+.phrase-copy-hint {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 9px; color: var(--text-muted); opacity: 0;
+  transition: opacity .15s;
+}
+.phrase-card:hover .phrase-copy-hint { opacity: 1; }
+
+/* 記帳圖表並排 */
+.spending-charts-row {
+  display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;
+  justify-content: center; margin: 0.75rem 0;
+}
+.chart-block { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-block-bar { flex: 1; min-width: 200px; }
+.chart-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
 .wi-rain { font-size: 0.6rem; color: rgba(255,255,255,0.4); }

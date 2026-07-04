@@ -36,6 +36,35 @@ const CAT_EMOJI  = { food:'🍽', ticket:'🎫', transport:'🚌', shopping:'�
 const CAT_LABEL  = { food:'餐飲', ticket:'票券', transport:'交通', shopping:'購物', hotel:'住宿', medicine:'藥妝', other:'其他' };
 const SHOP_CAT   = { medicine:'💊 藥妝', food:'🍬 食品/零食', fashion:'👗 服飾', souvenir:'🎁 伴手禮', other:'📦 其他' };
 
+// ── 急難聯絡 ──────────────────────────────────────────────────────────────────
+const EMERGENCY = [
+  { emoji:'🚓', label:'警察',               tel:'110',              desc:'犯罪・緊急事件' },
+  { emoji:'🚑', label:'救護車・消防',        tel:'119',              desc:'傷病・火災' },
+  { emoji:'📞', label:'旅遊諮詢熱線',        tel:'050-3816-2787',    desc:'觀光廳中文服務（免費）' },
+  { emoji:'🇹🇼', label:'台灣駐日辦事處（東京）', tel:'+81-3-3280-7811', desc:'護照遺失・緊急領事協助' },
+  { emoji:'🔵', label:'警察英語諮詢',        tel:'#9110',             desc:'非緊急・英語警察諮詢' },
+];
+
+// ── 常用日語 ──────────────────────────────────────────────────────────────────
+const JP_PHRASES = [
+  { cat:'basic',     jp:'すみません',                       rom:'Sumimasen',                           zh:'不好意思 / 麻煩您' },
+  { cat:'basic',     jp:'ありがとうございます',              rom:'Arigatou gozaimasu',                  zh:'謝謝' },
+  { cat:'basic',     jp:'わかりません',                      rom:'Wakarimasen',                         zh:'我不懂' },
+  { cat:'basic',     jp:'英語はわかりますか？',              rom:'Eigo wa wakarimasu ka?',               zh:'您會說英語嗎？' },
+  { cat:'food',      jp:'これをください',                    rom:'Kore o kudasai',                      zh:'請給我這個' },
+  { cat:'food',      jp:'いくらですか？',                    rom:'Ikura desu ka?',                      zh:'多少錢？' },
+  { cat:'food',      jp:'カードは使えますか？',              rom:'Kaado wa tsukaemasu ka?',              zh:'可以刷卡嗎？' },
+  { cat:'food',      jp:'袋は要りません',                    rom:'Fukuro wa irimasen',                  zh:'不需要袋子（環保）' },
+  { cat:'food',      jp:'アレルギーがあります',              rom:'Arerugii ga arimasu',                 zh:'我有過敏' },
+  { cat:'transport', jp:'トイレはどこですか？',              rom:'Toire wa doko desu ka?',               zh:'廁所在哪裡？' },
+  { cat:'transport', jp:'〇〇はどこですか？',                rom:'〇〇 wa doko desu ka?',                zh:'〇〇在哪裡？' },
+  { cat:'transport', jp:'写真を撮ってもいいですか？',        rom:'Shashin totte mo ii desu ka?',         zh:'可以拍照嗎？' },
+  { cat:'emergency', jp:'病院に連れて行ってください',        rom:'Byouin ni tsurete itte kudasai',       zh:'請帶我去醫院' },
+  { cat:'emergency', jp:'パスポートをなくしました',          rom:'Pasupooto o nakushimashita',           zh:'我遺失了護照' },
+  { cat:'emergency', jp:'警察を呼んでください',              rom:'Keisatsu o yonde kudasai',             zh:'請幫我叫警察' },
+  { cat:'emergency', jp:'財布を盗まれました',                rom:'Saifu o nusumaremashita',              zh:'我的錢包被偷了' },
+];
+
 // ════════════════════════════════════════════
 //  LOCALSTORAGE SCHEMA VERSION（改資料結構時遞增）
 // ════════════════════════════════════════════
@@ -86,6 +115,7 @@ function showLanding() {
   if (!landing) return;
   landing.style.display = 'flex';
   showFloatingButtons(false);
+  document.getElementById('floatEmergencyBtn').style.display = 'flex';
   const cd = document.getElementById('landingCountdown');
   const daysLeft = Math.ceil((new Date('2026-08-03') - new Date()) / 86400000);
   if (cd) cd.textContent = daysLeft > 0 ? `✈ 還有 ${daysLeft} 天出發！` : '🎉 旅程進行中！';
@@ -127,8 +157,9 @@ function switchTab(tabName) {
   if (tabName === 'shopping') renderShoppingList();
   if (tabName === 'ledger') {
     syncPaidByOptions(); renderExpenseList(); renderSettle();
-    drawSpendingChart(expenses); updateCurrencyConvert();
+    drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
   }
+  if (tabName === 'phrases') renderPhrases();
   if (tabName === 'prep') updatePrepRing();
   if (tabName === 'diary') renderDiary();
   // 如 AI 抽屜開著，同步更新快捷提示
@@ -137,8 +168,10 @@ function switchTab(tabName) {
 }
 
 function showFloatingButtons(show) {
-  document.getElementById('floatAIBtn').style.display = show ? 'flex' : 'none';
-  document.getElementById('homeBtn').style.display    = show ? 'flex' : 'none';
+  document.getElementById('floatAIBtn').style.display  = show ? 'flex' : 'none';
+  document.getElementById('homeBtn').style.display     = show ? 'flex' : 'none';
+  // 緊急按鈕始終可見（splash 結束後顯示）
+  document.getElementById('floatEmergencyBtn').style.display = 'flex';
 }
 
 // Home button → back to landing
@@ -165,6 +198,13 @@ document.getElementById('floatAIBtn').addEventListener('click', () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
+
+// 離線狀態橫幅
+function updateOnlineStatus() {
+  document.getElementById('offline-banner')?.classList.toggle('visible', !navigator.onLine);
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
 
 // ════════════════════════════════════════════
 //  WEATHER  (Open-Meteo — free, no API key)
@@ -555,6 +595,67 @@ function closeHotelModal() {
   document.getElementById('hotelModal').style.display = 'none';
 }
 
+// ════════════════════════════════════════════
+//  EMERGENCY PANEL
+// ════════════════════════════════════════════
+function showEmergencyPanel() {
+  const panel = document.getElementById('emergencyPanel');
+  document.getElementById('emergencyList').innerHTML = EMERGENCY.map(e =>
+    `<a class="emg-item" href="tel:${e.tel}">
+      <span class="emg-emoji">${e.emoji}</span>
+      <div class="emg-info">
+        <div class="emg-label">${escHtml(e.label)}</div>
+        <div class="emg-desc">${escHtml(e.desc)}</div>
+      </div>
+      <span class="emg-tel">${escHtml(e.tel)}</span>
+    </a>`
+  ).join('');
+  panel.style.display = 'flex';
+  requestAnimationFrame(() => panel.classList.add('emg-open'));
+}
+function closeEmergencyPanel() {
+  const panel = document.getElementById('emergencyPanel');
+  panel.classList.remove('emg-open');
+  setTimeout(() => { panel.style.display = 'none'; }, 280);
+}
+
+// ════════════════════════════════════════════
+//  JAPANESE PHRASES
+// ════════════════════════════════════════════
+let activePhrasesCat = 'all';
+
+function renderPhrases() {
+  const container = document.getElementById('phrases-content');
+  if (!container) return;
+  const filtered = activePhrasesCat === 'all'
+    ? JP_PHRASES
+    : JP_PHRASES.filter(p => p.cat === activePhrasesCat);
+  container.innerHTML = filtered.map((p, i) => `
+    <div class="phrase-card" data-idx="${JP_PHRASES.indexOf(p)}">
+      <div class="phrase-jp">${escHtml(p.jp)}</div>
+      <div class="phrase-rom">${escHtml(p.rom)}</div>
+      <div class="phrase-zh">${escHtml(p.zh)}</div>
+      <span class="phrase-copy-hint">點擊複製</span>
+    </div>`).join('');
+  container.querySelectorAll('.phrase-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const p = JP_PHRASES[+card.dataset.idx];
+      navigator.clipboard?.writeText(p.jp)
+        .then(() => showToast('已複製：' + p.jp))
+        .catch(() => showToast(p.jp));
+    });
+  });
+}
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.phrase-cat-btn');
+  if (!btn) return;
+  document.querySelectorAll('.phrase-cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activePhrasesCat = btn.dataset.cat;
+  renderPhrases();
+});
+
 function ensureDays() {
   Object.keys(DAY_SHORT).forEach(date => {
     if (!itinerary[date]) {
@@ -677,6 +778,21 @@ function renderItinerary() {
     });
 
   });
+  focusTodayColumn();
+}
+
+// 自動高亮並捲動至今天的欄位（旅行期間內）
+function focusTodayColumn() {
+  const todayKey = Object.keys(DAY_SHORT).find(k =>
+    new Date(k).toDateString() === new Date().toDateString()
+  );
+  document.querySelectorAll('.day-column').forEach(c => c.classList.remove('today-column'));
+  if (!todayKey) return;
+  const col = document.querySelector(`.day-column[data-date="${todayKey}"]`);
+  if (col) {
+    col.classList.add('today-column');
+    setTimeout(() => col.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' }), 300);
+  }
 }
 
 function getDayDensity(places) {
@@ -1500,7 +1616,7 @@ function renderExpenseList() {
     group.querySelectorAll('.exp-del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         expenses.splice(parseInt(btn.dataset.idx), 1);
-        saveExpenses(); renderExpenseList(); renderSettle(); drawSpendingChart(expenses); updateCurrencyConvert();
+        saveExpenses(); renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
       });
     });
     area.appendChild(group);
@@ -1542,7 +1658,7 @@ function addExpense() {
   if (!desc) { showToast('請輸入說明'); return; }
   if (!amount||amount<=0) { showToast('請輸入有效金額'); return; }
   expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy });
-  saveExpenses(); renderExpenseList(); drawSpendingChart(expenses); updateCurrencyConvert();
+  saveExpenses(); renderExpenseList(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
   document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
   showToast('已加入記帳 ✓');
 }
@@ -1874,6 +1990,57 @@ function drawSpendingChart(expArr) {
   ctx.font = 'bold 14px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('¥' + total.toLocaleString(), cx, cy + 5);
+}
+
+function drawDailyChart(expArr) {
+  const canvas = document.getElementById('dailyChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const days = Object.keys(DAY_SHORT);
+  const totals = days.map(d => (expArr || []).filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+  const maxVal = Math.max(...totals, 1);
+  const W = canvas.width, H = canvas.height;
+  const pad = { t:16, r:8, b:32, l:44 };
+  const barW = (W - pad.l - pad.r) / days.length;
+  ctx.clearRect(0, 0, W, H);
+
+  // Y-axis grid lines and labels
+  [0, 0.5, 1].forEach(f => {
+    const y = H - pad.b - f * (H - pad.t - pad.b);
+    ctx.strokeStyle = 'rgba(201,181,142,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#8A6F45';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right';
+    const label = f === 0 ? '0' : '¥' + (Math.round(maxVal * f / 1000)) + 'k';
+    ctx.fillText(label, pad.l - 2, y + 3);
+  });
+
+  // Bars
+  totals.forEach((val, i) => {
+    const bh = Math.max(val / maxVal * (H - pad.t - pad.b), val > 0 ? 2 : 0);
+    const bx = pad.l + i * barW + barW * 0.15;
+    const by = H - pad.b - bh;
+    ctx.fillStyle = val > 0 ? '#B23A2Ccc' : '#C9B58E33';
+    ctx.beginPath();
+    if (ctx.roundRect) { ctx.roundRect(bx, by, barW * 0.7, bh, [3, 3, 0, 0]); }
+    else { ctx.rect(bx, by, barW * 0.7, bh); }
+    ctx.fill();
+    // X labels
+    ctx.fillStyle = '#8A6F45';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(days[i].slice(5), bx + barW * 0.35, H - pad.b + 12);
+    // Value above bar
+    if (val > 0) {
+      ctx.fillStyle = '#3A2E1F';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText(val >= 10000 ? Math.round(val/1000)+'k' : val >= 1000 ? (val/1000).toFixed(1)+'k' : val, bx + barW * 0.35, by - 3);
+    }
+  });
 }
 
 function updateCurrencyConvert() {
