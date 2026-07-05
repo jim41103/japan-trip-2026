@@ -297,7 +297,56 @@ const map = L.map('map', { zoomControl: true }).setView([35.6762, 139.6503], 12)
 window.MAP = map;
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap', maxZoom: 19,
+  crossOrigin: true, // 讓瀏覽器用 CORS 模式讀取 tile，SW 才能真正把圖存進離線快取（否則是 opaque response，res.ok 恆為 false）
 }).addTo(map);
+
+// ════════════════════════════════════════════
+//  離線地圖預先快取：把整趟行程地點附近的 OSM 地圖磁磚先抓下來
+//  （交由 sw.js 的 tile cache-first 邏輯存進 TILE_CACHE，之後離線也看得到）
+// ════════════════════════════════════════════
+function latLngToTile(lat, lng, zoom) {
+  const n = Math.pow(2, zoom);
+  const x = Math.floor((lng + 180) / 360 * n);
+  const latRad = lat * Math.PI / 180;
+  const y = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
+  return { x, y };
+}
+
+async function cacheOfflineMap() {
+  const btn = document.getElementById('btn-cache-map');
+  const places = Object.values(itinerary).flatMap(d => d.places || []).filter(p => p.lat && p.lng);
+  if (!places.length) { showToast('目前沒有可快取的地點'); return; }
+
+  const zooms = [13, 14, 15, 16];
+  const tileSet = new Set();
+  places.forEach(p => {
+    zooms.forEach(z => {
+      const { x, y } = latLngToTile(p.lat, p.lng, z);
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        tileSet.add(`${z}/${x + dx}/${y + dy}`);
+      }
+    });
+  });
+  const subdomains = ['a', 'b', 'c'];
+  const urls = [...tileSet].map(t => {
+    const [z, x, y] = t.split('/');
+    const s = subdomains[Math.floor(Math.random() * subdomains.length)];
+    return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`;
+  });
+
+  if (btn) { btn.disabled = true; btn.textContent = `📥 下載中 0/${urls.length}`; }
+  let done = 0;
+  const BATCH = 6; // 避免同時發太多請求塞爆連線
+  for (let i = 0; i < urls.length; i += BATCH) {
+    await Promise.all(urls.slice(i, i + BATCH).map(u => fetch(u).catch(() => {})));
+    done = Math.min(i + BATCH, urls.length);
+    if (btn) btn.textContent = `📥 下載中 ${done}/${urls.length}`;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '📥 快取全程地圖'; }
+  showToast(`✅ 地圖快取完成，共 ${urls.length} 張磁磚`);
+}
+
+document.getElementById('btn-cache-map')?.addEventListener('click', cacheOfflineMap);
 
 function escHtml(str) {
   return String(str)
@@ -1266,7 +1315,7 @@ function renderTimelineView() {
           <span class="tl-day-count">${places.length} 個地點</span>
         </div>
         ${bodyHtml}
-        <div class="tl-hotel">🏨 ${escHtml(HOTEL.name)}</div>
+        ${date === '2026-08-09' ? '' : `<div class="tl-hotel">🏨 ${escHtml(date === '2026-08-08' ? HOTEL_0808.name : HOTEL.name)}</div>`}
       </div>`;
   }).join('');
 }
@@ -1611,6 +1660,7 @@ function renderExpenseList() {
           <div class="exp-info"><div class="exp-desc">${escHtml(exp.desc||'—')}</div><div class="exp-meta">${CAT_LABEL[exp.cat]||'其他'}</div></div>
           <span class="exp-amount-cell">¥${exp.amount.toLocaleString()}</span>
           <span class="exp-paid-badge ${exp.paidBy==='a'?'badge-a':'badge-b'}">${exp.paidBy==='a'?escHtml(nameA):escHtml(nameB)}</span>
+          ${exp.split==='personal' ? '<span class="exp-paid-badge" style="background:#999">🙋 個人</span>' : ''}
           <button class="exp-del-btn" data-idx="${exp._idx}">×</button>
         </div>`).join('')}`;
     group.querySelectorAll('.exp-del-btn').forEach(btn => {
@@ -1626,11 +1676,14 @@ function renderSettle() {
   const content = document.getElementById('settle-content');
   if (!content) return;
   const nameA = getMemberName('a'), nameB = getMemberName('b');
-  const totalA = expenses.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
-  const totalB = expenses.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
+  const shared = expenses.filter(e=>e.split!=='personal');
+  const personalA = expenses.filter(e=>e.split==='personal'&&e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
+  const personalB = expenses.filter(e=>e.split==='personal'&&e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
+  const totalA = shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
+  const totalB = shared.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const total = totalA+totalB, each = total/2, diff = totalA-each, diffAbs = Math.abs(Math.round(diff));
   const byCat = {};
-  expenses.forEach(e => { byCat[e.cat] = (byCat[e.cat]||0) + e.amount; });
+  shared.forEach(e => { byCat[e.cat] = (byCat[e.cat]||0) + e.amount; });
   let resultHTML = total===0
     ? `<div class="settle-result" style="border-color:#ccc;background:#f5f5f5"><div class="settle-result-desc" style="font-size:15px">尚無記帳資料</div></div>`
     : diff===0
@@ -1638,11 +1691,11 @@ function renderSettle() {
       : `<div class="settle-result"><div class="settle-result-label">結算結果</div><div class="settle-result-amount">¥${diffAbs.toLocaleString()}</div><div class="settle-result-desc">${escHtml(diff>0?nameB:nameA)} 應付 ${escHtml(diff>0?nameA:nameB)}<br>¥${diffAbs.toLocaleString()}</div></div>`;
   content.innerHTML = `
     <div class="settle-cards">
-      <div class="settle-card settle-card-a"><div class="settle-card-name">${escHtml(nameA)} 已付</div><div class="settle-card-amount">¥${totalA.toLocaleString()}</div><div class="settle-card-sub">應付 ¥${Math.round(each).toLocaleString()}</div></div>
-      <div class="settle-card settle-card-b"><div class="settle-card-name">${escHtml(nameB)} 已付</div><div class="settle-card-amount">¥${totalB.toLocaleString()}</div><div class="settle-card-sub">應付 ¥${Math.round(each).toLocaleString()}</div></div>
+      <div class="settle-card settle-card-a"><div class="settle-card-name">${escHtml(nameA)} 已付</div><div class="settle-card-amount">¥${totalA.toLocaleString()}</div><div class="settle-card-sub">應付 ¥${Math.round(each).toLocaleString()}${personalA?`<br>個人另花 ¥${personalA.toLocaleString()}`:''}</div></div>
+      <div class="settle-card settle-card-b"><div class="settle-card-name">${escHtml(nameB)} 已付</div><div class="settle-card-amount">¥${totalB.toLocaleString()}</div><div class="settle-card-sub">應付 ¥${Math.round(each).toLocaleString()}${personalB?`<br>個人另花 ¥${personalB.toLocaleString()}`:''}</div></div>
     </div>
     ${resultHTML}
-    <div class="settle-section-title">類別明細</div>
+    <div class="settle-section-title">類別明細（僅計入平分項目）</div>
     <table class="settle-cat-table">
       <thead><tr><th>類別</th><th>金額</th><th>佔比</th></tr></thead>
       <tbody>
@@ -1655,11 +1708,13 @@ function addExpense() {
   const date=document.getElementById('exp-date').value, cat=document.getElementById('exp-cat').value;
   const desc=document.getElementById('exp-desc').value.trim(), amount=parseInt(document.getElementById('exp-amount').value,10);
   const paidBy=document.getElementById('exp-paidby').value;
+  const split=document.getElementById('exp-split').value;
   if (!desc) { showToast('請輸入說明'); return; }
   if (!amount||amount<=0) { showToast('請輸入有效金額'); return; }
-  expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy });
+  expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy, split });
   saveExpenses(); renderExpenseList(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
   document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
+  document.getElementById('exp-split').value='shared';
   showToast('已加入記帳 ✓');
 }
 function openExpenseModal() {
@@ -1682,8 +1737,9 @@ document.querySelectorAll('.exp-tab').forEach(tab => {
 });
 document.getElementById('btn-export-settle').addEventListener('click', () => {
   const nameA=getMemberName('a'), nameB=getMemberName('b');
-  const totalA=expenses.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
-  const totalB=expenses.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
+  const shared=expenses.filter(e=>e.split!=='personal');
+  const totalA=shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
+  const totalB=shared.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const total=totalA+totalB, each=Math.round(total/2), diff=totalA-total/2, diffAbs=Math.abs(Math.round(diff));
   let md=`# 東京行程 2026 旅費結算\n\n`;
   md+=`| 成員 | 已付 | 應付 | 差額 |\n|------|------|------|------|\n`;
@@ -1697,7 +1753,7 @@ document.getElementById('btn-export-settle').addEventListener('click', () => {
   expenses.forEach(e => { if(!byDate[e.date]) byDate[e.date]=[]; byDate[e.date].push(e); });
   Object.keys(byDate).sort().forEach(date => {
     md+=`### ${DAY_SHORT[date]||date}\n`;
-    byDate[date].forEach(e => { md+=`- ${CAT_EMOJI[e.cat]||'📦'} ${e.desc} — ¥${e.amount.toLocaleString()}（${e.paidBy==='a'?nameA:nameB} 付）\n`; });
+    byDate[date].forEach(e => { md+=`- ${CAT_EMOJI[e.cat]||'📦'} ${e.desc} — ¥${e.amount.toLocaleString()}（${e.paidBy==='a'?nameA:nameB} 付${e.split==='personal'?'・個人花費不拆帳':''}）\n`; });
     md+='\n';
   });
   const blob=new Blob([md],{type:'text/plain;charset=utf-8'});
@@ -1919,8 +1975,22 @@ localStorage.setItem = function(key, value) {
   });
 });
 
-// 定期拉取（每 30 秒）
-setInterval(syncPull, 30000);
+// 記帳資料共編：定期比對伺服器最新版本，有變動才重繪（避免蓋掉正在輸入的表單）
+async function refreshExpensesIfChanged() {
+  try {
+    const res = await fetch('/api/expenses');
+    const data = await res.json();
+    if (JSON.stringify(data) !== JSON.stringify(expenses)) {
+      expenses = data;
+      renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
+    }
+  } catch (_) {}
+}
+
+// 定期拉取（每 30 秒，分頁切到背景時暫停以省電/省流量）
+setInterval(() => {
+  if (document.visibilityState === 'visible') { syncPull(); refreshExpensesIfChanged(); }
+}, 30000);
 
 // ════════════════════════════════════════════
 //  WEATHER TRIP FORECAST (Open-Meteo)
@@ -2097,6 +2167,17 @@ function renderDiaryDayTabs() {
   });
 }
 
+// 儲存日記資料，容量爆滿時提示使用者而非讓 App 整個壞掉
+function saveDiaryData(data) {
+  try {
+    localStorage.setItem('diaryData', JSON.stringify(data));
+    return true;
+  } catch (err) {
+    showToast('⚠️ 儲存空間已滿，請刪除幾張照片後再試');
+    return false;
+  }
+}
+
 function renderDiaryContent() {
   const container = document.getElementById('diaryContent');
   if (!container) return;
@@ -2124,7 +2205,7 @@ function renderDiaryContent() {
     const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
     if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
     data[activeDiaryDay].text = text;
-    localStorage.setItem('diaryData', JSON.stringify(data));
+    if (!saveDiaryData(data)) return;
     const btn = document.getElementById('saveDiary');
     btn.textContent = '✅ 已儲存';
     setTimeout(() => btn.textContent = '💾 儲存日記', 1500);
@@ -2140,7 +2221,7 @@ function addDiaryPhoto(base64) {
   const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
   if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
   data[activeDiaryDay].photos.push(base64);
-  localStorage.setItem('diaryData', JSON.stringify(data));
+  if (!saveDiaryData(data)) return;
   renderDiaryPhotos(data[activeDiaryDay].photos);
 }
 
@@ -2156,7 +2237,7 @@ function renderDiaryPhotos(photos) {
     btn.addEventListener('click', () => {
       const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
       data[activeDiaryDay].photos.splice(+btn.dataset.idx, 1);
-      localStorage.setItem('diaryData', JSON.stringify(data));
+      saveDiaryData(data);
       renderDiaryContent();
     });
   });

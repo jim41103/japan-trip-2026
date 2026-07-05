@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=50" />
+  <link rel="stylesheet" href="style.css?v=52" />
 </head>
 <body>
 
@@ -163,6 +163,11 @@
       <span class="landing-card-title">日語速查</span>
       <span class="landing-card-desc">常用句 · 點餐 · 急難</span>
     </button>
+    <button class="landing-card" data-tab="notices">
+      <span class="landing-card-icon">📌</span>
+      <span class="landing-card-title">注意事項</span>
+      <span class="landing-card-desc">初訪日本 · 禮儀 · 8月提醒</span>
+    </button>
   </div>
 
 </div>
@@ -246,7 +251,8 @@
       <div class="itinerary-actions">
         <button id="btn-today"       class="btn btn-outline btn-sm" onclick="focusTodayColumn()" title="跳至今天">📅 今天</button>
         <button id="btn-map-toggle"  class="btn btn-outline btn-sm">🗺 地圖</button>
-        <button id="btn-view-toggle" class="btn btn-outline btn-sm">🗓 時間軸</button>
+        <button id="btn-cache-map"   class="btn btn-outline btn-sm" title="出發前先連 Wi-Fi 按這個，把全部行程地點附近的地圖先下載，地鐵沒訊號時仍可用">📥 快取全程地圖</button>
+        <button id="btn-view-toggle" class="btn btn-outline btn-sm" aria-label="切換為時間軸檢視">🗓 時間軸</button>
         <span id="sync-indicator" class="sync-indicator" data-state="ok">☁ 已同步</span>
         <button id="btn-export" class="btn btn-accent btn-sm">⬇ 儲存</button>
       </div>
@@ -453,6 +459,10 @@
           <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
           <select id="exp-paidby"><option value="a">Jim 付</option><option value="b">野珊 付</option></select>
         </div>
+        <select id="exp-split">
+          <option value="shared">👫 兩人平分</option>
+          <option value="personal">🙋 個人花費（不列入拆帳）</option>
+        </select>
         <button id="btn-add-exp" class="btn btn-accent">＋ 加入</button>
       </div>
     </div>
@@ -497,10 +507,92 @@
 </div>
 
 <!-- ════════════════════════════════════════════
+     SECTION: 注意事項（首次赴日 · 2026/8 版）
+════════════════════════════════════════════ -->
+<div id="section-notices" class="tab-section page" style="display:none">
+  <div class="notices-wrap">
+    <div class="notices-header">
+      <h2>📌 注意事項</h2>
+      <p class="notices-hint">依 2026/8/3–8/9 東京行程整理，第一次去日本必看</p>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🚃 交通</h3>
+      <ul>
+        <li>手扶梯站位：東京靠左站，右側讓給趕時間的人</li>
+        <li>電車車廂內禁止講電話，交談請壓低音量</li>
+        <li>月台請在指定排隊區等候，勿跨越黃色警戒線</li>
+        <li>Suica／PASMO 可現場購買，iPhone 用戶也能直接在錢包 App 開卡儲值，不必到站排隊</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>💴 金錢</h3>
+      <ul>
+        <li>多數商品標價為「稅別」（未稅），結帳需另加 10% 消費稅</li>
+        <li>日本無議價文化，標價即定價</li>
+        <li>免稅：憑護照於免稅店現場出示即可折抵，離境前無需再排隊退稅（此為 2026/8 當下制度；同年 11/1 起將改為「先付後退」，但不影響這趟行程）</li>
+        <li>便利商店並非每一間都能退稅，僅特定登記門市可辦，且需出示護照，酒類/菸品等品項退稅範圍依店而異</li>
+        <li>信用卡在連鎖店/百貨/車站普及，但小型店家、神社寺廟、部分餐廳仍常僅收現金，建議隨身備一定現金</li>
+        <li>Suica/PASMO 單卡儲值上限為 20,000 円，無法調高；用海外信用卡透過手機 App 直接加值 Suica 通常不行，但透過 Apple Pay 錢包加值多數可行（需支援 3D 驗證），不確定就用現金加值最保險</li>
+        <li>機票已含「國際觀光旅客稅」（出國稅），2026/7/1 起已調漲為 3,000 円，8月出境票價已反映此稅額，無需額外準備</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🎆 你們行程期間剛好會遇到</h3>
+      <ul>
+        <li>8/3、8/8 東京都內多場煙火大會登場（如江戶川區花火等），若當晚行程會靠近會場周邊，該區域道路可能管制、鄰近車站散場後容易嚴重回堵，建議提早前往或避開該時段搭車</li>
+        <li>此為一般性提醒，實際管制路線與時間請於出發前一週查詢主辦單位官網或東京都交通局最新公告</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🙏 禮儀 / 禁忌</h3>
+      <ul>
+        <li>泡湯：入池前需先沖澡淨身，禁止穿泳衣，長髮須挽起，毛巾不可入水，飲酒後不可入浴，刺青者可能被拒絕入場</li>
+        <li>市區幾乎沒有公共垃圾桶，建議自備小塑膠袋，垃圾帶回住宿地或投入便利商店/車站垃圾桶</li>
+        <li>進入室內空間（部分店家、住宿）須留意是否需脫鞋</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>📶 通訊</h3>
+      <ul>
+        <li>兩人同行建議用 eSIM 或實體 SIM 卡，比 WiFi 分享器划算（WiFi 蛋較適合 3 人以上分攤）</li>
+        <li>多數網卡方案只有上網、不含通話/簡訊，若需接聽台灣號碼來電或收簡訊驗證，選有保號功能的 eSIM</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>☀️ 天氣 / 穿著（8月東京）</h3>
+      <ul>
+        <li>8月平均 20–30°C，近年最高可達 35°C，悶熱；建議輕薄透氣、吸濕排汗衣物</li>
+        <li>室內冷氣強，建議隨身帶一件薄外套</li>
+        <li>8月為颱風好發期，出發前留意天氣預報，準備雨具，並留意班機是否延誤</li>
+        <li>防中暑：隨身攜帶防曬用品，勤補水分，若頭暈、身體發燙應立即到陰涼處休息</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>⚠️ 常見新手誤區</h3>
+      <ul>
+        <li>出發前先在 <b>Visit Japan Web</b> 完成入境審查、海關申報資料登錄，現場可省排隊時間</li>
+        <li>部分台灣常見成藥（含麻黃素或可待因成分的感冒藥）是日本禁帶藥品，出發前確認成分</li>
+        <li>新鮮水果、香腸/臘肉等肉類加工品一律禁止攜入，未申報視同違法</li>
+        <li>電車內講電話、視訊通話是最常見的新手雷區，即使小聲交談也可能招來側目</li>
+      </ul>
+    </div>
+
+    <p class="notices-source">資料整理自：Joyce海陸漫遊中、GO TOKYO、Tabirai Japan、MATCHA、WAmazing、vocus 日本自助旅行新手攻略、kkday、商周（僅供參考，實際規定請以官方公告為準）</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      FLOATING BUTTONS
 ════════════════════════════════════════════ -->
 <button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
-<button id="floatEmergencyBtn" title="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
+<button id="floatEmergencyBtn" title="急難聯絡" aria-label="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
 <button id="floatAIBtn" title="AI 旅遊助手" style="display:none">
   <span>✨</span>
   <small>AI助手</small>
@@ -582,6 +674,6 @@
   </div>
 </div>
 
-<script src="app.js?v=50"></script>
+<script src="app.js?v=52"></script>
 </body>
 </html>
