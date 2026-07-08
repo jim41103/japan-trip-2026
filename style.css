@@ -1147,7 +1147,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ── FLOATING HOME BUTTON（與 AI 助手並排、同大小） ── */
 #homeBtn {
   position: fixed;
-  bottom: 2rem;
+  top: calc(var(--header-h) + 0.8rem);
   right: 5.5rem;
   width: 56px;
   height: 56px;
@@ -1170,7 +1170,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ── FLOATING AI BUTTON ── */
 #floatAIBtn {
   position: fixed;
-  bottom: 2rem;
+  top: calc(var(--header-h) + 0.8rem);
   right: 1.2rem;
   width: 56px;
   height: 56px;
@@ -1762,7 +1762,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* 緊急聯絡浮動按鈕 */
 #floatEmergencyBtn {
-  position: fixed; bottom: 2rem; right: 9.8rem;
+  position: fixed; top: calc(var(--header-h) + 0.8rem); right: 9.8rem;
   width: 44px; height: 44px; border-radius: 50%;
   background: #D32F2F; color: #fff; border: none;
   font-size: 1.3rem; cursor: pointer; z-index: 450;
