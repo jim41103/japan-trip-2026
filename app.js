@@ -763,12 +763,30 @@ function ensureFlights() {
 // ════════════════════════════════════════════
 //  LOAD ITINERARY
 // ════════════════════════════════════════════
+// 行程裡每個地點的 lat/lng 是當初加入行程時「複製」進去的快照，
+// 之後若 places.json 修正座標，行程裡的舊快照不會自動跟著更新（這是造成地圖位置對不上的根因）。
+// 這裡以 places.json（allPlaces）為單一權威來源，用名稱比對把行程內嵌的座標校正回最新值。
+function reconcileItineraryCoords() {
+  if (!allPlaces || !allPlaces.length) return;
+  const byName = new Map(allPlaces.map(p => [p.name, p]));
+  Object.values(itinerary).forEach(day => {
+    (day.places || []).forEach(p => {
+      const master = byName.get(p.name);
+      if (master && (p.lat !== master.lat || p.lng !== master.lng)) {
+        p.lat = master.lat;
+        p.lng = master.lng;
+      }
+    });
+  });
+}
+
 async function loadItinerary() {
   // 立刻用靜態檔渲染，不等 sync
   const res = await fetch('/itinerary.json');
   itinerary = await res.json();
   ensureDays();
   ensureFlights();
+  reconcileItineraryCoords();
   renderItinerary();
   drawRouteLines();
   renderRouteLegend();
@@ -781,6 +799,7 @@ async function loadItinerary() {
       itinerary = remote;
       ensureDays();
       ensureFlights();
+      reconcileItineraryCoords();
       renderItinerary();
       drawRouteLines();
     })
@@ -2398,9 +2417,9 @@ async function loadWeeklyWeather() {
 //  INIT
 // ════════════════════════════════════════════
 (async () => {
+  await loadPlaces();      // 先載入 places.json（權威座標來源），行程座標校正才有東西可比對
   await loadItinerary();
   loadTripForecast();
-  await loadPlaces();
   await loadExpenses();
   initPrepChecklists();
   renderShoppingList();
