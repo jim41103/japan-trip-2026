@@ -306,8 +306,8 @@
   {
     "name": "無印良品 銀座旗艦店",
     "description": "",
-    "lat": 35.6396951,
-    "lng": 139.7336157,
+    "lat": 35.6741,
+    "lng": 139.7659,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%84%A1%E5%8D%B0%E8%89%AF%E5%93%81+%E9%8A%80%E5%BA%A7%E6%97%97%E8%89%A6%E5%BA%97/data=!4m2!3m1!1s0x60188baa38aecf7d:0xab5a3452172b5f9"
   },
@@ -1578,8 +1578,8 @@
   {
     "name": "Hatoya Asakusa",
     "description": "抹茶",
-    "lat": 35.7183137,
-    "lng": 139.6921819,
+    "lat": 35.7145,
+    "lng": 139.8015,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hatoya+Asakusa/data=!4m2!3m1!1s0x60188d4d2096709d:0xa3f29d92f6ae1181"
   },

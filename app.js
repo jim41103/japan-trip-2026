@@ -300,6 +300,24 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   crossOrigin: true, // 讓瀏覽器用 CORS 模式讀取 tile，SW 才能真正把圖存進離線快取（否則是 opaque response，res.ok 恆為 false）
 }).addTo(map);
 
+// 住宿位置：固定小房子圖示，永遠顯示（不進 marker cluster），方便一眼看出景點與住宿的相對位置
+function makeHotelIcon() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">
+    <circle cx="17" cy="17" r="16" fill="#2E7D32" stroke="#fff" stroke-width="2"/>
+    <text x="17" y="23" text-anchor="middle" font-size="16">🏠</text>
+  </svg>`;
+  return L.divIcon({
+    className: '',
+    html: `<div style="filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))">${svg}</div>`,
+    iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17],
+  });
+}
+[HOTEL, HOTEL_0808].forEach(h => {
+  L.marker([h.lat, h.lng], { icon: makeHotelIcon(), zIndexOffset: 1000 })
+    .bindPopup(`<b>🏠 住宿：${escHtml(h.name)}</b><br>${escHtml(h.address || '')}`)
+    .addTo(map);
+});
+
 // ════════════════════════════════════════════
 //  離線地圖預先快取：把整趟行程地點附近的 OSM 地圖磁磚先抓下來
 //  （交由 sw.js 的 tile cache-first 邏輯存進 TILE_CACHE，之後離線也看得到）
