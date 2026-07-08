@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=56" />
+  <link rel="stylesheet" href="style.css?v=57" />
 </head>
 <body>
 
@@ -184,6 +184,11 @@
     <h1>雙狼北漂</h1>
     <span class="date-range">2026/8/3-8/9</span>
     <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
+    <div class="header-icon-actions" onclick="event.stopPropagation()">
+      <button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
+      <button id="floatEmergencyBtn" title="急難聯絡" aria-label="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
+      <button id="floatAIBtn" title="AI 旅遊助手" style="display:none">✨</button>
+    </div>
   </div>
   <button class="header-weather" onclick="openWeatherModal()" title="點擊查看天氣預報">
     <span id="wb-icon">⏳</span>
@@ -587,16 +592,6 @@
     <p class="notices-source">資料整理自：Joyce海陸漫遊中、GO TOKYO、Tabirai Japan、MATCHA、WAmazing、vocus 日本自助旅行新手攻略、kkday、商周（僅供參考，實際規定請以官方公告為準）</p>
   </div>
 </div>
-
-<!-- ════════════════════════════════════════════
-     FLOATING BUTTONS
-════════════════════════════════════════════ -->
-<button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
-<button id="floatEmergencyBtn" title="急難聯絡" aria-label="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
-<button id="floatAIBtn" title="AI 旅遊助手" style="display:none">
-  <span>✨</span>
-  <small>AI助手</small>
-</button>
 
 <!-- ════════════════════════════════════════════
      MOBILE NAV

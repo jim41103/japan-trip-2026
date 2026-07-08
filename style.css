@@ -844,6 +844,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .snoopy-badge { font-size: 14px; }
   .date-range { display: none; }
   .countdown-pill { font-size: 10px; padding: 2px 7px; white-space: nowrap; }
+  .header-icon-actions { gap: 3px; margin-left: 2px; }
+  .header-icon-actions button { width: 24px; height: 24px; font-size: 0.75rem; }
   .header-actions { gap: 4px; flex-shrink: 0; }
   .sync-indicator { font-size: 10px; padding: 3px 7px; }
   .btn { padding: 5px 9px; font-size: 11px; }
@@ -1144,53 +1146,19 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   to   { opacity: 0; transform: scale(1.03); }
 }
 
-/* ── FLOATING HOME BUTTON（與 AI 助手並排、同大小） ── */
-#homeBtn {
-  position: fixed;
-  top: calc(var(--header-h) + 0.8rem);
-  right: 5.5rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #C97B5F, #8B4513);
-  border: none;
-  color: #fff;
-  font-size: 1.4rem;
-  cursor: pointer;
-  z-index: 450;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(139,69,19,0.45);
-  transition: transform 0.2s, box-shadow 0.2s;
-  line-height: 1;
+/* ── HEADER 圖示按鈕（首頁／急難聯絡／AI助手，緊鄰倒數天數） ── */
+.header-icon-actions { display: flex; align-items: center; gap: 6px; margin-left: 4px; }
+.header-icon-actions button {
+  width: 30px; height: 30px; border-radius: 50%; border: none;
+  color: #fff; font-size: 0.95rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
-#homeBtn:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(139,69,19,0.6); }
-
-/* ── FLOATING AI BUTTON ── */
-#floatAIBtn {
-  position: fixed;
-  top: calc(var(--header-h) + 0.8rem);
-  right: 1.2rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed, #db2777);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-size: 1.4rem;
-  z-index: 450;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(124,58,237,0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
-  line-height: 1;
-}
-#floatAIBtn small { font-size: 0.45rem; display: block; margin-top: 2px; color: rgba(255,255,255,0.8); }
-#floatAIBtn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(124,58,237,0.7); }
+.header-icon-actions button:hover { transform: scale(1.08); }
+#homeBtn { background: linear-gradient(135deg, #C97B5F, #8B4513); }
+#floatAIBtn { background: linear-gradient(135deg, #7c3aed, #db2777); display: none; }
+#floatEmergencyBtn { background: #D32F2F; display: none; }
 
 /* ── HIDE OLD TAB NAV ── */
 .tab-nav { display: none !important; }
@@ -1759,18 +1727,6 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .day-column.today-column .day-header {
   background: var(--primary);
 }
-
-/* 緊急聯絡浮動按鈕 */
-#floatEmergencyBtn {
-  position: fixed; top: calc(var(--header-h) + 0.8rem); right: 9.8rem;
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #D32F2F; color: #fff; border: none;
-  font-size: 1.3rem; cursor: pointer; z-index: 450;
-  display: none; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(211,47,47,0.5);
-  transition: transform .2s, box-shadow .2s;
-}
-#floatEmergencyBtn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(211,47,47,0.7); }
 
 /* 急難聯絡 Panel */
 .emergency-panel {
