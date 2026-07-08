@@ -196,7 +196,21 @@ document.getElementById('floatAIBtn').addEventListener('click', () => {
 //  SERVICE WORKER
 // ════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    // 主動檢查新版本，不完全依賴瀏覽器自己的排程檢查（那個間隔可能長達數小時）
+    reg.update();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') reg.update();
+    });
+  }).catch(() => {});
+
+  // 偵測到新版 SW 接管後自動重新整理一次，避免使用者停留在舊分頁看到過期資料
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    window.location.reload();
+  });
 }
 
 // 離線狀態橫幅
@@ -1185,6 +1199,7 @@ const DAY_COLORS = {
 let routePolylines = {};
 let routeNumMarkers = {};
 let routeLinesVisible = true;
+let visibleDays = new Set(Object.keys(DAY_COLORS)); // 預設全部日期顯示，可用圖例勾選單獨開關
 
 function drawRouteLines() {
   Object.values(routePolylines).forEach(p => map.removeLayer(p));
@@ -1194,6 +1209,7 @@ function drawRouteLines() {
   if (!routeLinesVisible) return;
 
   Object.entries(itinerary).forEach(([date, day]) => {
+    if (!visibleDays.has(date)) return;
     const places = (day.places || []).filter(p => p.lat && p.lng);
     if (!places.length) return;
     const color = DAY_COLORS[date] || '#888';
@@ -1233,14 +1249,34 @@ document.getElementById('mapResetBtn')?.addEventListener('click', () => {
   map.setView([36.5, 137.5], 7, { animate: true });
 });
 
-// 路線顏色圖例
+// 路線顏色圖例（可勾選單一日期，避免多天路線顏色互相重疊看不清楚）
 function renderRouteLegend() {
   const el = document.getElementById('route-legend');
   if (!el) return;
   el.innerHTML = Object.entries(DAY_COLORS).map(([date, color]) => {
     const label = DAY_SHORT[date] || date;
-    return `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div><span>${label}</span></div>`;
-  }).join('');
+    const checked = visibleDays.has(date) ? 'checked' : '';
+    return `<label class="legend-item" title="勾選/取消顯示這天的路線">
+      <input type="checkbox" class="legend-checkbox" data-date="${date}" ${checked}>
+      <div class="legend-dot" style="background:${color}"></div><span>${label}</span>
+    </label>`;
+  }).join('') + `<button type="button" id="legend-all" class="legend-toggle-all">全選</button><button type="button" id="legend-none" class="legend-toggle-all">清空</button>`;
+
+  el.querySelectorAll('.legend-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const d = cb.dataset.date;
+      if (cb.checked) visibleDays.add(d); else visibleDays.delete(d);
+      drawRouteLines();
+    });
+  });
+  document.getElementById('legend-all')?.addEventListener('click', () => {
+    visibleDays = new Set(Object.keys(DAY_COLORS));
+    renderRouteLegend(); drawRouteLines();
+  });
+  document.getElementById('legend-none')?.addEventListener('click', () => {
+    visibleDays = new Set();
+    renderRouteLegend(); drawRouteLines();
+  });
 }
 
 // 手機地圖切換按鈕

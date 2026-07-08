@@ -1059,8 +1059,11 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* ── Route Color Legend ── */
 .route-legend { display:flex; flex-wrap:wrap; gap:6px 10px; padding:6px 12px; background:var(--bg); border-bottom:1px solid var(--border); }
-.legend-item { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--text-main); }
+.legend-item { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--text-main); cursor:pointer; user-select:none; }
+.legend-item input[type="checkbox"] { width:13px; height:13px; margin:0; cursor:pointer; accent-color: var(--primary); }
 .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-toggle-all { font-size:10px; font-weight:700; color:var(--text-muted); background:none; border:1px solid var(--border); border-radius:10px; padding:2px 8px; cursor:pointer; }
+.legend-toggle-all:hover { background:var(--bg-card); }
 
 /* ── AI Question Input ── */
 .ai-ask-row { display:flex; gap:6px; align-items:flex-start; }
