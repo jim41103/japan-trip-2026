@@ -1830,3 +1830,13 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .chart-block-bar { flex: 1; min-width: 200px; }
 .chart-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
 .wi-rain { font-size: 0.6rem; color: rgba(255,255,255,0.4); }
+
+/* ── 記帳同步狀態列 ── */
+.exp-sync-status {
+  padding: 8px 12px; margin-bottom: 10px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; text-align: center;
+}
+.exp-sync-status.sync-ing  { background: #fff8e1; color: #8a6d00; }
+.exp-sync-status.sync-ok   { background: #e8f5e9; color: #1b5e20; }
+.exp-sync-status.sync-warn { background: #fff3e0; color: #b45309; cursor: pointer; }
+.exp-sync-status.sync-fail { background: #ffebee; color: #b71c1c; cursor: pointer; }

@@ -1701,10 +1701,39 @@ function syncPaidByOptions() {
 async function loadExpenses() {
   try { expenses = await (await fetch('/api/expenses')).json(); } catch { expenses = []; }
 }
+// 同步狀態：idle | syncing | synced | sheet-fail | fail（fail=雲端都沒存到，關頁會遺失）
+let expSyncState = 'idle';
+function setExpSyncStatus(state, extra) {
+  expSyncState = state;
+  const el = document.getElementById('exp-sync-status');
+  if (!el) return;
+  const time = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
+  const MAP = {
+    syncing:      ['⏳ 同步中…請勿關閉頁面', 'sync-ing'],
+    synced:       [`✅ 已同步雲端＋試算表（${time}）`, 'sync-ok'],
+    'sheet-only': [`✅ 已存雲端（${time}）｜試算表同步未啟用`, 'sync-ok'],
+    'sheet-fail': [`⚠️ 雲端已存（${time}），試算表同步失敗 — 點此重試`, 'sync-warn'],
+    fail:         ['❌ 尚未儲存！請檢查網路 — 點此重試', 'sync-fail'],
+  };
+  const [text, cls] = MAP[state] || ['', ''];
+  el.textContent = text + (extra ? `（${extra}）` : '');
+  el.className = `exp-sync-status ${cls}`;
+  el.classList.toggle('hidden', !text);
+}
 async function saveExpenses() {
+  setExpSyncStatus('syncing');
   try {
-    await fetch('/api/expenses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(expenses) });
-  } catch (e) { console.error('記帳儲存失敗', e); }
+    const resp = await fetch('/api/expenses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(expenses) });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const result = await resp.json().catch(() => ({}));
+    const sheet = result.sheet || {};
+    if (sheet.status === 'ok') setExpSyncStatus('synced');
+    else if (sheet.status === 'skipped') setExpSyncStatus('sheet-only');
+    else setExpSyncStatus('sheet-fail', sheet.message);
+  } catch (e) {
+    console.error('記帳儲存失敗', e);
+    setExpSyncStatus('fail');
+  }
 }
 function renderExpenseList() {
   const area = document.getElementById('expense-list-area');
@@ -1796,6 +1825,14 @@ function openExpenseModal() {
 }
 document.getElementById('btn-add-exp').addEventListener('click', addExpense);
 document.getElementById('exp-amount').addEventListener('keydown', e => { if(e.key==='Enter') addExpense(); });
+// 同步失敗時點狀態列重試
+document.getElementById('exp-sync-status').addEventListener('click', () => {
+  if (expSyncState === 'fail' || expSyncState === 'sheet-fail') saveExpenses();
+});
+// 同步中或失敗時關頁跳警告，避免記帳遺失
+window.addEventListener('beforeunload', e => {
+  if (expSyncState === 'syncing' || expSyncState === 'fail') { e.preventDefault(); e.returnValue = ''; }
+});
 document.querySelectorAll('.exp-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.exp-tab').forEach(t=>t.classList.remove('active'));
