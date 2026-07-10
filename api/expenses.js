@@ -3,6 +3,28 @@ const https = require('https');
 
 const GIST_ID = process.env.GIST_ID;
 const GH_TOKEN = process.env.GH_TOKEN;
+const GSHEET_URL = process.env.GSHEET_URL;     // Google Apps Script 網頁應用程式網址
+const GSHEET_TOKEN = process.env.GSHEET_TOKEN; // 須與 Apps Script 內 TOKEN 一致
+
+// 轉發整份清單給試算表同步（失敗不影響記帳本身，但結果回傳給前端以免靜默失效）
+async function pushToSheet(expenses) {
+  if (!GSHEET_URL) return { status: 'skipped' };
+  try {
+    const resp = await fetch(GSHEET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: GSHEET_TOKEN, expenses }),
+      redirect: 'follow', // Apps Script 回應會經過一次 302 轉址
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const result = await resp.json(); // 權限錯誤時 Apps Script 回 HTML，這裡會拋錯
+    if (result.error) throw new Error(result.error);
+    return result; // { status:'ok', added, removed }
+  } catch (e) {
+    console.error('gsheet sync failed:', e.message);
+    return { status: 'failed', message: e.message };
+  }
+}
 
 function ghRequest(method, path, body) {
   return new Promise((resolve, reject) => {
@@ -49,7 +71,8 @@ module.exports = async (req, res) => {
     await ghRequest('PATCH', `/gists/${GIST_ID}`, {
       files: { 'expenses.json': { content: JSON.stringify(incoming, null, 2) } }
     });
-    res.json({ status: 'ok' });
+    const sheet = await pushToSheet(incoming); // 同步 Google 試算表
+    res.json({ status: 'ok', sheet });
   } else {
     res.status(405).json({ error: 'method not allowed' });
   }
