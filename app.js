@@ -2008,7 +2008,62 @@ function defaultShopItems() {
 }
 
 function saveShopItems() {
+  // shopItems 不走通用 SYNC_KEYS 攔截（整包覆蓋不安全），改由下方 syncShopItemsToCloud 做「GET→按 id 合併→POST」
   localStorage.setItem('shopItems', JSON.stringify(shopItems));
+  syncShopItemsToCloud();
+}
+
+// 本機刪除追蹤：記錄使用者在本裝置刪掉的購物項目 id，合併雲端版時用來排除，避免被雲端舊資料復活
+let shopDeletedIds = new Set(JSON.parse(localStorage.getItem('shop-deleted') || '[]'));
+function markShopDeleted(id) {
+  shopDeletedIds.add(id);
+  localStorage.setItem('shop-deleted', JSON.stringify([...shopDeletedIds]));
+}
+
+// 合併雲端版與本機版購物清單：以 id 為準，排除本機標記過刪除的項目；
+// 兩邊都有的項目比 updatedAt，新的贏（勾選/改價等狀態衝突用「後寫優先」，簡單可靠）；
+// 只有一邊有的項目直接聯集納入，確保兩人各自新增不會互蓋
+function mergeShopItems(cloud, local, deletedIds) {
+  const cloudMap = new Map(cloud.map(i => [i.id, i]));
+  const localMap = new Map(local.map(i => [i.id, i]));
+  const ids = new Set([...cloudMap.keys(), ...localMap.keys()]);
+  const merged = [];
+  ids.forEach(id => {
+    if (deletedIds.has(id)) return;
+    const c = cloudMap.get(id), l = localMap.get(id);
+    if (c && l) merged.push((c.updatedAt||0) >= (l.updatedAt||0) ? c : l);
+    else merged.push(c || l);
+  });
+  return merged;
+}
+
+// 儲存互斥鎖：避免快速連續操作（連加兩筆等）並發送出時互蓋
+let shopSaving = false, shopSaveQueued = false;
+async function syncShopItemsToCloud() {
+  if (shopSaving) { shopSaveQueued = true; return; }
+  shopSaving = true;
+  try {
+    let merged = shopItems;
+    try {
+      const res = await fetch('/api/sync');
+      const data = await res.json();
+      if (data.shopItems) {
+        const cloud = typeof data.shopItems === 'string' ? JSON.parse(data.shopItems) : data.shopItems;
+        merged = mergeShopItems(cloud, shopItems, shopDeletedIds);
+      }
+    } catch (_) { /* 離線時 GET 失敗，退回直接送本機版 */ }
+    shopItems = merged;
+    localStorage.setItem('shopItems', JSON.stringify(shopItems));
+    renderShoppingList();
+    await syncPush('shopItems', JSON.stringify(shopItems));
+    shopDeletedIds = new Set();
+    localStorage.removeItem('shop-deleted');
+  } catch (_) {
+    // 靜默失敗，維持本機資料，下次操作或 30 秒輪詢再試
+  } finally {
+    shopSaving = false;
+    if (shopSaveQueued) { shopSaveQueued = false; syncShopItemsToCloud(); }
+  }
 }
 
 function renderShoppingList() {
@@ -2051,15 +2106,16 @@ function renderShoppingList() {
       const id = parseInt(row.dataset.id);
       row.querySelector('input[type=checkbox]').addEventListener('change', e => {
         const it = shopItems.find(i=>i.id===id);
-        if (it) { it.bought = e.target.checked; saveShopItems(); renderShoppingList(); }
+        if (it) { it.bought = e.target.checked; it.updatedAt = Date.now(); saveShopItems(); renderShoppingList(); }
       });
       row.querySelector('.shop-price-input').addEventListener('input', e => {
         const it = shopItems.find(i=>i.id===id);
-        if (it) { it.price = parseFloat(e.target.value) || 0; saveShopItems(); recalcShopBudget(); }
+        if (it) { it.price = parseFloat(e.target.value) || 0; it.updatedAt = Date.now(); saveShopItems(); recalcShopBudget(); }
       });
       row.querySelector('.shop-item-del').addEventListener('click', () => {
         if (confirm('刪除此項目？')) {
           shopItems = shopItems.filter(i=>i.id!==id);
+          markShopDeleted(id);
           saveShopItems(); renderShoppingList();
         }
       });
@@ -2070,7 +2126,9 @@ function renderShoppingList() {
     const doAdd = () => {
       const name = addInput.value.trim();
       if (!name) { addInput.focus(); return; }
-      shopItems.push({ id: Date.now(), cat, name, bought: false });
+      // id 混入隨機尾碼，避免兩人同一毫秒新增時 id 撞號互蓋
+      const newId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+      shopItems.push({ id: newId, cat, name, bought: false, updatedAt: Date.now() });
       saveShopItems(); renderShoppingList();
       showToast(`已加入「${name}」✓`);
     };
@@ -2104,8 +2162,10 @@ function renderShoppingList() {
 // ════════════════════════════════════════════
 //  SYNC（多裝置共用同一 Flask server）
 // ════════════════════════════════════════════
+// 注意：shopItems 不在此清單中——購物清單走專用的「GET→按 id 合併→POST」流程
+// （見 syncShopItemsToCloud），因為這裡的通用 pull/push 是整包覆蓋，會讓兩人同時新增互蓋
 const SYNC_KEYS = ['prep_vjw', 'prep_tickets', 'prep_luggage', 'prep_carry',
-                   'shopping_list', 'member-a-name', 'member-b-name'];
+                   'member-a-name', 'member-b-name'];
 
 async function syncPush(key, value) {
   try {
@@ -2134,12 +2194,21 @@ async function syncPull() {
     }
     if (changed) {
       initPrepChecklists();
-      renderShoppingList();
       const a = localStorage.getItem('member-a-name');
       const b = localStorage.getItem('member-b-name');
       if (a) { const el = document.getElementById('member-a'); if (el) el.value = a; }
       if (b) { const el = document.getElementById('member-b'); if (el) el.value = b; }
     }
+    // 購物清單：按 id 合併雲端版與本機版（不能整包覆蓋，否則對方剛新增/刪除的項目會消失）
+    if (data.shopItems && !shopSaving) {
+      const cloud = typeof data.shopItems === 'string' ? JSON.parse(data.shopItems) : data.shopItems;
+      const merged = mergeShopItems(cloud, shopItems, shopDeletedIds);
+      if (JSON.stringify(merged) !== JSON.stringify(shopItems)) {
+        shopItems = merged;
+        localStorage.setItem('shopItems', JSON.stringify(shopItems));
+      }
+    }
+    renderShoppingList();
     updateSyncIndicator('已同步');
   } catch (_) { updateSyncIndicator('離線'); }
 }
