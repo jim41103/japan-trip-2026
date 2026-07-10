@@ -5,6 +5,7 @@ const GIST_ID = process.env.GIST_ID;
 const GH_TOKEN = process.env.GH_TOKEN;
 const GSHEET_URL = process.env.GSHEET_URL;     // Google Apps Script 網頁應用程式網址
 const GSHEET_TOKEN = process.env.GSHEET_TOKEN; // 須與 Apps Script 內 TOKEN 一致
+const APP_TOKEN = process.env.APP_TOKEN;       // 記帳寫入通行碼，未設則不擋（GET 一律不擋）
 
 // 轉發整份清單給試算表同步（失敗不影響記帳本身，但結果回傳給前端以免靜默失效）
 async function pushToSheet(expenses) {
@@ -57,7 +58,7 @@ function ghRequest(method, path, body) {
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-app-token');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {
@@ -67,6 +68,9 @@ module.exports = async (req, res) => {
     catch { res.json([]); }
 
   } else if (req.method === 'POST') {
+    if (APP_TOKEN && req.headers['x-app-token'] !== APP_TOKEN) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
     const incoming = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     await ghRequest('PATCH', `/gists/${GIST_ID}`, {
       files: { 'expenses.json': { content: JSON.stringify(incoming, null, 2) } }

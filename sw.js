@@ -1,7 +1,7 @@
-const CACHE = 'tokyo-trip-2026-v58';
+const CACHE = 'tokyo-trip-2026-v59';
 const TILE_CACHE = 'tokyo-osm-tiles-v1';
 // HTML 與資料檔不放入主快取，永遠從網路取最新版
-const STATIC = ['/style.css?v=58', '/app.js?v=58', '/manifest.json', '/icon.svg'];
+const STATIC = ['/style.css?v=59', '/app.js?v=59', '/manifest.json', '/icon.svg'];
 // 這些路徑永遠走 network-first（即時反映 CSV / 行程更新）
 const NETWORK_FIRST = ['/places.json', '/itinerary.json', '/expenses.json'];
 

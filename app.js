@@ -158,6 +158,7 @@ function switchTab(tabName) {
   if (tabName === 'ledger') {
     syncPaidByOptions(); renderExpenseList(); renderSettle();
     drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
+    fetchSheetMeta();
   }
   if (tabName === 'phrases') renderPhrases();
   if (tabName === 'prep') updatePrepRing();
@@ -1699,9 +1700,13 @@ function syncPaidByOptions() {
   if (sel) { sel.options[0].text = getMemberName('a')+' 付'; sel.options[1].text = getMemberName('b')+' 付'; }
 }
 async function loadExpenses() {
+  // 若有未送出的離線暫存，優先用本機版本，避免雲端版蓋掉還沒同步的記帳
+  if (localStorage.getItem('exp-pending')) {
+    try { expenses = JSON.parse(localStorage.getItem('exp-local') || '[]'); return; } catch {}
+  }
   try { expenses = await (await fetch('/api/expenses')).json(); } catch { expenses = []; }
 }
-// 同步狀態：idle | syncing | synced | sheet-fail | fail（fail=雲端都沒存到，關頁會遺失）
+// 同步狀態：idle | syncing | synced | sheet-fail | fail | pending（fail=雲端都沒存到，關頁會遺失；pending=離線已暫存本機）
 let expSyncState = 'idle';
 function setExpSyncStatus(state, extra) {
   expSyncState = state;
@@ -1714,27 +1719,82 @@ function setExpSyncStatus(state, extra) {
     'sheet-only': [`✅ 已存雲端（${time}）｜試算表同步未啟用`, 'sync-ok'],
     'sheet-fail': [`⚠️ 雲端已存（${time}），試算表同步失敗 — 點此重試`, 'sync-warn'],
     fail:         ['❌ 尚未儲存！請檢查網路 — 點此重試', 'sync-fail'],
+    pending:      ['📴 離線中，帳已暫存本機 — 恢復網路自動同步', 'sync-warn'],
+    auth:         ['⚠️ 通行碼錯誤，尚未儲存 — 點此重新輸入', 'sync-fail'],
   };
   const [text, cls] = MAP[state] || ['', ''];
   el.textContent = text + (extra ? `（${extra}）` : '');
   el.className = `exp-sync-status ${cls}`;
   el.classList.toggle('hidden', !text);
 }
+// 本機刪除追蹤：記錄使用者在本裝置刪掉的帳 id，合併雲端版時用來排除，避免被雲端舊資料復活
+let localDeletedIds = new Set(JSON.parse(localStorage.getItem('exp-deleted') || '[]'));
+function markLocalDeleted(id) {
+  localDeletedIds.add(id);
+  localStorage.setItem('exp-deleted', JSON.stringify([...localDeletedIds]));
+}
+// 合併雲端版與本機版：以 id 為準，排除本機標記過刪除的筆數，聯集本機新增但雲端還沒有的筆數
+function mergeExpenses(cloud, local, deletedIds) {
+  const cloudIds = new Set(cloud.map(e => e.id));
+  const kept = cloud.filter(e => !deletedIds.has(e.id));
+  const localOnly = local.filter(e => !cloudIds.has(e.id) && !deletedIds.has(e.id));
+  return [...kept, ...localOnly];
+}
+// 儲存互斥鎖：POST 是整份覆寫，兩次 saveExpenses 並發會互蓋丟資料，進行中的後到請求排隊等前一次完成
+let expSaving = false, expSaveQueued = false;
 async function saveExpenses() {
+  if (expSaving) { expSaveQueued = true; return; }
+  expSaving = true;
   setExpSyncStatus('syncing');
+  // token 每次呼叫時讀 localStorage，401 輸入新通行碼後重試才拿得到新值
+  const post = async (payload) => fetch('/api/expenses', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-app-token': localStorage.getItem('exp-token') || '' },
+    body: JSON.stringify(payload),
+  });
   try {
-    const resp = await fetch('/api/expenses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(expenses) });
+    let merged = expenses;
+    try {
+      const cloud = await (await fetch('/api/expenses')).json();
+      merged = mergeExpenses(cloud, expenses, localDeletedIds);
+    } catch (_) { /* GET 失敗（離線）時退回直接送本機版，讓下面的 POST 走離線暫存流程 */ }
+    let resp = await post(merged);
+    if (resp.status === 401) {
+      const input = prompt('請輸入記帳通行碼');
+      localStorage.setItem('exp-token', input || '');
+      resp = await post(merged); // 重試一次
+      if (resp.status === 401) { setExpSyncStatus('auth'); return; } // 通行碼錯誤不是離線，不寫入離線暫存
+    }
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const result = await resp.json().catch(() => ({}));
     const sheet = result.sheet || {};
+    // 成功後套用合併結果，並清空本機刪除追蹤與離線暫存
+    expenses = merged;
+    localDeletedIds = new Set();
+    localStorage.removeItem('exp-deleted');
+    localStorage.removeItem('exp-pending');
+    localStorage.removeItem('exp-local');
+    renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
     if (sheet.status === 'ok') setExpSyncStatus('synced');
     else if (sheet.status === 'skipped') setExpSyncStatus('sheet-only');
     else setExpSyncStatus('sheet-fail', sheet.message);
+    fetchSheetMeta();
   } catch (e) {
     console.error('記帳儲存失敗', e);
-    setExpSyncStatus('fail');
+    // 離線／網路失敗：暫存本機，等 online 事件或下次載入時自動重試
+    localStorage.setItem('exp-pending', '1');
+    localStorage.setItem('exp-local', JSON.stringify(expenses));
+    setExpSyncStatus('pending');
+  } finally {
+    expSaving = false;
+    // 進行中有人排隊過（例如快速連加兩筆），補跑一次確保最新狀態送出
+    if (expSaveQueued) { expSaveQueued = false; saveExpenses(); }
   }
 }
+// 網路恢復時自動重送暫存的記帳
+window.addEventListener('online', () => {
+  if (localStorage.getItem('exp-pending')) saveExpenses();
+});
 function renderExpenseList() {
   const area = document.getElementById('expense-list-area');
   if (!area) return;
@@ -1763,11 +1823,13 @@ function renderExpenseList() {
           <span class="exp-amount-cell">¥${exp.amount.toLocaleString()}</span>
           <span class="exp-paid-badge ${exp.paidBy==='a'?'badge-a':'badge-b'}">${exp.paidBy==='a'?escHtml(nameA):escHtml(nameB)}</span>
           ${exp.split==='personal' ? '<span class="exp-paid-badge" style="background:#999">🙋 個人</span>' : ''}
+          ${settledIds.has(String(exp.id)) ? '<span class="exp-paid-badge" style="background:#bbb">✓ 已結清</span>' : ''}
           <button class="exp-del-btn" data-idx="${exp._idx}">×</button>
         </div>`).join('')}`;
     group.querySelectorAll('.exp-del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        expenses.splice(parseInt(btn.dataset.idx), 1);
+        const [removed] = expenses.splice(parseInt(btn.dataset.idx), 1);
+        if (removed) markLocalDeleted(removed.id);
         saveExpenses(); renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
       });
     });
@@ -1778,7 +1840,7 @@ function renderSettle() {
   const content = document.getElementById('settle-content');
   if (!content) return;
   const nameA = getMemberName('a'), nameB = getMemberName('b');
-  const shared = expenses.filter(e=>e.split!=='personal');
+  const shared = expenses.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
   const personalA = expenses.filter(e=>e.split==='personal'&&e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
   const personalB = expenses.filter(e=>e.split==='personal'&&e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const totalA = shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
@@ -1827,11 +1889,12 @@ document.getElementById('btn-add-exp').addEventListener('click', addExpense);
 document.getElementById('exp-amount').addEventListener('keydown', e => { if(e.key==='Enter') addExpense(); });
 // 同步失敗時點狀態列重試
 document.getElementById('exp-sync-status').addEventListener('click', () => {
-  if (expSyncState === 'fail' || expSyncState === 'sheet-fail') saveExpenses();
+  if (expSyncState === 'auth') localStorage.removeItem('exp-token'); // 清掉錯的通行碼，重存時會再問一次
+  if (expSyncState === 'fail' || expSyncState === 'sheet-fail' || expSyncState === 'auth') saveExpenses();
 });
-// 同步中或失敗時關頁跳警告，避免記帳遺失
+// 同步中或失敗時關頁跳警告，避免記帳遺失（pending＝已暫存本機，不算會遺失，不跳警告）
 window.addEventListener('beforeunload', e => {
-  if (expSyncState === 'syncing' || expSyncState === 'fail') { e.preventDefault(); e.returnValue = ''; }
+  if (expSyncState === 'syncing' || expSyncState === 'fail' || expSyncState === 'auth') { e.preventDefault(); e.returnValue = ''; }
 });
 document.querySelectorAll('.exp-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1847,7 +1910,7 @@ document.querySelectorAll('.exp-tab').forEach(tab => {
 });
 document.getElementById('btn-export-settle').addEventListener('click', () => {
   const nameA=getMemberName('a'), nameB=getMemberName('b');
-  const shared=expenses.filter(e=>e.split!=='personal');
+  const shared=expenses.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
   const totalA=shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
   const totalB=shared.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const total=totalA+totalB, each=Math.round(total/2), diff=totalA-total/2, diffAbs=Math.abs(Math.round(diff));
@@ -1871,6 +1934,23 @@ document.getElementById('btn-export-settle').addEventListener('click', () => {
   const a=document.createElement('a'); a.href=url; a.download='東京旅費結算.md'; a.click();
   URL.revokeObjectURL(url); showToast('結算已下載 ✓');
 });
+
+// 試算表回流：已結清的帳號 id 集合（renderExpenseList/renderSettle/匯出結算 皆需排除）
+let settledIds = new Set();
+// 拉取試算表最新匯率與結清狀態；失敗靜默略過，不影響任何現有功能
+async function fetchSheetMeta() {
+  try {
+    const meta = await (await fetch('/api/sheet-meta')).json();
+    settledIds = new Set((meta.settledIds || []).map(String));
+    const rateEl = document.getElementById('twd2jpy');
+    if (rateEl && typeof meta.rate === 'number' && meta.rate > 0) {
+      rateEl.value = (1 / meta.rate).toFixed(2);
+      rateEl.readOnly = true;
+      rateEl.title = '匯率取自試算表';
+    }
+    renderExpenseList(); renderSettle(); updateCurrencyConvert();
+  } catch (_) { /* 唯讀輔助資訊，失敗不影響記帳主流程 */ }
+}
 
 // ════════════════════════════════════════════
 //  行前準備 CHECKLIST (localStorage)
@@ -2087,11 +2167,13 @@ localStorage.setItem = function(key, value) {
 
 // 記帳資料共編：定期比對伺服器最新版本，有變動才重繪（避免蓋掉正在輸入的表單）
 async function refreshExpensesIfChanged() {
+  if (localStorage.getItem('exp-pending')) return; // 有待送資料時跳過本輪，避免蓋掉尚未同步的本機記帳
   try {
     const res = await fetch('/api/expenses');
     const data = await res.json();
-    if (JSON.stringify(data) !== JSON.stringify(expenses)) {
-      expenses = data;
+    const filtered = data.filter(e => !localDeletedIds.has(e.id));
+    if (JSON.stringify(filtered) !== JSON.stringify(expenses)) {
+      expenses = filtered;
       renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
     }
   } catch (_) {}
@@ -2458,6 +2540,8 @@ async function loadWeeklyWeather() {
   await loadItinerary();
   loadTripForecast();
   await loadExpenses();
+  // 有離線暫存時自動重送——必須在 loadExpenses 之後，expenses 才是本機暫存版，太早跑會送出空陣列丟資料
+  if (localStorage.getItem('exp-pending')) saveExpenses();
   initPrepChecklists();
   renderShoppingList();
   updateCountdown();
