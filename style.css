@@ -1203,6 +1203,15 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .diary-day-tab.active { background: var(--black); color: #fff; border-color: var(--black); }
 .diary-day-tab:hover:not(.active) { background: var(--bg); }
 .diary-day-heading { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text); }
+/* 雙人日記區塊：野狼(a)／美珊(b) 各自一區，配色比照結算卡片 .settle-card-a/b */
+.diary-person-block {
+  border-radius: 12px; padding: 0.8rem; margin-bottom: 12px;
+}
+.diary-person-a { background: #E3F2FD; }
+.diary-person-b { background: #FCE4EC; }
+.diary-person-header { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+.diary-person-a .diary-person-header { color: #1565C0; }
+.diary-person-b .diary-person-header { color: #C2185B; }
 .diary-photo-upload {
   border: 2px dashed rgba(0,0,0,0.15);
   border-radius: 12px; padding: 1.5rem; text-align: center;

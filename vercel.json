@@ -4,6 +4,7 @@
     { "src": "/api/transit", "dest": "/api/transit.js" },
     { "src": "/api/sync",    "dest": "/api/sync.js" },
     { "src": "/api/expenses", "dest": "/api/expenses.js" },
+    { "src": "/api/diary", "dest": "/api/diary.js" },
     { "src": "/api/sheet-meta", "dest": "/api/sheet-meta.js" },
     { "src": "/api/suggest", "dest": "/api/suggest.js" },
     { "src": "/api/tenki-weekly", "dest": "/api/tenki-weekly.js" },

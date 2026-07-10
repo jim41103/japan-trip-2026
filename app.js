@@ -2355,11 +2355,12 @@ function renderDiaryDayTabs() {
       activeDiaryDay = btn.dataset.day;
       renderDiaryDayTabs();
       renderDiaryContent();
+      syncDiaryFromCloud(); // 切日期也拉一次雲端，長時間停留時才看得到對方剛存的內容（失敗靜默）
     });
   });
 }
 
-// 儲存日記資料，容量爆滿時提示使用者而非讓 App 整個壞掉
+// 儲存日記資料（照片），容量爆滿時提示使用者而非讓 App 整個壞掉
 function saveDiaryData(data) {
   try {
     localStorage.setItem('diaryData', JSON.stringify(data));
@@ -2370,20 +2371,75 @@ function saveDiaryData(data) {
   }
 }
 
+// 讀取日記文字（雲端同步用），並做一次性舊資料遷移：
+// 舊版 diaryData[date].text 只有單人欄位，若使用者尚未產生新格式的 a 欄位，
+// 就把舊文字搬進「野狼」(a) 欄位，並從 diaryData 移除 text（照片不動）
+function loadDiaryText() {
+  const diaryText = JSON.parse(localStorage.getItem('diaryText') || '{}');
+  const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
+  let migrated = false;
+  Object.keys(diaryData).forEach(date => {
+    const oldText = diaryData[date].text;
+    if (oldText && !(diaryText[date] && diaryText[date].a && diaryText[date].a.text)) {
+      if (!diaryText[date]) diaryText[date] = {};
+      // updatedAt 用 0：遷移的是舊資料，合併時必須輸給雲端任何既有內容，否則過時文字會反蓋掉對方較新的
+      diaryText[date].a = { text: oldText, updatedAt: 0 };
+      delete diaryData[date].text;
+      migrated = true;
+    }
+  });
+  if (migrated) {
+    localStorage.setItem('diaryText', JSON.stringify(diaryText));
+    saveDiaryData(diaryData);
+  }
+  return diaryText;
+}
+
+// 逐日期逐欄位合併雲端版與本機版：a、b 各自比 updatedAt，新的贏；
+// 任一邊沒有的日期/欄位直接補上，確保兩人各自儲存不會互蓋對方欄位
+function mergeDiaryText(cloud, local) {
+  const merged = {};
+  const dates = new Set([...Object.keys(cloud || {}), ...Object.keys(local || {})]);
+  dates.forEach(date => {
+    const c = (cloud && cloud[date]) || {};
+    const l = (local && local[date]) || {};
+    merged[date] = {};
+    ['a', 'b'].forEach(side => {
+      const cSide = c[side], lSide = l[side];
+      if (cSide && lSide) merged[date][side] = cSide.updatedAt >= lSide.updatedAt ? cSide : lSide;
+      else merged[date][side] = cSide || lSide;
+    });
+    if (!merged[date].a) delete merged[date].a;
+    if (!merged[date].b) delete merged[date].b;
+  });
+  return merged;
+}
+
 function renderDiaryContent() {
   const container = document.getElementById('diaryContent');
   if (!container) return;
   const diaryData = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  const dayData   = diaryData[activeDiaryDay] || { text: '', photos: [] };
+  const diaryText = loadDiaryText();
+  const dayData   = diaryData[activeDiaryDay] || { photos: [] };
+  const dayText   = diaryText[activeDiaryDay] || {};
+  const nameA = getMemberName('a'), nameB = getMemberName('b');
   container.innerHTML = `
     <h3 class="diary-day-heading">${DAY_SHORT[activeDiaryDay] || activeDiaryDay} 的日記</h3>
+    <div class="diary-person-block diary-person-a">
+      <div class="diary-person-header">🐺 ${escHtml(nameA)}</div>
+      <textarea id="diaryText-a" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="6">${escHtml((dayText.a && dayText.a.text) || '')}</textarea>
+      <button id="saveDiary-a" class="diary-save-btn">💾 儲存</button>
+    </div>
+    <div class="diary-person-block diary-person-b">
+      <div class="diary-person-header">🌸 ${escHtml(nameB)}</div>
+      <textarea id="diaryText-b" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="6">${escHtml((dayText.b && dayText.b.text) || '')}</textarea>
+      <button id="saveDiary-b" class="diary-save-btn">💾 儲存</button>
+    </div>
     <div class="diary-photo-upload" id="photoDropzone">
       <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
       <label for="photoInput" style="cursor:pointer">📷 點擊上傳照片</label>
     </div>
-    <div class="diary-photos" id="diaryPhotoGrid"></div>
-    <textarea id="diaryText" class="diary-textarea" placeholder="記錄今天的心情、感受、有趣的事…" rows="8">${escHtml(dayData.text || '')}</textarea>
-    <button id="saveDiary" class="diary-save-btn">💾 儲存日記</button>`;
+    <div class="diary-photos" id="diaryPhotoGrid"></div>`;
   renderDiaryPhotos(dayData.photos || []);
   document.getElementById('photoInput').addEventListener('change', e => {
     [...e.target.files].forEach(file => {
@@ -2392,26 +2448,103 @@ function renderDiaryContent() {
       reader.readAsDataURL(file);
     });
   });
-  document.getElementById('saveDiary').addEventListener('click', () => {
-    const text = document.getElementById('diaryText').value;
-    const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-    if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
-    data[activeDiaryDay].text = text;
-    if (!saveDiaryData(data)) return;
-    const btn = document.getElementById('saveDiary');
-    btn.textContent = '✅ 已儲存';
-    setTimeout(() => btn.textContent = '💾 儲存日記', 1500);
+  // 編輯中防丟：input 事件即時寫進 localStorage 草稿（不動 updatedAt，updatedAt 只在按儲存時更新）
+  ['a', 'b'].forEach(side => {
+    document.getElementById(`diaryText-${side}`).addEventListener('input', e => {
+      const dt = JSON.parse(localStorage.getItem('diaryText') || '{}');
+      if (!dt[activeDiaryDay]) dt[activeDiaryDay] = {};
+      const prevUpdatedAt = (dt[activeDiaryDay][side] && dt[activeDiaryDay][side].updatedAt) || 0;
+      dt[activeDiaryDay][side] = { text: e.target.value, updatedAt: prevUpdatedAt };
+      localStorage.setItem('diaryText', JSON.stringify(dt));
+    });
+    document.getElementById(`saveDiary-${side}`).addEventListener('click', () => saveDiaryText(activeDiaryDay, side));
   });
 }
 
 function renderDiary() {
   renderDiaryDayTabs();
   renderDiaryContent();
+  syncDiaryFromCloud();
+}
+
+// 切到日記分頁或初次載入時，GET 雲端合併進本機並重繪；失敗靜默用本機版即可
+// 只更新「使用者沒改過（與本機 localStorage 相同）」的 textarea，避免蓋掉正在輸入的內容
+async function syncDiaryFromCloud() {
+  let cloud;
+  try { cloud = await (await fetch('/api/diary')).json(); }
+  catch { return; }
+  const localBefore = JSON.parse(localStorage.getItem('diaryText') || '{}');
+  const merged = mergeDiaryText(cloud, localBefore);
+  localStorage.setItem('diaryText', JSON.stringify(merged));
+  ['a', 'b'].forEach(side => {
+    const el = document.getElementById(`diaryText-${side}`);
+    if (!el || document.activeElement === el) return; // 使用者正在輸入中，不打斷
+    const beforeText = (localBefore[activeDiaryDay] && localBefore[activeDiaryDay][side] && localBefore[activeDiaryDay][side].text) || '';
+    if (el.value !== beforeText) return; // 使用者已手動改過但還沒存，不覆蓋
+    const mergedText = (merged[activeDiaryDay] && merged[activeDiaryDay][side] && merged[activeDiaryDay][side].text) || '';
+    if (el.value !== mergedText) el.value = mergedText;
+  });
+}
+
+// 儲存互斥鎖：POST 是整份覆寫，兩次 saveDiaryText 並發會互蓋丟資料，進行中的後到請求排隊等前一次完成
+let diarySaving = false, diarySaveQueued = null;
+async function saveDiaryText(date, side) {
+  if (diarySaving) { diarySaveQueued = { date, side }; return; }
+  diarySaving = true;
+  const btn = document.getElementById(`saveDiary-${side}`);
+  const textEl = document.getElementById(`diaryText-${side}`);
+  const text = textEl ? textEl.value : '';
+  // 1. 更新本機
+  const diaryText = JSON.parse(localStorage.getItem('diaryText') || '{}');
+  if (!diaryText[date]) diaryText[date] = {};
+  diaryText[date][side] = { text, updatedAt: Date.now() };
+  localStorage.setItem('diaryText', JSON.stringify(diaryText));
+  // token 每次呼叫時讀 localStorage，401 輸入新通行碼後重試才拿得到新值
+  const post = async (payload) => fetch('/api/diary', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-app-token': localStorage.getItem('exp-token') || '' },
+    body: JSON.stringify(payload),
+  });
+  try {
+    let merged = diaryText;
+    try {
+      const cloud = await (await fetch('/api/diary')).json();
+      merged = mergeDiaryText(cloud, diaryText);
+    } catch (_) { /* GET 失敗只是少一次合併，仍嘗試 POST 本機版，別把整次儲存當失敗 */ }
+    let resp = await post(merged);
+    if (resp.status === 401) {
+      const input = prompt('請輸入記帳通行碼');
+      if (input === null) { showToast('已取消同步，內容已存本機'); return; }
+      localStorage.setItem('exp-token', input);
+      resp = await post(merged); // 重試一次
+      if (resp.status === 401) { showToast('⚠️ 通行碼錯誤，尚未同步雲端'); return; }
+    }
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    // 成功後套用合併結果並刷新兩個 textarea（對方有新內容會即時出現）
+    localStorage.setItem('diaryText', JSON.stringify(merged));
+    if (date === activeDiaryDay) {
+      ['a', 'b'].forEach(s => {
+        const el = document.getElementById(`diaryText-${s}`);
+        if (el && document.activeElement !== el) {
+          el.value = (merged[date] && merged[date][s] && merged[date][s].text) || '';
+        }
+      });
+    }
+    if (btn) { btn.textContent = '✅ 已同步'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 1500); }
+  } catch (e) {
+    console.error('日記同步失敗', e);
+    // 離線/失敗：本機已存（步驟1），提示使用者手動重按，日記不像記帳高頻不做自動重送
+    if (btn) { btn.textContent = '📴 已存本機，恢復網路請再按一次儲存'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 2500); }
+  } finally {
+    diarySaving = false;
+    if (diarySaveQueued) { const q = diarySaveQueued; diarySaveQueued = null; saveDiaryText(q.date, q.side); }
+  }
 }
 
 function addDiaryPhoto(base64) {
   const data = JSON.parse(localStorage.getItem('diaryData') || '{}');
-  if (!data[activeDiaryDay]) data[activeDiaryDay] = { text: '', photos: [] };
+  if (!data[activeDiaryDay]) data[activeDiaryDay] = { photos: [] };
+  if (!data[activeDiaryDay].photos) data[activeDiaryDay].photos = [];
   data[activeDiaryDay].photos.push(base64);
   if (!saveDiaryData(data)) return;
   renderDiaryPhotos(data[activeDiaryDay].photos);
