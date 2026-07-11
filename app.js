@@ -235,6 +235,38 @@ const WMO = {
 };
 function wmo(code) { return WMO[code] || ['🌡','—']; }
 
+// ════════════════════════════════════════════
+//  短 TTL 快取（天氣/匯率等唯讀外部 API，避免切頁/重整就重打）
+// ════════════════════════════════════════════
+// 快取鍵一律用 cache_ 前綴，刻意避開 prep_（shouldSyncKey 的前綴同步範圍），
+// 這些是唯讀外部資料、不需要跨裝置同步，落入 prep_ 前綴會被誤推上雲端
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 分鐘
+// 讀快取：在 TTL 內回傳 {data, stale:false}；過期回傳 {data:null, stale:true}（data 仍給呼叫端當作失敗時的備援）
+function readCache(key) {
+  try {
+    const raw = localStorage.getItem(`cache_${key}`);
+    if (!raw) return { data: null, stale: true };
+    const { data, ts } = JSON.parse(raw);
+    return { data, stale: (Date.now() - ts) > CACHE_TTL_MS };
+  } catch { return { data: null, stale: true }; }
+}
+function writeCache(key, data) {
+  try { localStorage.setItem(`cache_${key}`, JSON.stringify({ data, ts: Date.now() })); } catch (_) {}
+}
+// 帶快取的 fetch：TTL 內直接用快取；過期才呼叫 fetcher，fetcher 失敗時退回舊快取（stale-while-error）
+async function fetchWithCache(key, fetcher) {
+  const { data, stale } = readCache(key);
+  if (!stale) return data;
+  try {
+    const fresh = await fetcher();
+    writeCache(key, fresh);
+    return fresh;
+  } catch (e) {
+    if (data !== null) return data; // 舊快取還在，fetch 失敗時退回使用（stale-while-error）
+    throw e;
+  }
+}
+
 async function loadWeather() {
   try {
     const pos = await new Promise((res, rej) =>
@@ -244,7 +276,7 @@ async function loadWeather() {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
       `&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code` +
       `&timezone=auto&forecast_days=2`;
-    const data = await (await fetch(url)).json();
+    const data = await fetchWithCache('weather_current', () => fetch(url).then(r => r.json()));
     const cur = data.current;
     const [todayMax, todayMin] = [data.daily.temperature_2m_max[0], data.daily.temperature_2m_min[0]];
     const [tmrMax, tmrMin, tmrCode] = [
@@ -268,7 +300,7 @@ async function loadWeather() {
       const url = `https://api.open-meteo.com/v1/forecast?latitude=35.6762&longitude=139.6503` +
         `&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code` +
         `&timezone=Asia/Tokyo&forecast_days=2`;
-      const data = await (await fetch(url)).json();
+      const data = await fetchWithCache('weather_tokyo_default', () => fetch(url).then(r => r.json()));
       const cur = data.current;
       const [ico, desc] = wmo(cur.weather_code);
       const [tico, tdesc] = wmo(data.daily.weather_code[1]);
@@ -1940,7 +1972,7 @@ let settledIds = new Set();
 // 拉取試算表最新匯率與結清狀態；失敗靜默略過，不影響任何現有功能
 async function fetchSheetMeta() {
   try {
-    const meta = await (await fetch('/api/sheet-meta')).json();
+    const meta = await fetchWithCache('sheet_meta', () => fetch('/api/sheet-meta').then(r => r.json()));
     settledIds = new Set((meta.settledIds || []).map(String));
     const rateEl = document.getElementById('twd2jpy');
     if (rateEl && typeof meta.rate === 'number' && meta.rate > 0) {
@@ -2003,13 +2035,25 @@ function renderPrepCustomItem(listId, key, name) {
   if (!listEl || listEl.querySelector(`input[data-key="${key}"]`)) return; // 已存在就不重複加
   const label = document.createElement('label');
   label.className = 'prep-item';
-  label.innerHTML = `<input type="checkbox" data-key="${key}"> ${escHtml(name)}`;
+  // 自訂項目才有刪除鈕（固定的 24 個項目沒有，比照購物清單的 × 按鈕風格）
+  // 沿用購物清單既有的 .shop-item-del 樣式（灰色 × 按鈕、hover 變主色），視覺風格一致、不必另外加 CSS
+  label.innerHTML = `<input type="checkbox" data-key="${key}"> ${escHtml(name)} <button type="button" class="shop-item-del prep-item-del">×</button>`;
   const cb = label.querySelector('input');
   cb.checked = localStorage.getItem(`prep_${key}`) === '1';
   label.classList.toggle('checked', cb.checked);
   cb.addEventListener('change', e => {
     localStorage.setItem(`prep_${key}`, e.target.checked ? '1' : '0');
     label.classList.toggle('checked', e.target.checked);
+  });
+  label.querySelector('.prep-item-del').addEventListener('click', () => {
+    if (confirm('刪除此項目？')) {
+      // 軟刪除：留下墓碑而非真的移除，理由同購物清單（讓合併時能把刪除傳播給還沒拉到的裝置）
+      const items = loadPrepCustomItems();
+      const it = items.find(i => i.key === key);
+      if (it) { it.deleted = true; it.updatedAt = Date.now(); }
+      savePrepCustomItems(items);
+      label.remove();
+    }
   });
   listEl.appendChild(label);
 }
@@ -2251,7 +2295,11 @@ async function syncPush(key, value) {
   } catch (_) {}
 }
 
+// in-flight 旗標：visibilitychange 立即拉一次與 30 秒排程輪詢可能同時觸發，避免同時打兩發
+let syncPullInFlight = false;
 async function syncPull() {
+  if (syncPullInFlight) return;
+  syncPullInFlight = true;
   try {
     const res = await fetch('/api/sync');
     const data = await res.json();
@@ -2296,6 +2344,7 @@ async function syncPull() {
     renderShoppingList();
     updateSyncIndicator('已同步');
   } catch (_) { updateSyncIndicator('離線'); }
+  finally { syncPullInFlight = false; }
 }
 
 function updateSyncIndicator(text) {
@@ -2320,8 +2369,11 @@ localStorage.setItem = function(key, value) {
 });
 
 // 記帳資料共編：定期比對伺服器最新版本，有變動才重繪（避免蓋掉正在輸入的表單）
+let refreshExpensesInFlight = false; // in-flight 旗標：理由同 syncPullInFlight，防止切回前景與排程輪詢同時打兩發
 async function refreshExpensesIfChanged() {
   if (localStorage.getItem('exp-pending')) return; // 有待送資料時跳過本輪，避免蓋掉尚未同步的本機記帳
+  if (refreshExpensesInFlight) return;
+  refreshExpensesInFlight = true;
   try {
     const res = await fetch('/api/expenses');
     const data = await res.json();
@@ -2331,12 +2383,26 @@ async function refreshExpensesIfChanged() {
       renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
     }
   } catch (_) {}
+  finally { refreshExpensesInFlight = false; }
 }
 
-// 定期拉取（每 30 秒，分頁切到背景時暫停以省電/省流量）
-setInterval(() => {
-  if (document.visibilityState === 'visible') { syncPull(); refreshExpensesIfChanged(); }
-}, 30000);
+// 定期拉取（每 30 秒，分頁切到背景時暫停以省電/省流量）；
+// 另外監聽 visibilitychange：切回前景時立即拉一次並重置計時器，
+// 避免「切回瞬間」與「排程輪詢」剛好前後腳各打一次（用 clearInterval + setInterval 重新起算解決）
+let pollTimer = null;
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') { syncPull(); refreshExpensesIfChanged(); }
+  }, 30000);
+}
+startPolling();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    syncPull(); refreshExpensesIfChanged();
+    startPolling(); // 重置 30 秒計時器，避免緊接著排程輪詢又立刻打一次
+  }
+});
 
 // ════════════════════════════════════════════
 //  WEATHER TRIP FORECAST (Open-Meteo)
@@ -2345,8 +2411,7 @@ async function loadTripForecast() {
   const startDate = '2026-08-03', endDate = '2026-08-09';
   const url = `https://api.open-meteo.com/v1/forecast?latitude=35.68&longitude=139.69&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${startDate}&end_date=${endDate}`;
   try {
-    const res = await fetch(url);
-    const data = await res.json();
+    const data = await fetchWithCache('trip_forecast', () => fetch(url).then(r => r.json()));
     const bar = document.getElementById('forecastBar');
     if (!bar || !data.daily) return;
     bar.innerHTML = data.daily.time.map((date, i) => {
