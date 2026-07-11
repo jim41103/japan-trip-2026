@@ -473,6 +473,27 @@ function googleMapsUrl(place) {
   return `https://www.google.com/maps/search/${encodeURIComponent(place.name)}`;
 }
 
+// 取地點座標：優先用 places.json（allPlaces）依名稱查找的權威座標，
+// 找不到再 fallback 用行程項目內嵌的座標（reconcile 後兩者通常一致）。
+function getPlaceCoords(place) {
+  if (!place) return null;
+  const master = allPlaces.find(p => p.name === place.name);
+  if (master && master.lat && master.lng) return { lat: master.lat, lng: master.lng };
+  if (place.lat && place.lng) return { lat: place.lat, lng: place.lng };
+  return null;
+}
+
+// 產生 Google Maps 大眾運輸導航深度連結（origin → destination）。
+// 任一端缺座標則回傳 null，呼叫端須據此不顯示導航按鈕，避免產生壞連結。
+function transitDirectionsUrl(origin, dest) {
+  const o = getPlaceCoords(origin);
+  const d = getPlaceCoords(dest);
+  if (!o || !d) return null;
+  const originParam = encodeURIComponent(`${o.lat},${o.lng}`);
+  const destParam    = encodeURIComponent(`${d.lat},${d.lng}`);
+  return `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destParam}&travelmode=transit`;
+}
+
 // ════════════════════════════════════════════
 //  LOAD PLACES
 // ════════════════════════════════════════════
@@ -960,7 +981,29 @@ function renderDayPlaces(container, date) {
   const untimed = places.filter(p => !p.time);
   const sorted  = [...timed, ...untimed];
   itinerary[date].places = sorted;
-  sorted.forEach((place, pIdx) => container.appendChild(makePlaceCard(place, date, pIdx)));
+  sorted.forEach((place, pIdx) => {
+    // 每一段「移動」（與前一個地點之間）加導航按鈕；當天第一個地點前不放
+    if (pIdx > 0) {
+      const nav = makeNavButton(sorted[pIdx - 1], place);
+      if (nav) container.appendChild(nav);
+    }
+    container.appendChild(makePlaceCard(place, date, pIdx));
+  });
+}
+
+// 產生「起點 → 訖點」之間的導航按鈕（開 Google Maps 大眾運輸路線）
+// 兩端缺座標時回傳 null，不顯示按鈕，避免產生壞連結。
+function makeNavButton(from, to) {
+  const url = transitDirectionsUrl(from, to);
+  if (!url) return null;
+  const wrap = document.createElement('div');
+  wrap.className = 'iplace-nav-wrap';
+  wrap.innerHTML = `<button class="iplace-nav-btn" aria-label="從「${escHtml(from.name)}」導航至「${escHtml(to.name)}」" title="導航">🧭 導航</button>`;
+  wrap.querySelector('.iplace-nav-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    window.open(url, '_blank', 'noopener');
+  });
+  return wrap;
 }
 
 function makePlaceCard(place, date, pIdx) {
