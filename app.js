@@ -1614,7 +1614,7 @@ function buildAIContext() {
     shopping:   `當前查看的是購物清單頁面。已加入清單的商品：${shopItems.filter(s=>!s.deleted).map(s => s.name).join('、')}。`,
     prep:       `當前查看的是行前準備頁面。`,
     transport:  `當前查看的是交通查詢頁面。`,
-    ledger:     `當前查看的是旅費記帳頁面。目前記錄的支出筆數：${expenses.length} 筆。`,
+    ledger:     `當前查看的是旅費記帳頁面。目前記錄的支出筆數：${expenses.filter(e=>!e.deleted).length} 筆。`,
     diary:      `當前查看的是旅遊日記頁面。`,
   };
   return base + '\n' + (sectionContext[activeSection] || '') + '\n請用繁體中文回答。回答要簡潔實用。';
@@ -1761,18 +1761,13 @@ function setExpSyncStatus(state, extra) {
   el.className = `exp-sync-status ${cls}`;
   el.classList.toggle('hidden', !text);
 }
-// 本機刪除追蹤：記錄使用者在本裝置刪掉的帳 id，合併雲端版時用來排除，避免被雲端舊資料復活
-let localDeletedIds = new Set(JSON.parse(localStorage.getItem('exp-deleted') || '[]'));
-function markLocalDeleted(id) {
-  localDeletedIds.add(id);
-  localStorage.setItem('exp-deleted', JSON.stringify([...localDeletedIds]));
-}
-// 合併雲端版與本機版：以 id 為準，排除本機標記過刪除的筆數，聯集本機新增但雲端還沒有的筆數
-function mergeExpenses(cloud, local, deletedIds) {
-  const cloudIds = new Set(cloud.map(e => e.id));
-  const kept = cloud.filter(e => !deletedIds.has(e.id));
-  const localOnly = local.filter(e => !cloudIds.has(e.id) && !deletedIds.has(e.id));
-  return [...kept, ...localOnly];
+// 記帳刪除改採軟刪除墓碑（deleted:true + updatedAt），比照購物清單（mergeTombstoned）：
+// per-device 刪除追蹤（deletedIds 集合、push 成功後清空）無法防止「A 刪除已同步、
+// B 離線期間仍持有舊副本、上線後補記帳合併」時，被刪的帳被當成本機新增聯集回去而復活，
+// 還會被重新推送進 Google 試算表。改成墓碑後，刪除本身變成資料的一部分，
+// 靠 updatedAt 比對自然傳播、不依賴任何一方的本機刪除記錄。
+function mergeExpenses(cloud, local) {
+  return mergeTombstoned(cloud, local, 'id');
 }
 // 儲存互斥鎖：POST 是整份覆寫，兩次 saveExpenses 並發會互蓋丟資料，進行中的後到請求排隊等前一次完成
 let expSaving = false, expSaveQueued = false;
@@ -1790,7 +1785,7 @@ async function saveExpenses() {
     let merged = expenses;
     try {
       const cloud = await (await fetch('/api/expenses')).json();
-      merged = mergeExpenses(cloud, expenses, localDeletedIds);
+      merged = mergeExpenses(cloud, expenses);
     } catch (_) { /* GET 失敗（離線）時退回直接送本機版，讓下面的 POST 走離線暫存流程 */ }
     let resp = await post(merged);
     if (resp.status === 401) {
@@ -1802,10 +1797,8 @@ async function saveExpenses() {
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const result = await resp.json().catch(() => ({}));
     const sheet = result.sheet || {};
-    // 成功後套用合併結果，並清空本機刪除追蹤與離線暫存
+    // 成功後套用合併結果，並清空離線暫存（墓碑已隨 expenses 一起送出，不需另外清追蹤集合）
     expenses = merged;
-    localDeletedIds = new Set();
-    localStorage.removeItem('exp-deleted');
     localStorage.removeItem('exp-pending');
     localStorage.removeItem('exp-local');
     renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
@@ -1832,14 +1825,16 @@ window.addEventListener('online', () => {
 function renderExpenseList() {
   const area = document.getElementById('expense-list-area');
   if (!area) return;
-  if (expenses.length === 0) {
+  // 軟刪除墓碑（deleted:true）不顯示，但仍留在 expenses 陣列裡供合併時傳播刪除
+  const visible = expenses.filter(e => !e.deleted);
+  if (visible.length === 0) {
     area.innerHTML = '<div class="exp-empty">尚無記帳資料<br><small>從下方表單新增支出</small></div>';
     return;
   }
   const byDate = {};
-  expenses.forEach((exp,idx) => {
+  visible.forEach(exp => {
     if (!byDate[exp.date]) byDate[exp.date] = [];
-    byDate[exp.date].push({ ...exp, _idx:idx });
+    byDate[exp.date].push(exp);
   });
   area.innerHTML = '';
   const nameA = getMemberName('a'), nameB = getMemberName('b');
@@ -1858,12 +1853,14 @@ function renderExpenseList() {
           <span class="exp-paid-badge ${exp.paidBy==='a'?'badge-a':'badge-b'}">${exp.paidBy==='a'?escHtml(nameA):escHtml(nameB)}</span>
           ${exp.split==='personal' ? '<span class="exp-paid-badge" style="background:#999">🙋 個人</span>' : ''}
           ${settledIds.has(String(exp.id)) ? '<span class="exp-paid-badge" style="background:#bbb">✓ 已結清</span>' : ''}
-          <button class="exp-del-btn" data-idx="${exp._idx}">×</button>
+          <button class="exp-del-btn" data-id="${exp.id}">×</button>
         </div>`).join('')}`;
     group.querySelectorAll('.exp-del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const [removed] = expenses.splice(parseInt(btn.dataset.idx), 1);
-        if (removed) markLocalDeleted(removed.id);
+        // 軟刪除：留下墓碑而非真的移除，讓合併時能靠 updatedAt 把刪除傳播給還沒拉到的裝置
+        const id = parseInt(btn.dataset.id, 10);
+        const it = expenses.find(e => e.id === id);
+        if (it) { it.deleted = true; it.updatedAt = Date.now(); }
         saveExpenses(); renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
       });
     });
@@ -1874,9 +1871,10 @@ function renderSettle() {
   const content = document.getElementById('settle-content');
   if (!content) return;
   const nameA = getMemberName('a'), nameB = getMemberName('b');
-  const shared = expenses.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
-  const personalA = expenses.filter(e=>e.split==='personal'&&e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
-  const personalB = expenses.filter(e=>e.split==='personal'&&e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
+  const active = expenses.filter(e=>!e.deleted); // 過濾軟刪除墓碑
+  const shared = active.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
+  const personalA = active.filter(e=>e.split==='personal'&&e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
+  const personalB = active.filter(e=>e.split==='personal'&&e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const totalA = shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
   const totalB = shared.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const total = totalA+totalB, each = total/2, diff = totalA-each, diffAbs = Math.abs(Math.round(diff));
@@ -1909,7 +1907,7 @@ function addExpense() {
   const split=document.getElementById('exp-split').value;
   if (!desc) { showToast('請輸入說明'); return; }
   if (!amount||amount<=0) { showToast('請輸入有效金額'); return; }
-  expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy, split });
+  expenses.push({ id:Date.now(), date, cat, desc, amount, paidBy, split, updatedAt:Date.now() });
   saveExpenses(); renderExpenseList(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
   document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';
   document.getElementById('exp-split').value='shared';
@@ -1944,7 +1942,8 @@ document.querySelectorAll('.exp-tab').forEach(tab => {
 });
 document.getElementById('btn-export-settle').addEventListener('click', () => {
   const nameA=getMemberName('a'), nameB=getMemberName('b');
-  const shared=expenses.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
+  const active=expenses.filter(e=>!e.deleted); // 過濾軟刪除墓碑
+  const shared=active.filter(e=>e.split!=='personal'&&!settledIds.has(String(e.id)));
   const totalA=shared.filter(e=>e.paidBy==='a').reduce((s,e)=>s+e.amount,0);
   const totalB=shared.filter(e=>e.paidBy==='b').reduce((s,e)=>s+e.amount,0);
   const total=totalA+totalB, each=Math.round(total/2), diff=totalA-total/2, diffAbs=Math.abs(Math.round(diff));
@@ -1957,7 +1956,7 @@ document.getElementById('btn-export-settle').addEventListener('click', () => {
   else md+=`> **兩人花費相同，無需轉帳** ✅\n\n`;
   md+=`## 消費明細\n\n`;
   const byDate={};
-  expenses.forEach(e => { if(!byDate[e.date]) byDate[e.date]=[]; byDate[e.date].push(e); });
+  active.forEach(e => { if(!byDate[e.date]) byDate[e.date]=[]; byDate[e.date].push(e); });
   Object.keys(byDate).sort().forEach(date => {
     md+=`### ${DAY_SHORT[date]||date}\n`;
     byDate[date].forEach(e => { md+=`- ${CAT_EMOJI[e.cat]||'📦'} ${e.desc} — ¥${e.amount.toLocaleString()}（${e.paidBy==='a'?nameA:nameB} 付${e.split==='personal'?'・個人花費不拆帳':''}）\n`; });
@@ -2388,9 +2387,10 @@ async function refreshExpensesIfChanged() {
   try {
     const res = await fetch('/api/expenses');
     const data = await res.json();
-    const filtered = data.filter(e => !localDeletedIds.has(e.id));
-    if (JSON.stringify(filtered) !== JSON.stringify(expenses)) {
-      expenses = filtered;
+    // 走墓碑合併而非整包覆蓋：避免蓋掉本機剛標記刪除、但尚未 saveExpenses 送出的墓碑
+    const merged = mergeExpenses(data, expenses);
+    if (JSON.stringify(merged) !== JSON.stringify(expenses)) {
+      expenses = merged;
       renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
     }
   } catch (_) {}
@@ -2449,7 +2449,7 @@ function drawSpendingChart(expArr) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const totals = {};
-  (expArr || []).forEach(e => { totals[e.cat] = (totals[e.cat] || 0) + e.amount; });
+  (expArr || []).filter(e => !e.deleted).forEach(e => { totals[e.cat] = (totals[e.cat] || 0) + e.amount; });
   const entries = Object.entries(totals).filter(([, v]) => v > 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (!entries.length) return;
@@ -2489,7 +2489,7 @@ function drawDailyChart(expArr) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const days = Object.keys(DAY_SHORT);
-  const totals = days.map(d => (expArr || []).filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+  const totals = days.map(d => (expArr || []).filter(e => !e.deleted && e.date === d).reduce((s, e) => s + e.amount, 0));
   const maxVal = Math.max(...totals, 1);
   const W = canvas.width, H = canvas.height;
   const pad = { t:16, r:8, b:32, l:44 };
@@ -2537,7 +2537,7 @@ function drawDailyChart(expArr) {
 
 function updateCurrencyConvert() {
   const rate = parseFloat(document.getElementById('twd2jpy')?.value) || 4.55;
-  const totalJPY = (expenses || []).reduce((s, e) => s + e.amount, 0);
+  const totalJPY = (expenses || []).filter(e => !e.deleted).reduce((s, e) => s + e.amount, 0);
   const totalTWD = Math.round(totalJPY / rate);
   const el = document.getElementById('totalTWD');
   if (el) el.textContent = `≈ NT$ ${totalTWD.toLocaleString()}`;
