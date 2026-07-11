@@ -158,7 +158,7 @@ function switchTab(tabName) {
   if (tabName === 'ledger') {
     syncPaidByOptions(); renderExpenseList(); renderSettle();
     drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
-    fetchSheetMeta();
+    fetchSheetMeta(true); // 切到記帳頁：使用者要看最新結清狀態，繞過快取
   }
   if (tabName === 'phrases') renderPhrases();
   if (tabName === 'prep') updatePrepRing();
@@ -254,9 +254,11 @@ function writeCache(key, data) {
   try { localStorage.setItem(`cache_${key}`, JSON.stringify({ data, ts: Date.now() })); } catch (_) {}
 }
 // 帶快取的 fetch：TTL 內直接用快取；過期才呼叫 fetcher，fetcher 失敗時退回舊快取（stale-while-error）
-async function fetchWithCache(key, fetcher) {
+// force=true 時繞過 TTL 判斷、一律重打（供「使用者主動要最新資料」的呼叫點使用，例如切頁/儲存後），
+// 成功後仍 writeCache，讓其他被動路徑（輪詢等）之後也能吃到這次拿到的新資料
+async function fetchWithCache(key, fetcher, force = false) {
   const { data, stale } = readCache(key);
-  if (!stale) return data;
+  if (!force && !stale) return data;
   try {
     const fresh = await fetcher();
     writeCache(key, fresh);
@@ -1810,7 +1812,7 @@ async function saveExpenses() {
     if (sheet.status === 'ok') setExpSyncStatus('synced');
     else if (sheet.status === 'skipped') setExpSyncStatus('sheet-only');
     else setExpSyncStatus('sheet-fail', sheet.message);
-    fetchSheetMeta();
+    fetchSheetMeta(true); // 剛儲存成功：使用者要看最新結清狀態，繞過快取
   } catch (e) {
     console.error('記帳儲存失敗', e);
     // 離線／網路失敗：暫存本機，等 online 事件或下次載入時自動重試
@@ -1970,9 +1972,11 @@ document.getElementById('btn-export-settle').addEventListener('click', () => {
 // 試算表回流：已結清的帳號 id 集合（renderExpenseList/renderSettle/匯出結算 皆需排除）
 let settledIds = new Set();
 // 拉取試算表最新匯率與結清狀態；失敗靜默略過，不影響任何現有功能
-async function fetchSheetMeta() {
+// force=true：繞過 10 分鐘快取直接打 API，供「切到記帳頁」「記帳儲存成功後」這類
+// 使用者明確想看最新結清狀態的呼叫點使用；其餘被動路徑維持快取，避免頻繁重打
+async function fetchSheetMeta(force = false) {
   try {
-    const meta = await fetchWithCache('sheet_meta', () => fetch('/api/sheet-meta').then(r => r.json()));
+    const meta = await fetchWithCache('sheet_meta', () => fetch('/api/sheet-meta').then(r => r.json()), force);
     settledIds = new Set((meta.settledIds || []).map(String));
     const rateEl = document.getElementById('twd2jpy');
     if (rateEl && typeof meta.rate === 'number' && meta.rate > 0) {
@@ -2065,10 +2069,15 @@ function initPrepChecklists() {
     renderPrepCustomItem(`${list}-list`, key, name);
   });
 
+  // initPrepChecklists 會被多處呼叫（新增項目、syncPull 拉回、切分頁等），
+  // 每次都對全部 checkbox 重新 addEventListener 會累積重複監聽（等冪但浪費、事件會觸發多次）；
+  // 用 dataset.bound 標記「已綁過」，重複呼叫時跳過，只綁一次
   document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]').forEach(cb => {
     const key = cb.dataset.key;
     cb.checked = localStorage.getItem(`prep_${key}`) === '1';
     cb.closest('.prep-item').classList.toggle('checked', cb.checked);
+    if (cb.dataset.bound) return;
+    cb.dataset.bound = '1';
     cb.addEventListener('change', () => {
       localStorage.setItem(`prep_${key}`, cb.checked ? '1' : '0');
       cb.closest('.prep-item').classList.toggle('checked', cb.checked);
@@ -2076,6 +2085,8 @@ function initPrepChecklists() {
   });
 
   document.querySelectorAll('.btn-add-prep').forEach(btn => {
+    if (btn.dataset.bound) return; // 同上，避免重複呼叫時 click 監聽疊加、點一次跳多個 prompt
+    btn.dataset.bound = '1';
     btn.addEventListener('click', () => {
       const list = btn.dataset.list;
       const listId = list + '-list';
