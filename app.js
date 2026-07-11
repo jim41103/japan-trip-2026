@@ -1955,7 +1955,39 @@ async function fetchSheetMeta() {
 // ════════════════════════════════════════════
 //  行前準備 CHECKLIST (localStorage)
 // ════════════════════════════════════════════
+// 讀取使用者自訂新增的行前準備項目清單（{list, key, name}[]）；
+// 舊版自訂項目只存在 DOM、重整頁面或換裝置就消失，這裡改成落地 localStorage 才能真正跨裝置同步
+function loadPrepCustomItems() {
+  try { return JSON.parse(localStorage.getItem('prep_custom_items') || '[]'); }
+  catch { return []; }
+}
+function savePrepCustomItems(items) {
+  localStorage.setItem('prep_custom_items', JSON.stringify(items));
+}
+
+// 把單一自訂項目渲染成 DOM 並綁定勾選事件
+function renderPrepCustomItem(listId, key, name) {
+  const listEl = document.getElementById(listId);
+  if (!listEl || listEl.querySelector(`input[data-key="${key}"]`)) return; // 已存在就不重複加
+  const label = document.createElement('label');
+  label.className = 'prep-item';
+  label.innerHTML = `<input type="checkbox" data-key="${key}"> ${escHtml(name)}`;
+  const cb = label.querySelector('input');
+  cb.checked = localStorage.getItem(`prep_${key}`) === '1';
+  label.classList.toggle('checked', cb.checked);
+  cb.addEventListener('change', e => {
+    localStorage.setItem(`prep_${key}`, e.target.checked ? '1' : '0');
+    label.classList.toggle('checked', e.target.checked);
+  });
+  listEl.appendChild(label);
+}
+
 function initPrepChecklists() {
+  // 先把自訂項目（含跨裝置同步拉回的）渲染出來，才能一併被下面的 checkbox 掃描到並還原勾選狀態
+  loadPrepCustomItems().forEach(({ list, key, name }) => {
+    renderPrepCustomItem(`${list}-list`, key, name);
+  });
+
   document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]').forEach(cb => {
     const key = cb.dataset.key;
     cb.checked = localStorage.getItem(`prep_${key}`) === '1';
@@ -1968,18 +2000,16 @@ function initPrepChecklists() {
 
   document.querySelectorAll('.btn-add-prep').forEach(btn => {
     btn.addEventListener('click', () => {
-      const listId = btn.dataset.list + '-list';
+      const list = btn.dataset.list;
+      const listId = list + '-list';
       const name = prompt('新增項目：');
       if (!name?.trim()) return;
-      const key = btn.dataset.list + '_' + Date.now();
-      const label = document.createElement('label');
-      label.className = 'prep-item';
-      label.innerHTML = `<input type="checkbox" data-key="${key}"> ${escHtml(name.trim())}`;
-      label.querySelector('input').addEventListener('change', e => {
-        localStorage.setItem(`prep_${key}`, e.target.checked ? '1' : '0');
-        label.classList.toggle('checked', e.target.checked);
-      });
-      document.getElementById(listId).appendChild(label);
+      const key = list + '_' + Date.now();
+      // 落地存清單，讓另一裝置 syncPull 後也能重建出這個項目（不只是勾選狀態）
+      const items = loadPrepCustomItems();
+      items.push({ list, key, name: name.trim() });
+      savePrepCustomItems(items);
+      renderPrepCustomItem(listId, key, name.trim());
     });
   });
 }
@@ -2164,8 +2194,15 @@ function renderShoppingList() {
 // ════════════════════════════════════════════
 // 注意：shopItems 不在此清單中——購物清單走專用的「GET→按 id 合併→POST」流程
 // （見 syncShopItemsToCloud），因為這裡的通用 pull/push 是整包覆蓋，會讓兩人同時新增互蓋
-const SYNC_KEYS = ['prep_vjw', 'prep_tickets', 'prep_luggage', 'prep_carry',
-                   'member-a-name', 'member-b-name'];
+//
+// prep_ 開頭的鍵改用前綴比對（見 shouldSyncKey），不逐一列舉：
+// 行前準備 checkbox 實際鍵是 prep_vjw0…prep_vjw4、prep_s0…prep_s9、prep_c0…prep_c8、prep_t0…、
+// 加上自訂項目動態鍵 prep_${list}_${Date.now()} 與清單本身 prep_custom_items，
+// 舊版逐鍵列舉（prep_vjw/prep_tickets/prep_luggage/prep_carry）皆非真實存在的鍵，恆比對不到、從未同步過
+const SYNC_KEYS = ['member-a-name', 'member-b-name'];
+function shouldSyncKey(key) {
+  return SYNC_KEYS.includes(key) || key.startsWith('prep_');
+}
 
 async function syncPush(key, value) {
   try {
@@ -2182,12 +2219,14 @@ async function syncPull() {
     const res = await fetch('/api/sync');
     const data = await res.json();
     let changed = false;
-    for (const k of SYNC_KEYS) {
+    // prep_ 前綴鍵數量不固定（含使用者自訂項目），改成掃描雲端回傳的所有鍵，不能再逐一列舉比對
+    for (const k of Object.keys(data)) {
+      if (!shouldSyncKey(k)) continue;
       if (data[k] !== undefined) {
         const local = localStorage.getItem(k);
         const remote = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
         if (local !== remote) {
-          localStorage.setItem(k, remote);
+          _origSetItem(k, remote); // 用原生 setItem 寫入，避免觸發攔截器把剛拉回的值又 push 回去
           changed = true;
         }
       }
@@ -2222,7 +2261,7 @@ function updateSyncIndicator(text) {
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function(key, value) {
   _origSetItem(key, value);
-  if (SYNC_KEYS.includes(key)) syncPush(key, value);
+  if (shouldSyncKey(key)) syncPush(key, value);
 };
 
 // 成員名稱變更時同步
