@@ -536,16 +536,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .iplace-actions { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
 .iplace-gmaps { font-size: 13px; text-decoration: none; opacity: 0.6; transition: opacity .15s; }
 .iplace-gmaps:hover { opacity: 1; }
+/* 卡片內導航按鈕（與 .iplace-gmaps 同尺寸同風格，無邊框） */
+.iplace-nav { background: none; border: none; font-size: 13px; opacity: 0.6; transition: opacity .15s; cursor: pointer; padding: 0; line-height: 1; }
+.iplace-nav:hover { opacity: 1; }
 .iplace-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 1px; }
-
-/* 相鄰地點之間的導航按鈕（開 Google Maps 大眾運輸路線） */
-.iplace-nav-wrap { display: flex; justify-content: center; }
-.iplace-nav-btn {
-  font-size: 10px; padding: 2px 9px; margin: -1px 0;
-  background: #EBF3FF; color: #4A90E2; border: 1px solid #cfe2fb;
-  border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 700;
-}
-.iplace-nav-btn:hover { background: #4A90E2; color: #fff; border-color: #4A90E2; }
 .iplace-remove:hover { color: var(--primary); }
 
 .day-empty {

@@ -902,6 +902,7 @@ function renderItinerary() {
       animation: 150,
       filter: '.iplace-locked',
       ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+      delay: 300, delayOnTouchOnly: true, touchStartThreshold: 5, draggable: '.itinerary-place',
       onAdd: function(evt) {
         if (evt.from && evt.from.id === 'places-list') {
           const idx = parseInt(evt.item.dataset.idx);
@@ -920,6 +921,9 @@ function renderItinerary() {
         if (!evt.from || evt.from.id !== 'places-list') {
           syncItineraryFromDOM();
           markItineraryDirty();
+          // 重新渲染以刷新導航按鈕的起訖點；跨天拖曳需兩欄都刷新
+          if (evt.to) renderDayPlaces(evt.to, evt.to.id.replace('day-', ''));
+          if (evt.from !== evt.to) renderDayPlaces(evt.from, evt.from.id.replace('day-', ''));
         }
       },
     });
@@ -982,28 +986,8 @@ function renderDayPlaces(container, date) {
   const sorted  = [...timed, ...untimed];
   itinerary[date].places = sorted;
   sorted.forEach((place, pIdx) => {
-    // 每一段「移動」（與前一個地點之間）加導航按鈕；當天第一個地點前不放
-    if (pIdx > 0) {
-      const nav = makeNavButton(sorted[pIdx - 1], place);
-      if (nav) container.appendChild(nav);
-    }
     container.appendChild(makePlaceCard(place, date, pIdx));
   });
-}
-
-// 產生「起點 → 訖點」之間的導航按鈕（開 Google Maps 大眾運輸路線）
-// 兩端缺座標時回傳 null，不顯示按鈕，避免產生壞連結。
-function makeNavButton(from, to) {
-  const url = transitDirectionsUrl(from, to);
-  if (!url) return null;
-  const wrap = document.createElement('div');
-  wrap.className = 'iplace-nav-wrap';
-  wrap.innerHTML = `<button class="iplace-nav-btn" aria-label="從「${escHtml(from.name)}」導航至「${escHtml(to.name)}」" title="導航">🧭 導航</button>`;
-  wrap.querySelector('.iplace-nav-btn').addEventListener('click', e => {
-    e.stopPropagation();
-    window.open(url, '_blank', 'noopener');
-  });
-  return wrap;
 }
 
 function makePlaceCard(place, date, pIdx) {
@@ -1040,6 +1024,7 @@ function makePlaceCard(place, date, pIdx) {
         <div class="iplace-name" title="${escHtml(place.name)}">${escHtml(place.name)}</div>
       </div>
       <div class="iplace-actions">
+        <button class="iplace-nav" title="從上一站導航至此">🧭</button>
         <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
         <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
       </div>
@@ -1049,6 +1034,31 @@ function makePlaceCard(place, date, pIdx) {
         ${buildTimeOptions(place.time || '')}
       </select>
     </div>`;
+  card.querySelector('.iplace-nav').addEventListener('click', e => {
+    e.stopPropagation();
+    // 點擊當下才從 DOM 找「前一站」，確保拖曳調整順序後起訖點正確
+    const prevCard = card.previousElementSibling;
+    if (!prevCard || !prevCard.classList.contains('itinerary-place')) {
+      alert('此站無前一站或缺座標，無法導航');
+      return;
+    }
+    const origin = {
+      name: prevCard.dataset.name,
+      lat: parseFloat(prevCard.dataset.lat) || 0,
+      lng: parseFloat(prevCard.dataset.lng) || 0,
+    };
+    const dest = {
+      name: card.dataset.name,
+      lat: parseFloat(card.dataset.lat) || 0,
+      lng: parseFloat(card.dataset.lng) || 0,
+    };
+    const url = transitDirectionsUrl(origin, dest);
+    if (!url) {
+      alert('此站無前一站或缺座標，無法導航');
+      return;
+    }
+    window.open(url, '_blank', 'noopener');
+  });
   card.querySelector('.iplace-time').addEventListener('change', function() {
     card.dataset.time = this.value;
     syncItineraryFromDOM();
