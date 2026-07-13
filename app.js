@@ -4,6 +4,7 @@
 const HOTEL = {
   name: '淺草田原町站前APA飯店',
   description: '住宿', lat: 35.710269, lng: 139.7901016, type: 'hotel',
+  ftid: '0x60188ebec487f909:0x49b8ac644b467e30',
   googleMapsUrl: 'https://www.google.com/maps/place/APA+Hotel+Asakusa+Tawaramachi+Ekimae/@35.710269,139.7901016,17z',
   address: '〒111-0031 東京都台東区千束1-6-3',
   phone: '+81-3-5806-1611',
@@ -16,6 +17,7 @@ const HOTEL = {
 const HOTEL_0808 = {
   name: 'HOTEL FUJiTORiiGATE',
   description: '住宿', lat: 35.4828938, lng: 138.7967342, type: 'hotel',
+  ftid: '0x60196153e8ecd82d:0x6430cb81f7c21d92',
   googleMapsUrl: 'https://maps.app.goo.gl/xDJqon45c7W1vL2HA',
   address: '〒403-0005 山梨県富士吉田市上吉田2-6-18',
   phone: '+81-555-72-8880',
@@ -483,12 +485,54 @@ function getPlaceCoords(place) {
   return null;
 }
 
+// 從 googleMapsUrl 抽取 FTID（形如 0x60188957de0e5009:0xeec96412fe192abc）。
+const FTID_RE = /0x[0-9a-f]+:0x[0-9a-f]+/;
+function extractFtid(url) {
+  if (!url) return null;
+  const m = url.match(FTID_RE);
+  return m ? m[0] : null;
+}
+
+// 取地點座標＋FTID＋權威名稱：優先用 places.json（allPlaces）依名稱查找的條目，
+// 找不到再 fallback 用傳入物件自帶的 ftid / googleMapsUrl / 座標。
+function getPlaceNavInfo(place) {
+  if (!place) return null;
+  const master = allPlaces.find(p => p.name === place.name);
+  if (master && master.lat && master.lng) {
+    return {
+      name: master.name,
+      lat: master.lat,
+      lng: master.lng,
+      ftid: extractFtid(master.googleMapsUrl),
+    };
+  }
+  if (place.lat && place.lng) {
+    return {
+      name: place.name,
+      lat: place.lat,
+      lng: place.lng,
+      ftid: place.ftid || extractFtid(place.googleMapsUrl),
+    };
+  }
+  return null;
+}
+
 // 產生 Google Maps 大眾運輸導航深度連結（origin → destination）。
-// 任一端缺座標則回傳 null，呼叫端須據此不顯示導航按鈕，避免產生壞連結。
+// 兩端都有 FTID 時組 FTID+座標深度連結（避免座標被吸附到鄰近 POI）；
+// 任一端缺 FTID 則 fallback 現行純座標 api=1 格式；任一端缺座標則回傳 null。
 function transitDirectionsUrl(origin, dest) {
-  const o = getPlaceCoords(origin);
-  const d = getPlaceCoords(dest);
+  const o = getPlaceNavInfo(origin);
+  const d = getPlaceNavInfo(dest);
   if (!o || !d) return null;
+
+  if (o.ftid && d.ftid) {
+    const oName = encodeURIComponent(o.name);
+    const dName = encodeURIComponent(d.name);
+    return `https://www.google.com/maps/dir/${oName}/${dName}/data=!4m14!4m13`
+      + `!1m5!1m1!1s${o.ftid}!2m2!1d${o.lng}!2d${o.lat}`
+      + `!1m5!1m1!1s${d.ftid}!2m2!1d${d.lng}!2d${d.lat}!3e3`;
+  }
+
   const originParam = encodeURIComponent(`${o.lat},${o.lng}`);
   const destParam    = encodeURIComponent(`${d.lat},${d.lng}`);
   return `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destParam}&travelmode=transit`;
@@ -1044,7 +1088,7 @@ function makePlaceCard(place, date, pIdx) {
       // （8/9 前一晚住河口湖 HOTEL_0808，其餘天前一晚住 APA；
       //  8/8 早上仍從 APA 出發，故不歸入 8/9 分支）
       const hotel = date === '2026-08-09' ? HOTEL_0808 : HOTEL;
-      origin = { name: hotel.name, lat: hotel.lat, lng: hotel.lng };
+      origin = hotel;
     } else {
       origin = {
         name: prevCard.dataset.name,
