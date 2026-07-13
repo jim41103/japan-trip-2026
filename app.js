@@ -1024,7 +1024,7 @@ function makePlaceCard(place, date, pIdx) {
         <div class="iplace-name" title="${escHtml(place.name)}">${escHtml(place.name)}</div>
       </div>
       <div class="iplace-actions">
-        <button class="iplace-nav" title="從上一站導航至此">🧭</button>
+        <button class="iplace-nav" title="導航至此（首站從住宿出發）">🧭</button>
         <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
         <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
       </div>
@@ -1038,15 +1038,20 @@ function makePlaceCard(place, date, pIdx) {
     e.stopPropagation();
     // 點擊當下才從 DOM 找「前一站」，確保拖曳調整順序後起訖點正確
     const prevCard = card.previousElementSibling;
+    let origin;
     if (!prevCard || !prevCard.classList.contains('itinerary-place')) {
-      alert('此站無前一站或缺座標，無法導航');
-      return;
+      // 當天第一個地點：找不到前一站卡片，改以前一晚住宿為起點
+      // （8/9 前一晚住河口湖 HOTEL_0808，其餘天前一晚住 APA；
+      //  8/8 早上仍從 APA 出發，故不歸入 8/9 分支）
+      const hotel = date === '2026-08-09' ? HOTEL_0808 : HOTEL;
+      origin = { name: hotel.name, lat: hotel.lat, lng: hotel.lng };
+    } else {
+      origin = {
+        name: prevCard.dataset.name,
+        lat: parseFloat(prevCard.dataset.lat) || 0,
+        lng: parseFloat(prevCard.dataset.lng) || 0,
+      };
     }
-    const origin = {
-      name: prevCard.dataset.name,
-      lat: parseFloat(prevCard.dataset.lat) || 0,
-      lng: parseFloat(prevCard.dataset.lng) || 0,
-    };
     const dest = {
       name: card.dataset.name,
       lat: parseFloat(card.dataset.lat) || 0,
