@@ -17,7 +17,7 @@ const HOTEL_0808 = {
   name: 'HOTEL FUJiTORiiGATE',
   description: '住宿', lat: 35.4828938, lng: 138.7967342, type: 'hotel',
   googleMapsUrl: 'https://maps.app.goo.gl/xDJqon45c7W1vL2HA',
-  address: '〒401-0304 山梨県南都留郡富士河口湖町船津3557',
+  address: '〒403-0005 山梨県富士吉田市上吉田2-6-18',
   phone: '+81-555-72-8880',
   checkIn: '15:00',
   checkOut: '11:00',
