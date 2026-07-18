@@ -1820,7 +1820,13 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* 注意事項 Section */
 #section-notices { overflow-y: auto; }
 #section-notices.active { display: block; }
-.notices-wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+.notices-wrap { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
+/* 寬螢幕改雙欄，充分利用左右空間；卡片不可跨欄斷開 */
+@media (min-width: 900px) {
+  .notices-wrap { columns: 2; column-gap: 16px; }
+  .notices-header, .notices-source { column-span: all; }
+  .notices-cat { break-inside: avoid; }
+}
 .notices-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
 .notices-header h2 { font-size: 16px; font-weight: 800; }
 .notices-hint { font-size: 11px; color: var(--text-muted); }
