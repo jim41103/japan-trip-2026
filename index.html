@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=72" />
+  <link rel="stylesheet" href="style.css?v=73" />
 </head>
 <body>
 
@@ -167,6 +167,11 @@
       <span class="landing-card-icon">📌</span>
       <span class="landing-card-title">注意事項</span>
       <span class="landing-card-desc">初訪日本 · 禮儀 · 8月提醒</span>
+    </button>
+    <button class="landing-card" data-tab="insurance">
+      <span class="landing-card-icon">🛡</span>
+      <span class="landing-card-title">保險應變</span>
+      <span class="landing-card-desc">延誤怎麼辦 · 證據清單 · 賠多少</span>
     </button>
   </div>
 
@@ -595,6 +600,85 @@
 </div>
 
 <!-- ════════════════════════════════════════════
+     保險應變 SECTION
+════════════════════════════════════════════ -->
+<div id="section-insurance" class="tab-section page" style="display:none">
+  <div class="notices-wrap">
+    <div class="notices-header">
+      <h2>🛡 保險應變手冊</h2>
+      <p class="notices-hint">富邦 C+ 方案（1,960 元/人）｜保障期間 8/2 中午 12:00 → 8/11 中午 12:00｜去程 GK12（8/3 02:40）／回程 GK11（8/9 22:40 成田）｜理賠專線 0800-009-888</p>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🔑 出事先記四句話</h3>
+      <ul>
+        <li><strong>通通截圖</strong>：航空公司的任何通知都截圖，畫面要看得到時間</li>
+        <li><strong>收據全留</strong>：登機證、收據回國前都不要丟</li>
+        <li><strong>行李先開單</strong>：行李有事，人先別出關，去櫃檯開 PIR</li>
+        <li><strong>延誤看結果</strong>：賠不賠只看最後實際延誤幾小時，從原定起飛時間起算</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>✈️ 飛機延誤了（去程或回程）</h3>
+      <ul>
+        <li><strong>怎麼做</strong>：在機場等就好，不用急著花錢。理賠是「定額給付」＝條件到了就給固定金額，<strong>完全不用收據</strong></li>
+        <li><strong>賠多少</strong>：每卡滿 4 小時賠新台幣 6,000 元；滿 8 小時封頂 <strong>12,000 元</strong>（整趟旅程最多賠 2 次）</li>
+        <li><strong>要收集</strong>：延誤通知截圖、登機證、實際起飛時間截圖</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>📅 飛機被正式改到隔天</h3>
+      <ul>
+        <li><strong>去程</strong>：二選一——等隔天飛（領延誤理賠 12,000 元），或拿「正式時刻變更通知」向捷星辦全額退票、改訂別家</li>
+        <li><strong>回程</strong>：放心直接訂飯店住一晚，走「飛機延誤」定額 12,000 元，免收據，拿來付房錢綽綽有餘</li>
+        <li><strong>最關鍵證據</strong>：捷星「正式時刻變更／取消」的通知截圖</li>
+        <li>若額外開銷想再走「旅程更改險」實報實銷（上限 6 萬），<strong>必須附原本日本飯店的預訂單</strong>，否則每天最多只賠 2,000 元</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>⚠️ 只是「聽說可能延誤」，還沒正式通知</h3>
+      <ul>
+        <li><strong>先不要自己改訂機票！</strong>沒有正式通知就自行改訂，之後飛機照飛＝保險什麼都不賠，錢自己吸收</li>
+        <li>等航空公司發出「正式時刻變更」再行動，那張通知就是我們的退票權與理賠依據</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🧳 行李出狀況</h3>
+      <ul>
+        <li><strong>超過 6 小時沒出來</strong>：離開行李轉盤前，到航空公司行李櫃檯開 <strong>PIR（行李事故報告書）</strong>，沒這張理賠免談。急需盥洗衣物可先買。賠 6,000 元</li>
+        <li><strong>遺失或摔壞</strong>：一樣先開 PIR，損壞處拍照，保留航空公司回覆。賠 6,000 元</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>🏥 其他狀況</h3>
+      <ul>
+        <li><strong>飛機降落到別的機場</strong>：保留改降通知與前往目的地的交通收據，賠 5,000 元</li>
+        <li><strong>疑似食物中毒</strong>：就醫並請醫師在診斷書寫明「食物中毒」，賠 5,000 元</li>
+        <li><strong>護照不見</strong>：先向警察報案，再聯絡駐日代表處補辦，賠 3,000 元（憑報案證明＋補辦收據）</li>
+        <li><strong>生病或受傷</strong>：突發疾病醫療額度 96 萬、意外醫療 120 萬，就醫收據與診斷書全留</li>
+      </ul>
+    </div>
+
+    <div class="notices-cat">
+      <h3>📖 保險話翻譯機</h3>
+      <ul>
+        <li><strong>定額給付</strong>＝條件達成就賠固定金額，不用收據</li>
+        <li><strong>實支實付</strong>＝先花錢、憑收據報銷，有上限；收據不見＝報不了</li>
+        <li><strong>PIR</strong>＝行李事故報告書，行李轉盤旁的航空公司櫃檯填寫</li>
+        <li><strong>2,000 元魔咒</strong>＝走「旅程更改險」卻拿不出原預訂付款證明時，每天最多只賠 2,000 元。破解法：出發前把日本飯店預訂單（含每晚價格）截圖存手機</li>
+      </ul>
+    </div>
+
+    <p class="notices-source">依富邦產險官網方案比較表＋現行保單條款整理（2026-07-18）；投保時請登錄正確航班（去程 GK12、回程 GK11）啟用快捷理賠（延誤 4 小時自動通知）。本頁為白話摘要，實際理賠以保單條款為準。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      MOBILE NAV
 ════════════════════════════════════════════ -->
 <nav id="mobile-nav" style="display:none">
@@ -670,6 +754,6 @@
   </div>
 </div>
 
-<script src="app.js?v=72"></script>
+<script src="app.js?v=73"></script>
 </body>
 </html>

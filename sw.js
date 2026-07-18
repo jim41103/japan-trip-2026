@@ -1,4 +1,4 @@
-const CACHE = 'tokyo-trip-2026-v72';
+const CACHE = 'tokyo-trip-2026-v73';
 const TILE_CACHE = 'tokyo-osm-tiles-v1';
 // HTML 與資料檔不放入主快取，永遠從網路取最新版
 // 注意：每次改 app.js/style.css 都必須同步 bump 此處與 index.html 的 ?v=，否則 cache-first 會讓舊客戶端永遠拿不到新版
