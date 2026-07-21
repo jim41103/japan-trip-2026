@@ -35,6 +35,7 @@ body {
   background: var(--bg);
   color: var(--text);
   height: 100vh;
+  height: 100dvh; /* iOS Safari 網址列/工具列會動態伸縮，100vh 含住它們，100dvh 才是實際可見高度 */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -842,12 +843,14 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 @media (max-width: 767px) {
   /* ─── Header ─── */
   header { padding: 0 10px; gap: 6px; }
-  .header-title { gap: 4px; min-width: 0; overflow: hidden; }
-  header h1 { font-size: 13px; white-space: nowrap; }
-  .snoopy-badge { font-size: 14px; }
+  /* header-title 本身不裁切——Home/SOS/AI 這組按鈕放在最後面，
+     若容器 overflow:hidden 而內容總寬超出，會直接把它們裁到看不見，只讓標題文字自己 ellipsis */
+  .header-title { gap: 4px; min-width: 0; }
+  header h1 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .snoopy-badge { font-size: 14px; flex-shrink: 0; }
   .date-range { display: none; }
-  .countdown-pill { font-size: 10px; padding: 2px 7px; white-space: nowrap; }
-  .header-icon-actions { gap: 3px; margin-left: 2px; }
+  .countdown-pill { font-size: 10px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
+  .header-icon-actions { gap: 3px; margin-left: 2px; flex-shrink: 0; }
   .header-icon-actions button { width: 24px; height: 24px; font-size: 0.75rem; }
   .header-actions { gap: 4px; flex-shrink: 0; }
   .sync-indicator { font-size: 10px; padding: 3px 7px; }
@@ -1086,7 +1089,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   position: fixed;
   inset: 0;
   background: linear-gradient(180deg, #080f24 0%, #12244e 30%, #7a3a5a 55%, #c8705a 70%, #5a8fa8 100%);
-  overflow: hidden;
+  overflow-y: auto; /* 小螢幕 8 張卡片會超出視窗高度，原本 overflow:hidden 會把底部卡片裁掉、也無法捲動 */
+  -webkit-overflow-scrolling: touch;
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -1094,6 +1098,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   justify-content: center;
   gap: 2rem;
   padding: 2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
   animation: landingFadeIn 0.6s ease forwards;
 }
 @keyframes landingFadeIn {
