@@ -850,8 +850,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .snoopy-badge { font-size: 14px; flex-shrink: 0; }
   .date-range { display: none; }
   .countdown-pill { font-size: 10px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
-  .header-icon-actions { gap: 3px; margin-left: 2px; flex-shrink: 0; }
-  .header-icon-actions button { width: 24px; height: 24px; font-size: 0.75rem; }
+  .header-icon-actions { flex-shrink: 0; } /* 尺寸/間距收斂見檔案後段（1170行附近）同名 media query——這裡設定會被無 media 限制的 1158 行規則蓋過，故拆開放 */
   .header-actions { gap: 4px; flex-shrink: 0; }
   .sync-indicator { font-size: 10px; padding: 3px 7px; }
   .btn { padding: 5px 9px; font-size: 11px; }
@@ -1167,6 +1166,14 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #homeBtn { background: linear-gradient(135deg, #C97B5F, #8B4513); }
 #floatAIBtn { background: linear-gradient(135deg, #7c3aed, #db2777); display: none; }
 #floatEmergencyBtn { background: #D32F2F; display: none; }
+
+/* 手機版縮小尺寸/間距——故意放在這裡（.header-icon-actions button base 規則之後），
+   因為 CSS cascade 是比「原始碼順序」不是比「哪個 media query 寫在檔案前面」，
+   放在 767px 那段（檔案前段）會被上面這條無 media 限制的 base 規則蓋過，過去這是三顆按鈕在手機上擠成一團的真正原因 */
+@media (max-width: 767px) {
+  .header-icon-actions { gap: 3px; margin-left: 2px; }
+  .header-icon-actions button { width: 24px; height: 24px; font-size: 0.75rem; }
+}
 
 /* ── HIDE OLD TAB NAV ── */
 .tab-nav { display: none !important; }

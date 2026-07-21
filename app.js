@@ -2428,6 +2428,17 @@ async function syncPull() {
         }
       }
     }
+    // 補推：本機已打勾但雲端從未收過的 prep_ 勾選狀態（例如同步機制上線前就打勾的舊資料，
+    // 只在 change 事件時才會 push，載入時不會主動補推）——只推雲端「完全沒有這個鍵」的情況，
+    // 不覆蓋雲端已有值，避免和其他裝置的資料互相蓋掉。
+    // 刻意序列化（for...of + await）而非平行 forEach：/api/sync 後端是無鎖的 GET→merge→PATCH，
+    // 若一次有多筆缺鍵同時平行送出，後完成的 PATCH 會蓋掉先完成、但還沒反映在自己那份 GET 快照裡的鍵，
+    // 序列化讓下一筆的 GET 一定能讀到前一筆剛寫入的結果，避免互蓋遺失
+    for (const cb of document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]')) {
+      const k = `prep_${cb.dataset.key}`;
+      const local = localStorage.getItem(k);
+      if (local && data[k] === undefined) await syncPush(k, local);
+    }
     if (changed) {
       initPrepChecklists();
       const a = localStorage.getItem('member-a-name');
