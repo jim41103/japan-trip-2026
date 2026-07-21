@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=75" />
+  <link rel="stylesheet" href="style.css?v=76" />
 </head>
 <body>
 
@@ -445,6 +445,8 @@
       <div id="expense-list-area"></div>
       <div class="expense-add-form">
         <div class="exp-form-title">＋ 新增支出</div>
+        <!-- 金額移到最上面：手機上開起這個表單通常是急著記價錢，先讓使用者馬上打數字 -->
+        <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
         <div class="exp-form-row">
           <select id="exp-date">
             <option value="2026-08-03">8/3 (一)</option>
@@ -467,13 +469,12 @@
         </div>
         <input id="exp-desc" type="text" placeholder="說明（如：築地早餐）" maxlength="40">
         <div class="exp-form-row">
-          <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
           <select id="exp-paidby"><option value="a">Jim 付</option><option value="b">野珊 付</option></select>
+          <select id="exp-split">
+            <option value="shared">👫 兩人平分</option>
+            <option value="personal">🙋 個人花費（不列入拆帳）</option>
+          </select>
         </div>
-        <select id="exp-split">
-          <option value="shared">👫 兩人平分</option>
-          <option value="personal">🙋 個人花費（不列入拆帳）</option>
-        </select>
         <button id="btn-add-exp" class="btn btn-accent">＋ 加入</button>
       </div>
     </div>
@@ -754,6 +755,6 @@
   </div>
 </div>
 
-<script src="app.js?v=75"></script>
+<script src="app.js?v=76"></script>
 </body>
 </html>

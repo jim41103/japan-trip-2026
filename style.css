@@ -851,6 +851,9 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .date-range { display: none; }
   .countdown-pill { font-size: 10px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
   .header-icon-actions { flex-shrink: 0; } /* 尺寸/間距收斂見檔案後段（1170行附近）同名 media query——這裡設定會被無 media 限制的 1158 行規則蓋過，故拆開放 */
+  /* 手機版天氣按鈕只留 icon+目前溫度，「明日預報」「地點」在窄螢幕會撐爆整列，
+     讓天氣按鈕跟左邊 Home/SOS/AI 圖示擠在一起沒有間距（因為內容總寬超出時 flex gap 也救不了） */
+  .header-weather #wb-tomorrow, .header-weather .wb-divider, .header-weather #wb-loc { display: none; }
   .header-actions { gap: 4px; flex-shrink: 0; }
   .sync-indicator { font-size: 10px; padding: 3px 7px; }
   .btn { padding: 5px 9px; font-size: 11px; }
