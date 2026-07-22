@@ -2134,6 +2134,45 @@ async function syncPrepCustomItemsToCloud() {
   }
 }
 
+// 讓一個 .prep-item-name span 可以點擊就地編輯，儲存後換回可再點擊的 span（不靠外層重繪）
+function makeEditablePrepName(nameEl, key) {
+  nameEl.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation(); // label 預設點擊會轉發去勾選 checkbox，這裡要擋掉
+    const originalName = this.textContent; // Escape 時要復原，不能靠 input.defaultValue（沒設 value 屬性、抓不到原字串）
+    const input = document.createElement('input');
+    input.type = 'text'; input.className = 'shop-item-name-edit';
+    input.value = originalName; input.maxLength = 40;
+    this.replaceWith(input);
+    input.focus(); input.select();
+    input.addEventListener('click', ev => ev.stopPropagation());
+    let committed = false;
+    const finish = displayName => {
+      if (committed) return;
+      committed = true;
+      const span = document.createElement('span');
+      span.className = 'prep-item-name';
+      span.textContent = displayName;
+      input.replaceWith(span);
+      makeEditablePrepName(span, key); // 換回 span 後要重新綁定，不然只能編輯這一次
+    };
+    input.addEventListener('blur', () => {
+      // committed 在這裡也要擋：Escape 已經先呼叫過 finish() 把 input 換掉，
+      // 但移除仍在 focus 中的 input 會補觸發一次原生 blur，若不擋就會把「使用者已經按 Escape 放棄」
+      // 的編輯內容重新存回去，等於 Escape 沒真的作廢
+      if (committed) return;
+      const newName = input.value.trim();
+      const items = loadPrepCustomItems();
+      const it = items.find(i => i.key === key);
+      if (it && newName && newName !== it.name) { it.name = newName; it.updatedAt = Date.now(); savePrepCustomItems(items); }
+      finish(newName || originalName);
+    });
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') input.blur();
+      if (ev.key === 'Escape') finish(originalName);
+    });
+  });
+}
+
 // 把單一自訂項目渲染成 DOM 並綁定勾選事件
 function renderPrepCustomItem(listId, key, name) {
   const listEl = document.getElementById(listId);
@@ -2142,7 +2181,7 @@ function renderPrepCustomItem(listId, key, name) {
   label.className = 'prep-item';
   // 自訂項目才有刪除鈕（固定的 24 個項目沒有，比照購物清單的 × 按鈕風格）
   // 沿用購物清單既有的 .shop-item-del 樣式（灰色 × 按鈕、hover 變主色），視覺風格一致、不必另外加 CSS
-  label.innerHTML = `<input type="checkbox" data-key="${key}"> ${escHtml(name)} <button type="button" class="shop-item-del prep-item-del">×</button>`;
+  label.innerHTML = `<input type="checkbox" data-key="${key}"> <span class="prep-item-name">${escHtml(name)}</span> <button type="button" class="shop-item-del prep-item-del">×</button>`;
   const cb = label.querySelector('input');
   cb.checked = localStorage.getItem(`prep_${key}`) === '1';
   label.classList.toggle('checked', cb.checked);
@@ -2160,6 +2199,8 @@ function renderPrepCustomItem(listId, key, name) {
       label.remove();
     }
   });
+  // 點名稱可以就地編輯（原本只能新增/刪除，改名字要刪掉重加會弄丟勾選狀態）
+  makeEditablePrepName(label.querySelector('.prep-item-name'), key);
   listEl.appendChild(label);
 }
 
@@ -2339,6 +2380,29 @@ function renderShoppingList() {
           if (it) { it.deleted = true; it.updatedAt = Date.now(); }
           saveShopItems(); renderShoppingList();
         }
+      });
+      // 點名稱可以就地編輯（原本只能新增/刪除，改個名字要刪掉重加會弄丟已購狀態跟金額）
+      row.querySelector('.shop-item-name').addEventListener('click', function () {
+        const nameEl = this;
+        const input = document.createElement('input');
+        input.type = 'text'; input.className = 'shop-item-name-edit';
+        input.value = nameEl.textContent; input.maxLength = 40;
+        nameEl.replaceWith(input);
+        input.focus(); input.select();
+        let committed = false;
+        const commit = () => {
+          if (committed) return;
+          committed = true;
+          const newName = input.value.trim();
+          const it = shopItems.find(i => i.id === id);
+          if (it && newName && newName !== it.name) { it.name = newName; it.updatedAt = Date.now(); saveShopItems(); }
+          renderShoppingList();
+        };
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Enter') input.blur();
+          if (e.key === 'Escape') { committed = true; renderShoppingList(); }
+        });
       });
     });
 

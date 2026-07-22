@@ -661,8 +661,13 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .shop-item:hover { background: var(--bg); }
 .shop-item:last-child { border-bottom: none; }
 .shop-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; }
-.shop-item-name { flex: 1; font-size: 13px; }
+.shop-item-name { flex: 1; font-size: 13px; cursor: pointer; border-bottom: 1px dashed transparent; }
+.shop-item-name:hover { border-bottom-color: var(--border-dark); }
 .shop-item.bought .shop-item-name { text-decoration: line-through; color: var(--text-muted); }
+.shop-item-name-edit {
+  flex: 1; font-size: 13px; padding: 1px 4px; border: 1.5px solid var(--primary);
+  border-radius: 6px; outline: none; background: #fff; color: var(--text);
+}
 .shop-item-del { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 4px; }
 .shop-item-del:hover { color: var(--primary); }
 .shop-add-bar {
@@ -899,6 +904,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
   /* ─── Transit ─── */
   #section-transport { padding-bottom: env(safe-area-inset-bottom, 8px); }
+
+  /* ─── 注意事項／保險應變標題：保險頁的說明文字很長，跟標題擠同一行（flex row + baseline）
+         在窄螢幕會擠壓變形，改直式排列 ─── */
+  .notices-header { flex-direction: column; align-items: flex-start; gap: 4px; }
 
 }
 
@@ -1832,9 +1841,12 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .phrase-card:hover .phrase-copy-hint { opacity: 1; }
 
-/* 注意事項 Section */
-#section-notices { overflow-y: auto; }
-#section-notices.active { display: block; }
+/* 注意事項 / 保險應變 Section（共用 .notices-* 排版元件）
+   保險應變原本沒套用這兩條，直接吃通用 .page{overflow:hidden} + .page.active{display:flex}，
+   導致頁面完全不能捲動、且 .notices-wrap 的多欄排版跟 .notices-header 的 flex 佈局
+   包在錯的 display:flex 父層裡跑版（標題那行亂掉） */
+#section-notices, #section-insurance { overflow-y: auto; }
+#section-notices.active, #section-insurance.active { display: block; }
 .notices-wrap { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
 /* 寬螢幕改雙欄，充分利用左右空間；卡片不可跨欄斷開 */
 @media (min-width: 900px) {
