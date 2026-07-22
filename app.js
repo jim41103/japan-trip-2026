@@ -2206,8 +2206,105 @@ function renderPrepCustomItem(listId, key, name) {
   listEl.appendChild(label);
 }
 
+// 固定的 24 個行前準備項目：原本寫死在 index.html 裡純文字，改成資料驅動才能讓標籤可編輯。
+// key 沿用原本 HTML 裡的 data-key 不變（vjw0-4／s0-9／c0-8／t0-5），既有勾選狀態跟雲端資料才不會失聯。
+const PREP_FIXED = {
+  vjw: [
+    ['vjw0', '訪日外客個人資料登錄完成'],
+    ['vjw1', '入境審查（Kansatsu）事前登錄'],
+    ['vjw2', '海關申報（Customs）事前申請'],
+    ['vjw3', '出發前 24h 確認 QR Code 可開啟'],
+    ['vjw4', 'QR Code 截圖存至相簿（備用）'],
+  ],
+  suitcase: [
+    ['s0', '護照（確認效期 3 個月以上）'],
+    ['s1', '換洗衣物（6套）'],
+    ['s2', '盥洗用品'],
+    ['s3', '藥品（腸胃藥、止痛藥、暈車藥）'],
+    ['s4', '充電器 + 行動電源'],
+    ['s5', '旅行轉接頭（日本 110V A型）'],
+    ['s6', '相機 + 充電器 + 記憶卡'],
+    ['s7', '雨傘'],
+    ['s8', '防曬乳 SPF50+'],
+    ['s9', '空間預留（購物用）'],
+  ],
+  carryon: [
+    ['c0', '護照正本 + 影本（分開放）'],
+    ['c1', '信用卡（VISA/Master × 2張）'],
+    ['c2', '日幣現金（出發前換好）'],
+    ['c3', '手機 + 充電線 + 充電頭'],
+    ['c4', '耳機'],
+    ['c5', '頸枕 + 眼罩'],
+    ['c6', '即可拍底片相機'],
+    ['c7', 'Visit Japan Web QR Code（截圖）'],
+    ['c8', '零食 / 水'],
+  ],
+  tickets: [
+    ['t0', 'teamLab Planets TOKYO（沉浸式燈光秀）'],
+    ['t1', 'SHIBUYA SKY 展望台（夕陽時段）'],
+    ['t2', '史努比博物館手作課程'],
+    ['t3', '富士回遊號指定席（KKday / Navitime）'],
+    ['t4', '淺草今半（請飯店代訂或自行預約）'],
+    ['t5', '東京晴空塔（Skytree）'],
+  ],
+};
+
+// 固定項目的標籤覆寫獨立存一個 key（prep_label_${key}），跟勾選狀態（prep_${key}）分開，
+// 這樣才能沿用既有「prep_ 前綴自動同步」機制（shouldSyncKey），不用另外寫合併邏輯
+function makeEditableFixedPrepName(nameEl, key, defaultName) {
+  nameEl.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation();
+    const originalName = this.textContent;
+    const input = document.createElement('input');
+    input.type = 'text'; input.className = 'shop-item-name-edit';
+    input.value = originalName; input.maxLength = 40;
+    this.replaceWith(input);
+    input.focus(); input.select();
+    input.addEventListener('click', ev => ev.stopPropagation());
+    let committed = false;
+    const finish = displayName => {
+      if (committed) return;
+      committed = true;
+      const span = document.createElement('span');
+      span.className = 'prep-item-name';
+      span.textContent = displayName;
+      input.replaceWith(span);
+      makeEditableFixedPrepName(span, key, defaultName);
+    };
+    input.addEventListener('blur', () => {
+      if (committed) return; // Escape 已經 finish 過，擋掉隨後補觸發的原生 blur，不要又存一次
+      const newName = input.value.trim();
+      if (newName && newName !== originalName) {
+        localStorage.setItem(`prep_label_${key}`, newName); // 走攔截器，prep_ 前綴自動觸發雲端同步
+      }
+      finish(newName || originalName);
+    });
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') input.blur();
+      if (ev.key === 'Escape') finish(originalName);
+    });
+  });
+}
+
+function renderFixedPrepItem(listId, key, defaultName) {
+  const listEl = document.getElementById(listId);
+  if (!listEl || listEl.querySelector(`input[data-key="${key}"]`)) return; // 已存在就不重複加
+  const label = document.createElement('label');
+  label.className = 'prep-item';
+  const displayName = localStorage.getItem(`prep_label_${key}`) || defaultName;
+  label.innerHTML = `<input type="checkbox" data-key="${key}"> <span class="prep-item-name">${escHtml(displayName)}</span>`;
+  makeEditableFixedPrepName(label.querySelector('.prep-item-name'), key, defaultName);
+  listEl.appendChild(label);
+  // checkbox 的勾選狀態還原跟 change 事件綁定，統一交給下面 initPrepChecklists 的通用掃描處理
+}
+
 function initPrepChecklists() {
-  // 先把自訂項目（含跨裝置同步拉回的、排除已標記刪除的墓碑）渲染出來，
+  // 固定項目（原本寫死在 HTML，現在資料驅動才能讓標籤可編輯）
+  Object.entries(PREP_FIXED).forEach(([list, items]) => {
+    items.forEach(([key, defaultName]) => renderFixedPrepItem(`${list}-list`, key, defaultName));
+  });
+
+  // 自訂項目（含跨裝置同步拉回的、排除已標記刪除的墓碑）渲染出來，
   // 才能一併被下面的 checkbox 掃描到並還原勾選狀態
   loadPrepCustomItems().filter(i => !i.deleted).forEach(({ list, key, name }) => {
     renderPrepCustomItem(`${list}-list`, key, name);
@@ -2228,22 +2325,28 @@ function initPrepChecklists() {
     });
   });
 
-  document.querySelectorAll('.btn-add-prep').forEach(btn => {
-    if (btn.dataset.bound) return; // 同上，避免重複呼叫時 click 監聽疊加、點一次跳多個 prompt
-    btn.dataset.bound = '1';
-    btn.addEventListener('click', () => {
-      const list = btn.dataset.list;
-      const listId = list + '-list';
-      const name = prompt('新增項目：');
-      if (!name?.trim()) return;
+  // 新增區塊比照購物清單樣式：每個分類底下都有一個行內輸入框，取代原本小圓形 + 按鈕彈 prompt() 的做法
+  document.querySelectorAll('#section-prep .prep-cat-add').forEach(bar => {
+    if (bar.dataset.bound) return;
+    bar.dataset.bound = '1';
+    const listEl = bar.previousElementSibling; // .prep-checklist 緊接在這個 add bar 前面
+    const list = listEl.id.replace(/-list$/, '');
+    const input = bar.querySelector('input');
+    const btn = bar.querySelector('button');
+    const doAdd = () => {
+      const name = input.value.trim();
+      if (!name) { input.focus(); return; }
       // key 混入隨機尾碼，避免兩人同一毫秒新增時撞號互蓋（比照 shopItems 新增 id 的做法）
       const key = list + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       // 落地存清單，讓另一裝置 syncPull 後也能重建出這個項目（不只是勾選狀態）
       const items = loadPrepCustomItems();
-      items.push({ list, key, name: name.trim(), updatedAt: Date.now() });
+      items.push({ list, key, name, updatedAt: Date.now() });
       savePrepCustomItems(items);
-      renderPrepCustomItem(listId, key, name.trim());
-    });
+      renderPrepCustomItem(`${list}-list`, key, name);
+      input.value = '';
+    };
+    btn.addEventListener('click', doAdd);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
   });
 }
 

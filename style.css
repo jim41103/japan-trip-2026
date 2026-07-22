@@ -604,12 +604,6 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   font-size: 9px; background: var(--primary); color: #fff;
   border-radius: 10px; padding: 2px 7px; font-weight: 700;
 }
-.prep-header-right { display: flex; align-items: center; gap: 6px; }
-.btn-add-prep {
-  background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4);
-  border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-}
 .prep-checklist { padding: 10px 16px; display: flex; flex-direction: column; gap: 2px; }
 .prep-item {
   display: flex; align-items: center; gap: 10px; padding: 7px 4px;
@@ -618,6 +612,20 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .prep-item:hover { background: var(--bg); }
 .prep-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; }
 .prep-item.checked { color: var(--text-muted); text-decoration: line-through; }
+/* 新增區塊比照購物清單 .shop-cat-add 同款樣式，兩邊介面風格統一 */
+.prep-cat-add {
+  display: flex; gap: 6px; padding: 10px 16px;
+  border-top: 1px dashed var(--border); background: var(--bg-main);
+}
+.prep-cat-add input {
+  flex: 1; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 16px;
+  font-size: 12px; outline: none; background: #fff;
+}
+.prep-cat-add input:focus { border-color: var(--primary); }
+.prep-cat-add button {
+  background: var(--primary); color: #fff; border: none; border-radius: 16px;
+  padding: 4px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
 
 /* ════════════════════════════════════════════
    PAGE: 購物清單
@@ -791,7 +799,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 #exp-amount { border: none !important; flex: 1; padding: 7px 8px; font-size: 13px; outline: none; background: #fff; }
 #exp-paidby { flex-shrink: 0; min-width: 88px; padding: 7px 8px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; background: #fff; }
-#btn-add-exp { align-self: flex-end; }
+/* 原本 align-self:flex-end 讓按鈕縮到右側一小塊、整行大部分空間閒置，改滿版寬更好點 */
+#btn-add-exp { width: 100%; padding: 10px; font-size: 14px; }
 
 /* ── Settle tab ── */
 #exp-tab-settle { overflow: hidden; }

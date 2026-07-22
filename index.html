@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=81" />
+  <link rel="stylesheet" href="style.css?v=82" />
 </head>
 <body>
 
@@ -303,17 +303,12 @@
     <div class="prep-card">
       <div class="prep-card-header">
         <span>🌐 Visit Japan Web</span>
-        <div class="prep-header-right">
-          <span class="prep-badge">出發前必做</span>
-          <button class="btn-add-prep" data-list="vjw">＋</button>
-        </div>
+        <span class="prep-badge">出發前必做</span>
       </div>
-      <div class="prep-checklist" id="vjw-list">
-        <label class="prep-item"><input type="checkbox" data-key="vjw0"> 訪日外客個人資料登錄完成</label>
-        <label class="prep-item"><input type="checkbox" data-key="vjw1"> 入境審查（Kansatsu）事前登錄</label>
-        <label class="prep-item"><input type="checkbox" data-key="vjw2"> 海關申報（Customs）事前申請</label>
-        <label class="prep-item"><input type="checkbox" data-key="vjw3"> 出發前 24h 確認 QR Code 可開啟</label>
-        <label class="prep-item"><input type="checkbox" data-key="vjw4"> QR Code 截圖存至相簿（備用）</label>
+      <div class="prep-checklist" id="vjw-list"></div>
+      <div class="prep-cat-add">
+        <input type="text" placeholder="新增到「Visit Japan Web」…" maxlength="40">
+        <button>＋</button>
       </div>
     </div>
 
@@ -321,19 +316,11 @@
     <div class="prep-card">
       <div class="prep-card-header">
         <span>🧳 行李箱清單（託運）</span>
-        <button class="btn-add-prep" data-list="suitcase">＋</button>
       </div>
-      <div class="prep-checklist" id="suitcase-list">
-        <label class="prep-item"><input type="checkbox" data-key="s0"> 護照（確認效期 3 個月以上）</label>
-        <label class="prep-item"><input type="checkbox" data-key="s1"> 換洗衣物（6套）</label>
-        <label class="prep-item"><input type="checkbox" data-key="s2"> 盥洗用品</label>
-        <label class="prep-item"><input type="checkbox" data-key="s3"> 藥品（腸胃藥、止痛藥、暈車藥）</label>
-        <label class="prep-item"><input type="checkbox" data-key="s4"> 充電器 + 行動電源</label>
-        <label class="prep-item"><input type="checkbox" data-key="s5"> 旅行轉接頭（日本 110V A型）</label>
-        <label class="prep-item"><input type="checkbox" data-key="s6"> 相機 + 充電器 + 記憶卡</label>
-        <label class="prep-item"><input type="checkbox" data-key="s7"> 雨傘</label>
-        <label class="prep-item"><input type="checkbox" data-key="s8"> 防曬乳 SPF50+</label>
-        <label class="prep-item"><input type="checkbox" data-key="s9"> 空間預留（購物用）</label>
+      <div class="prep-checklist" id="suitcase-list"></div>
+      <div class="prep-cat-add">
+        <input type="text" placeholder="新增到「行李箱清單」…" maxlength="40">
+        <button>＋</button>
       </div>
     </div>
 
@@ -341,18 +328,11 @@
     <div class="prep-card">
       <div class="prep-card-header">
         <span>🎒 隨身行李清單</span>
-        <button class="btn-add-prep" data-list="carryon">＋</button>
       </div>
-      <div class="prep-checklist" id="carryon-list">
-        <label class="prep-item"><input type="checkbox" data-key="c0"> 護照正本 + 影本（分開放）</label>
-        <label class="prep-item"><input type="checkbox" data-key="c1"> 信用卡（VISA/Master × 2張）</label>
-        <label class="prep-item"><input type="checkbox" data-key="c2"> 日幣現金（出發前換好）</label>
-        <label class="prep-item"><input type="checkbox" data-key="c3"> 手機 + 充電線 + 充電頭</label>
-        <label class="prep-item"><input type="checkbox" data-key="c4"> 耳機</label>
-        <label class="prep-item"><input type="checkbox" data-key="c5"> 頸枕 + 眼罩</label>
-        <label class="prep-item"><input type="checkbox" data-key="c6"> 即可拍底片相機</label>
-        <label class="prep-item"><input type="checkbox" data-key="c7"> Visit Japan Web QR Code（截圖）</label>
-        <label class="prep-item"><input type="checkbox" data-key="c8"> 零食 / 水</label>
+      <div class="prep-checklist" id="carryon-list"></div>
+      <div class="prep-cat-add">
+        <input type="text" placeholder="新增到「隨身行李清單」…" maxlength="40">
+        <button>＋</button>
       </div>
     </div>
 
@@ -360,15 +340,11 @@
     <div class="prep-card">
       <div class="prep-card-header">
         <span>🎫 票券預約狀態</span>
-        <button class="btn-add-prep" data-list="tickets">＋</button>
       </div>
-      <div class="prep-checklist" id="tickets-list">
-        <label class="prep-item"><input type="checkbox" data-key="t0"> teamLab Planets TOKYO（沉浸式燈光秀）</label>
-        <label class="prep-item"><input type="checkbox" data-key="t1"> SHIBUYA SKY 展望台（夕陽時段）</label>
-        <label class="prep-item"><input type="checkbox" data-key="t2"> 史努比博物館手作課程</label>
-        <label class="prep-item"><input type="checkbox" data-key="t3"> 富士回遊號指定席（KKday / Navitime）</label>
-        <label class="prep-item"><input type="checkbox" data-key="t4"> 淺草今半（請飯店代訂或自行預約）</label>
-        <label class="prep-item"><input type="checkbox" data-key="t5"> 東京晴空塔（Skytree）</label>
+      <div class="prep-checklist" id="tickets-list"></div>
+      <div class="prep-cat-add">
+        <input type="text" placeholder="新增到「票券預約狀態」…" maxlength="40">
+        <button>＋</button>
       </div>
     </div>
 
@@ -757,6 +733,6 @@
   </div>
 </div>
 
-<script src="app.js?v=81"></script>
+<script src="app.js?v=82"></script>
 </body>
 </html>
