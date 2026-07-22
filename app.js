@@ -1900,7 +1900,9 @@ async function saveExpenses() {
     const result = await resp.json().catch(() => ({}));
     const sheet = result.sheet || {};
     // 成功後套用合併結果，並清空離線暫存（墓碑已隨 expenses 一起送出，不需另外清追蹤集合）
-    expenses = merged;
+    // 優先採用後端回傳的 result.expenses：如果後端偵測到有別的裝置也同時寫入（status:'conflict'）
+    // 會自動重新合併過，這份才是真正含有雙方資料的權威版本；只有舊版後端沒回這個欄位時才退回本機的 merged
+    expenses = result.expenses || merged;
     localStorage.removeItem('exp-pending');
     localStorage.removeItem('exp-local');
     renderExpenseList(); renderSettle(); drawSpendingChart(expenses); drawDailyChart(expenses); updateCurrencyConvert();
@@ -2461,18 +2463,19 @@ function shouldSyncKey(key) {
   return SYNC_KEYS.includes(key) || key.startsWith('prep_');
 }
 
-// 記錄「這個鍵是本裝置最近才推送的」，syncPull 拉回比對時用來擋下競態：
-// 後端 /api/sync 的 GET→merge→PATCH 有讀回驗證＋重試（見 api/sync.js），但驗證窗口仍在，
-// PATCH 落地到 GitHub Gist、下一次 GET 讀得到最新值，中間仍有網路延遲空窗（實測可達 1-2 秒）。
-// 使用者打勾的瞬間常常會撞上 30 秒排程輪詢或切換分頁的 visibilitychange 觸發另一次 syncPull()，
-// 若那次 GET 剛好卡在空窗內，會讀到舊值、把使用者剛打的勾直接蓋回去（使用者看到的「勾了幾秒後
-// 自動變回未勾選」就是這個）。寬限期內優先信任本機、不覆蓋。
+// syncPull 拉回比對時用這兩個結構擋下競態：
+// 1. pushPending：這個鍵「現在正在推送中」，無論已經過了多久都無條件不覆蓋——
+//    之前的設計是「發起請求當下就記錄時間、給 8 秒寬限期」，但後端 GET→PATCH→延遲驗證＋重試
+//    最壞情況本身就要跑到 5.8 秒，加上真實網路延遲（尤其行動網路），常常整段推送逼近甚至
+//    超過 8 秒，等於寬限期在推送都還沒真的落地前就先過期，syncPull 照樣把還沒推完的舊值蓋回去
+//    （實測會看到「打勾後約 10 秒又自動變回未勾選」）。現在只要 push 還在飛，不管多久一律擋下。
+// 2. recentPush：push 結束（成功/失敗）那一刻才開始倒數的寬限期，涵蓋「PATCH 已完成但
+//    下一次 GET 可能還讀不到最新值」的殘餘傳播空窗。
+const pushPending = new Set();
 const recentPush = new Map();
 const PUSH_GRACE_MS = 8000;
 async function syncPush(key, value, _retried) {
-  // 樂觀標記：發起請求「前」就先記錄時間，寬限期才涵蓋得到 GET→merge→PATCH 那 1-2 秒的傳送空窗本身——
-  // 若改成 await 之後才標記，等於完全沒防到競態真正發生的那個時間點（推送進行中，而非推送完成後）
-  recentPush.set(key, Date.now());
+  pushPending.add(key);
   try {
     // 後端最壞情況（GET→PATCH→驗證，含重試）約需 5.8 秒，比照同檔案 saveItinerary（約1319行）
     // 既有的 8 秒 timeout 慣例，避免網路異常時這個 fetch 無限期掛著
@@ -2491,11 +2494,15 @@ async function syncPush(key, value, _retried) {
     // 誤判這次推送成功——這裡補一次前端重試，只重試一次避免無限迴圈；再失敗就放棄，
     // 等下次使用者操作或排程輪詢時的補推邏輯自然修正。
     if (data.status === 'conflict' && !_retried) {
-      recentPush.delete(key);
-      return syncPush(key, value, true);
+      // 注意：一定要 await，不能直接 return 那個 promise——如果不 await，這裡的 finally 會在
+      // 內層重試「發起的當下」就先執行，pushPending 提早被清掉，重試那幾秒又暴露在競態窗口裡
+      await syncPush(key, value, true);
     }
   } catch (_) {
-    recentPush.delete(key); // 推送失敗就解除寬限期，避免離線期間卡住不讓雲端其他裝置的更新拉回來
+    // 推送失敗：不給寬限期（沒有真的成功過，沒東西好保護），讓 syncPull 可以立刻用雲端現況修正本機
+  } finally {
+    pushPending.delete(key);
+    recentPush.set(key, Date.now()); // push 結束（不論成功失敗）這一刻才開始倒數寬限期
   }
 }
 
@@ -2514,8 +2521,9 @@ async function syncPull() {
       if (data[k] !== undefined) {
         const local = localStorage.getItem(k);
         const remote = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
+        if (pushPending.has(k)) continue; // 這個鍵現在正在推送中，不管經過多久都無條件不覆蓋
         const pushedAt = recentPush.get(k);
-        if (pushedAt && Date.now() - pushedAt < PUSH_GRACE_MS) continue; // 寬限期內：剛推送過，不信任這次拉回的值
+        if (pushedAt && Date.now() - pushedAt < PUSH_GRACE_MS) continue; // 推送剛結束的寬限期內：不信任這次拉回的值
         if (local !== remote) {
           _origSetItem(k, remote); // 用原生 setItem 寫入，避免觸發攔截器把剛拉回的值又 push 回去
           changed = true;
@@ -2604,7 +2612,9 @@ async function refreshExpensesIfChanged() {
   finally { refreshExpensesInFlight = false; }
 }
 
-// 定期拉取（每 30 秒，分頁切到背景時暫停以省電/省流量）；
+// 定期拉取（每 10 秒，分頁切到背景時暫停以省電/省流量）——原本 30 秒對「兩人各拿一支手機互相
+// 看對方打勾」來說太慢、體感像沒同步，縮短到 10 秒；GitHub API 額度 5000 次/小時，
+// 兩人兩裝置各 10 秒一次 ≈ 720 次/小時，還有充足空間。
 // 另外監聽 visibilitychange：切回前景時立即拉一次並重置計時器，
 // 避免「切回瞬間」與「排程輪詢」剛好前後腳各打一次（用 clearInterval + setInterval 重新起算解決）
 let pollTimer = null;
@@ -2612,7 +2622,7 @@ function startPolling() {
   if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(() => {
     if (document.visibilityState === 'visible') { syncPull(); refreshExpensesIfChanged(); }
-  }, 30000);
+  }, 10000);
 }
 startPolling();
 document.addEventListener('visibilitychange', () => {

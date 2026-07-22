@@ -31,6 +31,22 @@ async function pushToSheet(expenses) {
   }
 }
 
+// 跟 app.js 的 mergeTombstoned 同一套演算法搬一份到後端：按 id、updatedAt 取新者（含軟刪除墓碑）。
+// 原本 POST 是「client 自己 GET→merge→整包 POST 覆蓋」，跟 sync.js 修過的那個 bug是同一類：
+// 兩裝置幾乎同時各自記一筆帳，用的都是「對方寫入前」的舊快照去合併，後送達的整包覆蓋掉先送達的。
+function mergeTombstoned(cloudArr, localArr, idKey) {
+  const cloudMap = new Map((cloudArr || []).map(i => [i[idKey], i]));
+  const localMap = new Map((localArr || []).map(i => [i[idKey], i]));
+  const ids = new Set([...cloudMap.keys(), ...localMap.keys()]);
+  const merged = [];
+  ids.forEach(id => {
+    const c = cloudMap.get(id), l = localMap.get(id);
+    const item = (c && l) ? ((c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l) : (c || l);
+    merged.push(item);
+  });
+  return merged;
+}
+
 function ghRequest(method, path, body) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : null;
@@ -76,11 +92,27 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'unauthorized' });
     }
     const incoming = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    await ghRequest('PATCH', `/gists/${GIST_ID}`, {
-      files: { 'expenses.json': { content: JSON.stringify(incoming, null, 2) } }
-    });
-    const sheet = await pushToSheet(incoming); // 同步 Google 試算表
-    res.json({ status: 'ok', sheet });
+    // PATCH 後延遲驗證：太早驗證會像 sync.js 實測過的那樣「驗過但馬上被另一裝置晚到的寫入蓋掉」。
+    // 驗證失敗代表這段等待期間有別的裝置也寫入了，拿最新雲端資料跟這次要寫的 incoming 重新做一次
+    // tombstone 合併（而不是像原本一樣整包硬蓋），才不會把對方剛記的帳弄丟。
+    // 時間預算：2 次 attempt，每次 1 PATCH + 500ms 等待 + 1 次驗證 GET，保守估計 ≈ 4.2 秒，
+    // 加上後面 pushToSheet 呼叫 Google Apps Script（約 1-3 秒），沒有 functions.maxDuration 設定，
+    // 吃 Vercel Hobby 預設 10 秒硬上限，抓 2 次重試留安全邊際。
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    let toWrite = incoming, ok = false;
+    for (let attempt = 0; attempt < 2 && !ok; attempt++) {
+      if (attempt > 0) await wait(100 + Math.random() * 150);
+      await ghRequest('PATCH', `/gists/${GIST_ID}`, {
+        files: { 'expenses.json': { content: JSON.stringify(toWrite, null, 2) } }
+      });
+      await wait(500);
+      const verify = await ghRequest('GET', `/gists/${GIST_ID}`);
+      const verifyData = JSON.parse(verify.files?.['expenses.json']?.content || '[]');
+      ok = JSON.stringify(verifyData) === JSON.stringify(toWrite);
+      if (!ok) toWrite = mergeTombstoned(verifyData, incoming, 'id'); // 被別人插隊寫入了，拿最新資料重新合併這筆再試
+    }
+    const sheet = await pushToSheet(toWrite); // 同步 Google 試算表
+    res.json({ status: ok ? 'ok' : 'conflict', expenses: toWrite, sheet });
   } else {
     res.status(405).json({ error: 'method not allowed' });
   }
