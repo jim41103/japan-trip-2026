@@ -2398,22 +2398,31 @@ function shouldSyncKey(key) {
 }
 
 // 記錄「這個鍵是本裝置最近才推送的」，syncPull 拉回比對時用來擋下競態：
-// 後端 /api/sync 是無鎖的 GET→merge→PATCH，PATCH 落地到 GitHub Gist、下一次 GET 讀得到最新值，
-// 中間有網路延遲空窗（實測可達 1-2 秒）。使用者打勾的瞬間常常會撞上 30 秒排程輪詢或切換分頁的
-// visibilitychange 觸發另一次 syncPull()，若那次 GET 剛好卡在空窗內，會讀到舊值、把使用者剛打的
-// 勾直接蓋回去（使用者看到的「勾了幾秒後自動變回未勾選」就是這個）。寬限期內優先信任本機、不覆蓋。
+// 後端 /api/sync 的 GET→merge→PATCH 有讀回驗證＋重試（見 api/sync.js），但驗證窗口仍在，
+// PATCH 落地到 GitHub Gist、下一次 GET 讀得到最新值，中間仍有網路延遲空窗（實測可達 1-2 秒）。
+// 使用者打勾的瞬間常常會撞上 30 秒排程輪詢或切換分頁的 visibilitychange 觸發另一次 syncPull()，
+// 若那次 GET 剛好卡在空窗內，會讀到舊值、把使用者剛打的勾直接蓋回去（使用者看到的「勾了幾秒後
+// 自動變回未勾選」就是這個）。寬限期內優先信任本機、不覆蓋。
 const recentPush = new Map();
 const PUSH_GRACE_MS = 8000;
-async function syncPush(key, value) {
+async function syncPush(key, value, _retried) {
   // 樂觀標記：發起請求「前」就先記錄時間，寬限期才涵蓋得到 GET→merge→PATCH 那 1-2 秒的傳送空窗本身——
   // 若改成 await 之後才標記，等於完全沒防到競態真正發生的那個時間點（推送進行中，而非推送完成後）
   recentPush.set(key, Date.now());
   try {
-    await fetch('/api/sync', {
+    const res = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [key]: value }),
     });
+    const data = await res.json().catch(() => ({}));
+    // 後端在偵測到「另一裝置同時寫入、被蓋掉」時會回 status:'conflict'（重試 3 次仍驗證失敗）。
+    // fetch 本身沒有拋錯（HTTP 200），若不檢查 body 就會誤判這次推送成功——這裡補一次前端重試，
+    // 只重試一次避免無限迴圈；再失敗就放棄，等下次使用者操作或排程輪詢時的補推邏輯自然修正。
+    if (data.status === 'conflict' && !_retried) {
+      recentPush.delete(key);
+      return syncPush(key, value, true);
+    }
   } catch (_) {
     recentPush.delete(key); // 推送失敗就解除寬限期，避免離線期間卡住不讓雲端其他裝置的更新拉回來
   }

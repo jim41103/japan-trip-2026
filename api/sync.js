@@ -45,16 +45,26 @@ module.exports = async (req, res) => {
     catch { res.json({}); }
 
   } else if (req.method === 'POST') {
-    // 取得現有資料
-    const gist = await ghRequest('GET', `/gists/${GIST_ID}`);
-    const existing = JSON.parse(gist.files?.['sync.json']?.content || '{}');
     const incoming = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    Object.assign(existing, incoming);
-
-    await ghRequest('PATCH', `/gists/${GIST_ID}`, {
-      files: { 'sync.json': { content: JSON.stringify(existing, null, 2) } }
-    });
-    res.json({ status: 'ok' });
+    // GET→merge→PATCH 不是原子操作：兩個人（兩台裝置）幾乎同時各自送出不同的鍵時，
+    // 兩邊都各自讀到「對方寫入前」的舊快照、各自 merge、各自整包 PATCH 回去，
+    // 後完成的那次會把先完成、但沒出現在自己那份舊快照裡的鍵直接覆蓋消失，兩邊都不會收到任何錯誤。
+    // 這裡用「寫入後立刻讀回驗證」＋失敗重試（重新讀最新資料再合併一次）來大幅縮小這個窗口，
+    // 不是完美的鎖，但對「兩人偶爾同時打勾」這種輕度並發已經足夠可靠。
+    let ok = false;
+    for (let attempt = 0; attempt < 3 && !ok; attempt++) {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 150 + Math.random() * 250));
+      const gist = await ghRequest('GET', `/gists/${GIST_ID}`);
+      const existing = JSON.parse(gist.files?.['sync.json']?.content || '{}');
+      const merged = Object.assign({}, existing, incoming);
+      await ghRequest('PATCH', `/gists/${GIST_ID}`, {
+        files: { 'sync.json': { content: JSON.stringify(merged, null, 2) } }
+      });
+      const verifyGist = await ghRequest('GET', `/gists/${GIST_ID}`);
+      const verifyData = JSON.parse(verifyGist.files?.['sync.json']?.content || '{}');
+      ok = Object.keys(incoming).every(k => JSON.stringify(verifyData[k]) === JSON.stringify(incoming[k]));
+    }
+    res.json({ status: ok ? 'ok' : 'conflict' });
   } else {
     res.status(405).json({ error: 'method not allowed' });
   }
