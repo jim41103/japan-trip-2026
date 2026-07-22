@@ -2397,14 +2397,26 @@ function shouldSyncKey(key) {
   return SYNC_KEYS.includes(key) || key.startsWith('prep_');
 }
 
+// 記錄「這個鍵是本裝置最近才推送的」，syncPull 拉回比對時用來擋下競態：
+// 後端 /api/sync 是無鎖的 GET→merge→PATCH，PATCH 落地到 GitHub Gist、下一次 GET 讀得到最新值，
+// 中間有網路延遲空窗（實測可達 1-2 秒）。使用者打勾的瞬間常常會撞上 30 秒排程輪詢或切換分頁的
+// visibilitychange 觸發另一次 syncPull()，若那次 GET 剛好卡在空窗內，會讀到舊值、把使用者剛打的
+// 勾直接蓋回去（使用者看到的「勾了幾秒後自動變回未勾選」就是這個）。寬限期內優先信任本機、不覆蓋。
+const recentPush = new Map();
+const PUSH_GRACE_MS = 8000;
 async function syncPush(key, value) {
+  // 樂觀標記：發起請求「前」就先記錄時間，寬限期才涵蓋得到 GET→merge→PATCH 那 1-2 秒的傳送空窗本身——
+  // 若改成 await 之後才標記，等於完全沒防到競態真正發生的那個時間點（推送進行中，而非推送完成後）
+  recentPush.set(key, Date.now());
   try {
     await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [key]: value }),
     });
-  } catch (_) {}
+  } catch (_) {
+    recentPush.delete(key); // 推送失敗就解除寬限期，避免離線期間卡住不讓雲端其他裝置的更新拉回來
+  }
 }
 
 // in-flight 旗標：visibilitychange 立即拉一次與 30 秒排程輪詢可能同時觸發，避免同時打兩發
@@ -2422,6 +2434,8 @@ async function syncPull() {
       if (data[k] !== undefined) {
         const local = localStorage.getItem(k);
         const remote = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
+        const pushedAt = recentPush.get(k);
+        if (pushedAt && Date.now() - pushedAt < PUSH_GRACE_MS) continue; // 寬限期內：剛推送過，不信任這次拉回的值
         if (local !== remote) {
           _origSetItem(k, remote); // 用原生 setItem 寫入，避免觸發攔截器把剛拉回的值又 push 回去
           changed = true;

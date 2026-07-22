@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=76" />
+  <link rel="stylesheet" href="style.css?v=77" />
 </head>
 <body>
 
@@ -407,6 +407,42 @@
       <h2>💴 旅費記帳</h2>
     </div>
 
+    <!-- 新增支出：移到整個記帳頁最上面，一進頁面就能馬上記帳，不用先滑過圖表跟清單；
+         切到「拆帳」子頁籤時這裡也繼續顯示（不隨 exp-tab-list/exp-tab-settle 切換而隱藏） -->
+    <div class="expense-add-form">
+      <div class="exp-form-title">＋ 新增支出</div>
+      <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
+      <div class="exp-form-row">
+        <select id="exp-date">
+          <option value="2026-08-03">8/3 (一)</option>
+          <option value="2026-08-04">8/4 (二)</option>
+          <option value="2026-08-05">8/5 (三)</option>
+          <option value="2026-08-06">8/6 (四)</option>
+          <option value="2026-08-07">8/7 (五)</option>
+          <option value="2026-08-08">8/8 (六)</option>
+          <option value="2026-08-09">8/9 (日)</option>
+        </select>
+        <select id="exp-cat">
+          <option value="food">🍽 餐飲</option>
+          <option value="ticket">🎫 票券</option>
+          <option value="transport">🚌 交通</option>
+          <option value="shopping">🛍 購物</option>
+          <option value="hotel">🏨 住宿</option>
+          <option value="medicine">💊 藥妝</option>
+          <option value="other">📦 其他</option>
+        </select>
+      </div>
+      <input id="exp-desc" type="text" placeholder="說明（如：築地早餐）" maxlength="40">
+      <div class="exp-form-row">
+        <select id="exp-paidby"><option value="a">Jim 付</option><option value="b">野珊 付</option></select>
+        <select id="exp-split">
+          <option value="shared">👫 兩人平分</option>
+          <option value="personal">🙋 個人花費（不列入拆帳）</option>
+        </select>
+      </div>
+      <button id="btn-add-exp" class="btn btn-accent">＋ 加入</button>
+    </div>
+
     <!-- 成員名稱 -->
     <div class="expense-members">
       <div class="member-field"><label>成員 A</label><input id="member-a" type="text" value="野狼" maxlength="8"></div>
@@ -443,40 +479,6 @@
     <div id="exp-tab-list" class="exp-tab-pane">
       <div id="exp-sync-status" class="exp-sync-status hidden"></div>
       <div id="expense-list-area"></div>
-      <div class="expense-add-form">
-        <div class="exp-form-title">＋ 新增支出</div>
-        <!-- 金額移到最上面：手機上開起這個表單通常是急著記價錢，先讓使用者馬上打數字 -->
-        <div class="exp-amount-wrap"><span class="exp-currency">¥</span><input id="exp-amount" type="number" placeholder="金額" min="0" step="1"></div>
-        <div class="exp-form-row">
-          <select id="exp-date">
-            <option value="2026-08-03">8/3 (一)</option>
-            <option value="2026-08-04">8/4 (二)</option>
-            <option value="2026-08-05">8/5 (三)</option>
-            <option value="2026-08-06">8/6 (四)</option>
-            <option value="2026-08-07">8/7 (五)</option>
-            <option value="2026-08-08">8/8 (六)</option>
-            <option value="2026-08-09">8/9 (日)</option>
-          </select>
-          <select id="exp-cat">
-            <option value="food">🍽 餐飲</option>
-            <option value="ticket">🎫 票券</option>
-            <option value="transport">🚌 交通</option>
-            <option value="shopping">🛍 購物</option>
-            <option value="hotel">🏨 住宿</option>
-            <option value="medicine">💊 藥妝</option>
-            <option value="other">📦 其他</option>
-          </select>
-        </div>
-        <input id="exp-desc" type="text" placeholder="說明（如：築地早餐）" maxlength="40">
-        <div class="exp-form-row">
-          <select id="exp-paidby"><option value="a">Jim 付</option><option value="b">野珊 付</option></select>
-          <select id="exp-split">
-            <option value="shared">👫 兩人平分</option>
-            <option value="personal">🙋 個人花費（不列入拆帳）</option>
-          </select>
-        </div>
-        <button id="btn-add-exp" class="btn btn-accent">＋ 加入</button>
-      </div>
     </div>
     <div id="exp-tab-settle" class="exp-tab-pane hidden">
       <div id="settle-content"></div>
@@ -755,6 +757,6 @@
   </div>
 </div>
 
-<script src="app.js?v=76"></script>
+<script src="app.js?v=77"></script>
 </body>
 </html>
