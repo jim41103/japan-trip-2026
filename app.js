@@ -2410,15 +2410,22 @@ async function syncPush(key, value, _retried) {
   // 若改成 await 之後才標記，等於完全沒防到競態真正發生的那個時間點（推送進行中，而非推送完成後）
   recentPush.set(key, Date.now());
   try {
+    // 後端最壞情況（GET→PATCH→驗證，含重試）約需 5.8 秒，比照同檔案 saveItinerary（約1319行）
+    // 既有的 8 秒 timeout 慣例，避免網路異常時這個 fetch 無限期掛著
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     const res = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [key]: value }),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     const data = await res.json().catch(() => ({}));
-    // 後端在偵測到「另一裝置同時寫入、被蓋掉」時會回 status:'conflict'（重試 3 次仍驗證失敗）。
-    // fetch 本身沒有拋錯（HTTP 200），若不檢查 body 就會誤判這次推送成功——這裡補一次前端重試，
-    // 只重試一次避免無限迴圈；再失敗就放棄，等下次使用者操作或排程輪詢時的補推邏輯自然修正。
+    // 後端在偵測到「另一裝置同時寫入、被蓋掉」時會回 status:'conflict'（GET→merge→PATCH 後
+    // 延遲驗證仍失敗，重試一次仍不行）。fetch 本身沒有拋錯（HTTP 200），若不檢查 body 就會
+    // 誤判這次推送成功——這裡補一次前端重試，只重試一次避免無限迴圈；再失敗就放棄，
+    // 等下次使用者操作或排程輪詢時的補推邏輯自然修正。
     if (data.status === 'conflict' && !_retried) {
       recentPush.delete(key);
       return syncPush(key, value, true);
