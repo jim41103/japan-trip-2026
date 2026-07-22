@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=84" />
+  <link rel="stylesheet" href="style.css?v=85" />
 </head>
 <body>
 
@@ -270,6 +270,9 @@
 
     <!-- 7日天氣預報 -->
     <div id="forecastBar" class="forecast-bar"></div>
+
+    <!-- 手機版一次只顯示一天，這裡切換要看哪一天（桌面版多欄並排，這排籤不會顯示） -->
+    <div id="itineraryDayTabs" class="itinerary-day-tabs"></div>
 
     <div id="itinerary-days"></div>
     <div id="timeline-view" class="hidden"></div>
@@ -734,6 +737,6 @@
   </div>
 </div>
 
-<script src="app.js?v=84"></script>
+<script src="app.js?v=85"></script>
 </body>
 </html>

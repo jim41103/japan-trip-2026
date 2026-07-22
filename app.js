@@ -1016,6 +1016,7 @@ function renderItinerary() {
     });
 
   });
+  renderItineraryDayTabs();
   focusTodayColumn();
 }
 
@@ -1025,12 +1026,41 @@ function focusTodayColumn() {
     new Date(k).toDateString() === new Date().toDateString()
   );
   document.querySelectorAll('.day-column').forEach(c => c.classList.remove('today-column'));
-  if (!todayKey) return;
-  const col = document.querySelector(`.day-column[data-date="${todayKey}"]`);
-  if (col) {
-    col.classList.add('today-column');
-    setTimeout(() => col.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' }), 300);
+  if (todayKey) {
+    const col = document.querySelector(`.day-column[data-date="${todayKey}"]`);
+    if (col) {
+      col.classList.add('today-column');
+      setTimeout(() => col.scrollIntoView({ behavior:'smooth', inline:'start', block:'nearest' }), 300);
+    }
   }
+  // 手機版一次只顯示一天：「今天」按鈕（或首次載入）要切到今天那一天，不只是捲動；
+  // 出發前這幾天今天不在行程範圍內（todayKey 找不到），退回顯示第一天，避免手機版整頁空白
+  setActiveItinDay(todayKey || Object.keys(itinerary)[0]);
+}
+
+// 手機版一次只顯示一天的行程（原本多欄並排在窄螢幕上每欄只剩130-170px，
+// 名稱跟導航/地圖按鈕擠在同一行，名稱幾乎看不到）；桌面版不受影響，維持多欄並排。
+let activeItinDay = null;
+function renderItineraryDayTabs() {
+  const container = document.getElementById('itineraryDayTabs');
+  if (!container) return;
+  container.innerHTML = Object.keys(itinerary).map(date =>
+    `<button class="itin-day-tab${date === activeItinDay ? ' active' : ''}" data-date="${date}">${DAY_SHORT[date] || itinerary[date].label || date}</button>`
+  ).join('');
+  container.querySelectorAll('.itin-day-tab').forEach(btn => {
+    btn.addEventListener('click', () => setActiveItinDay(btn.dataset.date));
+  });
+}
+
+function setActiveItinDay(date) {
+  if (!date || !itinerary[date]) return;
+  activeItinDay = date;
+  document.querySelectorAll('.day-column').forEach(col => {
+    col.classList.toggle('itin-active', col.dataset.date === date);
+  });
+  document.querySelectorAll('.itin-day-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.date === date);
+  });
 }
 
 function getDayDensity(places) {
@@ -1095,22 +1125,25 @@ function makePlaceCard(place, date, pIdx) {
 
   const icon = place.type==='restaurant' ? '🍽' : place.type==='hotel' ? '🏨' : place.type==='transport' ? '🚌' : '🏯';
   card.className = 'itinerary-place';
+  // 導航/地圖按鈕原本跟名稱擠在同一行，窄螢幕（手機一次只顯示一天，欄位變全寬但字級沒變）
+  // 名稱空間還是被這兩顆按鈕吃掉大半、看不清楚是哪個景點；移到下面跟時間選單同一排，
+  // 名稱那一行只留「圖示＋名稱＋移除」，移除鈕小顆不佔什麼空間，留著不動
   card.innerHTML = `
     <div class="iplace-top">
       <span class="iplace-icon">${icon}</span>
       <div class="iplace-info">
         <div class="iplace-name" title="${escHtml(place.name)}">${escHtml(place.name)}</div>
       </div>
-      <div class="iplace-actions">
-        <button class="iplace-nav" title="導航至此（首站從住宿出發）">🧭</button>
-        <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
-        <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
-      </div>
+      <button class="iplace-remove" title="移除" data-date="${date}" data-idx="${pIdx}">×</button>
     </div>
     <div class="iplace-bottom">
       <select class="iplace-time" title="預計時間" onclick="event.stopPropagation()">
         ${buildTimeOptions(place.time || '')}
       </select>
+      <div class="iplace-actions">
+        <button class="iplace-nav" title="導航至此（首站從住宿出發）">🧭</button>
+        <a class="iplace-gmaps" href="${googleMapsUrl(place)}" target="_blank" rel="noopener" title="Google Maps" onclick="event.stopPropagation()">📍</a>
+      </div>
     </div>`;
   card.querySelector('.iplace-nav').addEventListener('click', e => {
     e.stopPropagation();
