@@ -160,13 +160,16 @@ body {
    HEADER
 ════════════════════════════════════════════ */
 header {
-  height: var(--header-h);
+  /* box-sizing:border-box 是全域設定，height 固定的話 padding-top 會從裡面扣掉可用空間，
+     瀏海機型的 safe-area-inset-top 常常比 --header-h(56px) 本身還高，會把內容整個擠壓變形；
+     這裡把安全區高度「加」到 height 上，而不是從原本高度裡扣，內容區才能維持原本大小 */
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
   background: var(--black);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: env(safe-area-inset-top, 0px) 16px 0; /* 全螢幕 PWA 模式下避免被系統狀態列遮到，底部安全區已另外處理 */
   flex-shrink: 0;
   border-bottom: 3px solid var(--primary);
 }
@@ -267,7 +270,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #search-input {
   flex: 1; padding: 7px 12px;
   border: 1.5px solid var(--border); border-radius: 20px;
-  font-size: 13px; outline: none; background: var(--bg);
+  font-size: 16px; outline: none; background: var(--bg);
 }
 #search-input:focus { border-color: var(--primary); }
 #btn-place-search {
@@ -289,7 +292,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 #psp-input {
   flex: 1; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 20px;
-  font-size: 14px; outline: none; background: #fff;
+  font-size: 16px; outline: none; background: #fff;
 }
 #psp-input:focus { border-color: var(--blue); }
 #psp-close {
@@ -341,6 +344,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   flex-shrink: 0;
   transition: background .15s;
   position: relative;
+  touch-action: none; /* 不擋掉瀏覽器預設捲動手勢的話，觸控拖曳會被誤判成頁面捲動 */
 }
 #places-resizer::after {
   content: '⋯';
@@ -424,6 +428,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: none; /* 不擋掉瀏覽器預設捲動手勢的話，觸控拖曳會被誤判成頁面捲動 */
 }
 #panel-resizer::after {
   content: '⋮';
@@ -490,8 +495,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* 時間下拉選單 */
 .iplace-time {
-  width: 86px; border: 1px solid var(--border); background: #f5f5f5;
-  border-radius: 5px; font-size: 11px; color: #444; padding: 2px 3px;
+  width: 86px; min-height: 32px; border: 1px solid var(--border); background: #f5f5f5;
+  border-radius: 5px; font-size: 13px; color: #444; padding: 6px 3px;
   cursor: pointer; font-family: inherit; font-weight: 600; outline: none;
   appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
@@ -534,13 +539,15 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .iplace-info { flex: 1; min-width: 0; }
 .iplace-name { font-size: 12px; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .iplace-desc { display: none; }
-.iplace-actions { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
-.iplace-gmaps { font-size: 13px; text-decoration: none; opacity: 0.6; transition: opacity .15s; }
+.iplace-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+/* 卡片寬度只有約130-170px，三顆圖示排不出標準44px熱區；
+   這裡用 padding 撐大實際可點擊範圍（垂直方向優先），視覺圖示大小不變 */
+.iplace-gmaps { font-size: 13px; text-decoration: none; opacity: 0.6; transition: opacity .15s; display: inline-flex; align-items: center; justify-content: center; padding: 9px 4px; }
 .iplace-gmaps:hover { opacity: 1; }
 /* 卡片內導航按鈕（與 .iplace-gmaps 同尺寸同風格，無邊框） */
-.iplace-nav { background: none; border: none; font-size: 13px; opacity: 0.6; transition: opacity .15s; cursor: pointer; padding: 0; line-height: 1; }
+.iplace-nav { background: none; border: none; font-size: 13px; opacity: 0.6; transition: opacity .15s; cursor: pointer; padding: 9px 4px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
 .iplace-nav:hover { opacity: 1; }
-.iplace-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 1px; }
+.iplace-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 9px 5px; display: inline-flex; align-items: center; justify-content: center; }
 .iplace-remove:hover { color: var(--primary); }
 
 .day-empty {
@@ -646,7 +653,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .shop-cat-add input {
   flex: 1; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 16px;
-  font-size: 12px; outline: none; background: #fff;
+  font-size: 16px; outline: none; background: #fff;
 }
 .shop-cat-add input:focus { border-color: var(--primary); }
 .shop-cat-add button {
@@ -673,10 +680,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .shop-item-name:hover { border-bottom-color: var(--border-dark); }
 .shop-item.bought .shop-item-name { text-decoration: line-through; color: var(--text-muted); }
 .shop-item-name-edit {
-  flex: 1; font-size: 13px; padding: 1px 4px; border: 1.5px solid var(--primary);
+  flex: 1; font-size: 16px; padding: 1px 4px; border: 1.5px solid var(--primary);
   border-radius: 6px; outline: none; background: #fff; color: var(--text);
 }
-.shop-item-del { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 4px; }
+.shop-item-del { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 9px 8px; display: inline-flex; align-items: center; justify-content: center; }
 .shop-item-del:hover { color: var(--primary); }
 .shop-add-bar {
   display: flex; gap: 8px; align-items: center;
@@ -684,7 +691,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .shop-add-bar select, .shop-add-bar input {
   padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 20px;
-  font-size: 13px; outline: none; background: #fff;
+  font-size: 16px; outline: none; background: #fff;
 }
 .shop-add-bar input { flex: 1; }
 .shop-add-bar select:focus, .shop-add-bar input:focus { border-color: var(--primary); }
@@ -740,7 +747,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .member-field label { font-size: 11px; color: var(--text-muted); font-weight: 700; }
 .member-field input {
   width: 72px; padding: 4px 8px; border: 1.5px solid var(--border);
-  border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center; outline: none;
+  border-radius: 10px; font-size: 16px; font-weight: 700; text-align: center; outline: none;
 }
 .member-field input:focus { border-color: var(--primary); }
 .member-sep { color: var(--text-muted); font-size: 18px; }
@@ -773,7 +780,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .exp-paid-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
 .badge-a { background: #E3F2FD; color: #1565C0; }
 .badge-b { background: #FCE4EC; color: #C2185B; }
-.exp-del-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; padding: 0 4px; flex-shrink: 0; }
+.exp-del-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; padding: 10px 8px; flex-shrink: 0; }
 .exp-del-btn:hover { color: var(--primary); }
 .exp-empty { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; line-height: 1.8; }
 .expense-add-form {
@@ -784,7 +791,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .exp-form-row { display: flex; gap: 8px; }
 .exp-form-row select, .expense-add-form input[type="text"] {
   padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-size: 13px; outline: none; background: #fff; flex: 1;
+  font-size: 16px; outline: none; background: #fff; flex: 1;
 }
 .exp-form-row select:focus, .expense-add-form input:focus { border-color: var(--primary); }
 .expense-add-form input[type="text"] { width: 100%; }
@@ -797,8 +804,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   border-right: 1px solid var(--border); background: var(--bg);
   align-self: stretch; display: flex; align-items: center;
 }
-#exp-amount { border: none !important; flex: 1; padding: 7px 8px; font-size: 13px; outline: none; background: #fff; }
-#exp-paidby { flex-shrink: 0; min-width: 88px; padding: 7px 8px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; background: #fff; }
+#exp-amount { border: none !important; flex: 1; padding: 7px 8px; font-size: 16px; outline: none; background: #fff; }
+#exp-paidby { flex-shrink: 0; min-width: 88px; padding: 7px 8px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 16px; background: #fff; }
 /* 原本 align-self:flex-end 讓按鈕縮到右側一小塊、整行大部分空間閒置，改滿版寬更好點 */
 #btn-add-exp { width: 100%; padding: 10px; font-size: 14px; }
 
@@ -907,8 +914,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
   /* ─── Shopping add bar ─── */
   .shop-add-bar { flex-wrap: wrap; gap: 8px; padding: 12px; }
-  .shop-add-bar select { flex: 1 1 40%; min-height: 40px; font-size: 14px; }
-  .shop-add-bar input { flex: 1 1 100%; min-height: 40px; font-size: 14px; }
+  .shop-add-bar select { flex: 1 1 40%; min-height: 40px; font-size: 16px; }
+  .shop-add-bar input { flex: 1 1 100%; min-height: 40px; font-size: 16px; }
   .shop-add-bar .btn { width: 100%; min-height: 40px; font-size: 14px; }
 
   /* ─── Transit ─── */
@@ -936,15 +943,15 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .transit-route-row { display: flex; align-items: flex-end; gap: 8px; }
 .transit-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
 .transit-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
-.transit-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; background: var(--bg-card); color: var(--text-main); outline: none; transition: border-color .15s; box-sizing: border-box; }
+.transit-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--bg-card); color: var(--text-main); outline: none; transition: border-color .15s; box-sizing: border-box; }
 .transit-input:focus { border-color: #4A90E2; }
 .transit-swap-btn { flex-shrink: 0; width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 50%; background: var(--bg-card); font-size: 16px; cursor: pointer; color: var(--text-muted); transition: background .15s; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
 .transit-swap-btn:hover { background: #E8F0FE; color: #4A90E2; }
 
 .transit-dt-row { display: flex; gap: 8px; align-items: center; }
-.transit-select { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card); color: var(--text-main); cursor: pointer; }
+.transit-select { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--bg-card); color: var(--text-main); cursor: pointer; }
 .transit-way-sel { width: 72px; flex-shrink: 0; }
-.transit-time-input { flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card); color: var(--text-main); }
+.transit-time-input { flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--bg-card); color: var(--text-main); }
 
 .transit-quick-wrap { display: flex; flex-direction: column; gap: 8px; }
 .transit-quick-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
@@ -1095,7 +1102,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* ── AI Question Input ── */
 .ai-ask-row { display:flex; gap:6px; align-items:flex-start; }
-.ai-ask-input { flex:1; padding:8px 10px; border:1.5px solid var(--border); border-radius:10px; font-size:13px; font-family:inherit; resize:none; outline:none; min-height:38px; max-height:100px; overflow-y:auto; background:var(--surface); color:var(--text); }
+.ai-ask-input { flex:1; padding:8px 10px; border:1.5px solid var(--border); border-radius:10px; font-size:16px; font-family:inherit; resize:none; outline:none; min-height:38px; max-height:100px; overflow-y:auto; background:var(--surface); color:var(--text); }
 .ai-ask-input:focus { border-color:#4A90E2; }
 .ai-ask-btn { flex-shrink:0; padding:8px 14px; border-radius:10px; border:none; background:#4A90E2; color:#fff; font-size:13px; font-weight:700; cursor:pointer; }
 .ai-ask-btn:hover { background:#2255AA; }
@@ -1192,8 +1199,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
    因為 CSS cascade 是比「原始碼順序」不是比「哪個 media query 寫在檔案前面」，
    放在 767px 那段（檔案前段）會被上面這條無 media 限制的 base 規則蓋過，過去這是三顆按鈕在手機上擠成一團的真正原因 */
 @media (max-width: 767px) {
-  .header-icon-actions { gap: 3px; margin-left: 2px; }
-  .header-icon-actions button { width: 24px; height: 24px; font-size: 0.75rem; }
+  .header-icon-actions { gap: 2px; margin-left: 2px; }
+  .header-icon-actions button { width: 32px; height: 32px; font-size: 0.8rem; } /* 24px 觸控熱區太小，放大到 32px；跟天氣資訊擠在一起的舊 bug 根因是規則優先順序、不是尺寸數字，見上方註解 */
 }
 
 /* ── HIDE OLD TAB NAV ── */
@@ -1270,7 +1277,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 .diary-textarea {
   width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 0.9rem; color: var(--text); font-size: 0.9rem;
+  border-radius: 12px; padding: 0.9rem; color: var(--text); font-size: 16px;
   resize: vertical; font-family: inherit; line-height: 1.6; outline: none;
 }
 .diary-textarea:focus { border-color: var(--primary); }
@@ -1330,7 +1337,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .shop-search-input {
   width: 100%; padding: 8px 14px; border-radius: 99px;
   border: 1.5px solid var(--border); background: var(--surface);
-  color: var(--text); font-size: 13px; margin-bottom: 8px; outline: none;
+  color: var(--text); font-size: 16px; margin-bottom: 8px; outline: none;
 }
 .shop-search-input:focus { border-color: var(--primary); }
 .shop-budget-bar {
@@ -1341,7 +1348,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 }
 #shopTotalEstimate, #shopTotalSpent { color: var(--primary); }
 .shop-price-input {
-  width: 72px; font-size: 11px; padding: 2px 6px;
+  width: 72px; font-size: 16px; padding: 2px 6px;
   border: 1px solid var(--border); border-radius: 8px; background: #fff; outline: none;
 }
 
@@ -1493,7 +1500,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   border-radius: 12px;
   padding: 0.6rem 1rem;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 16px;
   resize: none;
   font-family: inherit;
   line-height: 1.4;
@@ -1664,7 +1671,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .hd-link:hover { text-decoration: underline; }
 .hd-editable { align-items: center; }
 .hd-input {
-  flex: 1; padding: 6px 10px; font-size: 13px;
+  flex: 1; padding: 6px 10px; font-size: 16px;
   border: 1.5px solid var(--border); border-radius: 8px;
   background: #fff; color: var(--text); outline: none;
   font-family: inherit;
@@ -1760,7 +1767,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #offline-banner {
   display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
   background: #E65100; color: #fff; text-align: center;
-  font-size: 12px; font-weight: 700; padding: 6px 16px;
+  font-size: 12px; font-weight: 700; padding: calc(6px + env(safe-area-inset-top, 0px)) 16px 6px;
 }
 #offline-banner.visible { display: block; }
 

@@ -180,7 +180,10 @@ function switchTab(tabName) {
   target.style.display = '';
   target.classList.add('active');
   target.classList.add('section-enter');
+  // animationend 若因分頁被切走（display:none 中斷動畫）或頁面被切到背景而沒觸發，
+  // 保底用 setTimeout 清掉，避免 section-enter 的 translateX 永久卡住造成橫向溢出
   target.addEventListener('animationend', () => target.classList.remove('section-enter'), { once: true });
+  setTimeout(() => target.classList.remove('section-enter'), 500);
   if (tabName === 'itinerary') {
     document.getElementById('itinerary-panel')?.classList.add('mobile-active');
     document.getElementById('map-panel')?.classList.remove('mobile-active');
@@ -664,6 +667,7 @@ function initPlaceListDrag() {
     animation: 120,
     ghostClass: 'sortable-ghost',
     chosenClass: 'sortable-chosen',
+    delay: 300, delayOnTouchOnly: true, touchStartThreshold: 5, // 觸控長按判斷，避免跟頁面捲動打架（比照下面行程重排的 Sortable）
   });
 }
 
@@ -1794,25 +1798,30 @@ document.getElementById('btn-export').addEventListener('click', async () => {
   const mapPanel   = document.getElementById('map-panel');
   let dragging     = false;
 
-  resizer.addEventListener('mousedown', e => {
+  // Pointer Events 取代 mouse-only 事件：原本只綁 mousedown/mousemove/mouseup，
+  // 觸控裝置完全無法觸發，這個拖曳把手在手機上等於失效
+  resizer.addEventListener('pointerdown', e => {
     dragging = true;
+    resizer.setPointerCapture(e.pointerId);
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     e.preventDefault();
   });
-  document.addEventListener('mousemove', e => {
+  resizer.addEventListener('pointermove', e => {
     if (!dragging) return;
     const rect = document.getElementById('section-itinerary').getBoundingClientRect();
     const newW = Math.max(200, Math.min(700, e.clientX - rect.left));
     mapPanel.style.width = newW + 'px';
   });
-  document.addEventListener('mouseup', () => {
+  const endDrag = () => {
     if (!dragging) return;
     dragging = false;
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     setTimeout(() => map.invalidateSize(), 50);
-  });
+  };
+  resizer.addEventListener('pointerup', endDrag);
+  resizer.addEventListener('pointercancel', endDrag); // 系統手勢中斷（來電、長按選單）搶走 pointer 時，避免卡在 dragging=true 出不來
 })();
 
 // ════════════════════════════════════════════
@@ -1824,13 +1833,14 @@ document.getElementById('btn-export').addEventListener('click', async () => {
   const listPanel = document.getElementById('places-list-panel');
   let dragging    = false;
 
-  resizer.addEventListener('mousedown', e => {
+  resizer.addEventListener('pointerdown', e => {
     dragging = true;
+    resizer.setPointerCapture(e.pointerId);
     document.body.style.cursor = 'row-resize';
     document.body.style.userSelect = 'none';
     e.preventDefault();
   });
-  document.addEventListener('mousemove', e => {
+  resizer.addEventListener('pointermove', e => {
     if (!dragging) return;
     const panelRect = document.getElementById('map-panel').getBoundingClientRect();
     const controlsH = document.getElementById('map-controls').offsetHeight;
@@ -1840,13 +1850,15 @@ document.getElementById('btn-export').addEventListener('click', async () => {
     const remaining = panelRect.height - controlsH - mapH - resizer.offsetHeight;
     listPanel.style.height = Math.max(60, remaining) + 'px';
   });
-  document.addEventListener('mouseup', () => {
+  const endDrag = () => {
     if (!dragging) return;
     dragging = false;
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     setTimeout(() => map.invalidateSize(), 50);
-  });
+  };
+  resizer.addEventListener('pointerup', endDrag);
+  resizer.addEventListener('pointercancel', endDrag); // 系統手勢中斷（來電、長按選單）搶走 pointer 時，避免卡在 dragging=true 出不來
 })();
 
 // ════════════════════════════════════════════
@@ -3023,9 +3035,7 @@ function renderDiaryContent() {
   renderDiaryPhotos(dayData.photos || []);
   document.getElementById('photoInput').addEventListener('change', e => {
     [...e.target.files].forEach(file => {
-      const reader = new FileReader();
-      reader.onload = ev => addDiaryPhoto(ev.target.result);
-      reader.readAsDataURL(file);
+      compressImage(file).then(addDiaryPhoto).catch(() => showToast('⚠️ 照片處理失敗，請換一張再試'));
     });
   });
   // 編輯中防丟：input 事件即時寫進 localStorage 草稿（不動 updatedAt，updatedAt 只在按儲存時更新）
@@ -3119,6 +3129,32 @@ async function saveDiaryText(date, side) {
     diarySaving = false;
     if (diarySaveQueued) { const q = diarySaveQueued; diarySaveQueued = null; saveDiaryText(q.date, q.side); }
   }
+}
+
+// 手機拍照原檔常是 3-8MB，直接存 base64 進 localStorage 一兩張就爆容量；
+// 先縮到長邊 maxEdge、轉 JPEG 壓縮，體積大幅縮小才存
+function compressImage(file, maxEdge = 1600, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxEdge || height > maxEdge) {
+          if (width > height) { height = Math.round(height * maxEdge / width); width = maxEdge; }
+          else { width = Math.round(width * maxEdge / height); height = maxEdge; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = ev.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function addDiaryPhoto(base64) {
