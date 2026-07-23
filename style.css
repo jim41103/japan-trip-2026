@@ -60,8 +60,9 @@ body {
 #splash {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 100vh;
-  height: 100dvh;
+  /* 100dvh 在此機型獨立模式下仍比 body 實際高度少一截固定值，故意超出螢幕蓋過去，超出部分會被裁掉無副作用 */
+  height: calc(100vh + 60px);
+  height: calc(100dvh + 60px);
   z-index: 10000;
   overflow: hidden;
   display: flex;
@@ -92,7 +93,8 @@ body {
 }
 .splash-overlay-text {
   position: absolute;
-  bottom: 80px;
+  /* #splash 高度故意 +60px 超出螢幕蓋安全區，這裡的 bottom 也要跟著補償 60px，否則文字視覺上會往下位移 */
+  bottom: 140px;
   left: 0; right: 0;
   text-align: center;
   pointer-events: none;
@@ -134,7 +136,7 @@ body {
 
 .splash-loader {
   position: absolute;
-  bottom: 28px;
+  bottom: 88px; /* 同上，補償 #splash +60px 的高度超出量 */
   left: 50%;
   transform: translateX(-50%);
   width: 180px;
@@ -1154,10 +1156,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #landing {
   position: fixed;
   top: 0; left: 0; right: 0;
-  /* 用跟 body 完全相同的高度單位（100vh 後蓋 100dvh），避免 fixed 元素跟 body 對「視窗高度」算法不一致，
-     底部露出 body 米色底——用 bottom:0/env(safe-area-inset-bottom) 兩種寫法在 iOS 獨立模式下都對不齊過 */
-  height: 100vh;
-  height: 100dvh;
+  /* 100dvh 在此機型獨立模式下仍比 body 實際高度少一截固定值（實機驗證：換色不換尺寸），
+     故意超出螢幕蓋過去，超出部分會被裁掉無副作用 */
+  height: calc(100vh + 60px);
+  height: calc(100dvh + 60px);
   background:
     linear-gradient(180deg, rgba(2,3,10,.96) 0%, rgba(6,10,26,.8) 8%, rgba(10,18,42,.5) 30%, rgba(20,15,25,.55) 60%, rgba(6,10,20,.8) 100%),
     url('landing-bg.jpg') center 62% / cover no-repeat;
