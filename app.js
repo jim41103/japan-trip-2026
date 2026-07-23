@@ -146,6 +146,8 @@ function showLanding() {
   const landing = document.getElementById('landing');
   if (!landing) return;
   landing.style.display = 'flex';
+  // iOS 獨立模式安全區底色跟著換，避免跟選單頁底部照片顏色兜不起來（見 style.css body 註解）
+  document.body.style.background = '#0E1530';
   showFloatingButtons(false);
   document.getElementById('floatEmergencyBtn').style.display = 'flex';
   const cd = document.getElementById('landingCountdown');
@@ -170,6 +172,8 @@ function showLanding() {
 let activeSection = 'itinerary';
 
 function switchTab(tabName) {
+  // 進到 app 內頁後 .page 自己有米色底，安全區底色跟著換回米色（同上，見 style.css body 註解）
+  document.body.style.background = 'var(--bg)';
   activeSection = tabName;
   document.querySelectorAll('.tab-section').forEach(s => {
     s.classList.remove('active');

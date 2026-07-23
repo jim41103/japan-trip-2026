@@ -43,9 +43,10 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
-  /* 深色不是給 app 用的，是 splash/landing 這兩個全螢幕遮罩在 iOS 獨立模式下量高度量不準時的 fallback；
-     真正進到 app 內頁後的米色底由 .page 自己給（見下方 .page 規則），不依賴這裡 */
-  background: #080f24;
+  /* iOS 獨立模式下，狀態列/home indicator 安全區的底色是系統直接取用這裡的 background-color 填色，
+     跟畫面實際內容（照片、fixed 元素高度）脫鉤——改 #landing/#splash 尺寸完全無效，只有換這裡的顏色才有用。
+     這裡是 splash-bg.jpg 實測底部像素色，landing/切頁後的顏色由 app.js showLanding()/switchTab() 動態改 */
+  background: #625F62;
   color: var(--text);
   height: 100vh;
   height: 100dvh; /* iOS Safari 網址列/工具列會動態伸縮，100vh 含住它們，100dvh 才是實際可見高度 */
