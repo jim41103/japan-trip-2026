@@ -58,7 +58,8 @@ body {
 #splash {
   position: fixed;
   top: 0; left: 0; right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  height: 100vh;
+  height: 100dvh;
   z-index: 10000;
   overflow: hidden;
   display: flex;
@@ -1151,8 +1152,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 #landing {
   position: fixed;
   top: 0; left: 0; right: 0;
-  /* iOS 獨立模式下 bottom:0 常停在 home indicator 安全區域內側，往下多延伸安全區高度蓋過那截露白 */
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  /* 用跟 body 完全相同的高度單位（100vh 後蓋 100dvh），避免 fixed 元素跟 body 對「視窗高度」算法不一致，
+     底部露出 body 米色底——用 bottom:0/env(safe-area-inset-bottom) 兩種寫法在 iOS 獨立模式下都對不齊過 */
+  height: 100vh;
+  height: 100dvh;
   background:
     linear-gradient(180deg, rgba(2,3,10,.96) 0%, rgba(6,10,26,.8) 8%, rgba(10,18,42,.5) 30%, rgba(20,15,25,.55) 60%, rgba(6,10,20,.8) 100%),
     url('landing-bg.jpg') center 62% / cover no-repeat;
