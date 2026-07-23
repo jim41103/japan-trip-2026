@@ -43,7 +43,9 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
-  background: var(--bg);
+  /* 深色不是給 app 用的，是 splash/landing 這兩個全螢幕遮罩在 iOS 獨立模式下量高度量不準時的 fallback；
+     真正進到 app 內頁後的米色底由 .page 自己給（見下方 .page 規則），不依賴這裡 */
+  background: #080f24;
   color: var(--text);
   height: 100vh;
   height: 100dvh; /* iOS Safari 網址列/工具列會動態伸縮，100vh 含住它們，100dvh 才是實際可見高度 */
@@ -249,7 +251,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ════════════════════════════════════════════
    PAGES
 ════════════════════════════════════════════ */
-.page { display: none; flex: 1; overflow: hidden; }
+.page { display: none; flex: 1; overflow: hidden; background: var(--bg); }
 .page.active { display: flex; }
 .hidden { display: none !important; }
 
