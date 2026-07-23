@@ -1245,6 +1245,13 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .ledger-wrap { max-width: 720px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .ledger-header { display: flex; align-items: center; justify-content: space-between; }
 .ledger-header h2 { font-size: 16px; font-weight: 800; }
+.ledger-sheet-link {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 11px; border-radius: 20px; border: 1.5px solid var(--primary);
+  color: var(--primary); font-size: 12px; font-weight: 700; text-decoration: none; background: #fff;
+  flex-shrink: 0; transition: background .15s, color .15s;
+}
+.ledger-sheet-link:hover { background: var(--primary); color: #fff; }
 .currency-row {
   display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
   font-size: 13px; color: var(--text-muted);
