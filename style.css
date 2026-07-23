@@ -488,7 +488,11 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 
 /* ── Itinerary Place Card ── */
 .itinerary-place {
-  background: #fff; border: 1.5px solid var(--border); border-radius: 8px;
+  background:
+    linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.9)),
+    url('landing-bg.jpg') center 55% / cover no-repeat;
+  background-color: #fff;
+  border: 1.5px solid var(--border); border-radius: 8px;
   padding: 5px 9px 4px; cursor: grab; display: flex; flex-direction: column; gap: 3px;
   transition: box-shadow .15s; user-select: none;
 }
