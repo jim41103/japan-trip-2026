@@ -1617,14 +1617,14 @@ function updateCountdown() {
   if (!pill) return;
   if (days > 0) {
     pill.textContent = `✈ ${days} 天後出發`;
-    pill.style.background = days <= 30 ? '#FFEAA7' : '#E8F5E9';
-    pill.style.color       = days <= 30 ? '#CC8800' : '#27AE60';
+    pill.style.background = days <= 30 ? '#FFEAA7' : 'var(--wa-green-light)';
+    pill.style.color       = days <= 30 ? '#CC8800' : 'var(--wa-green)';
   } else if (days === 0) {
     pill.textContent = '🎉 今天出發！';
-    pill.style.background = '#FFE0E0'; pill.style.color = '#E74C3C';
+    pill.style.background = '#FFE0E0'; pill.style.color = 'var(--primary)';
   } else {
     pill.textContent = `📸 旅行中 Day ${-days + 1}`;
-    pill.style.background = '#E8F0FE'; pill.style.color = '#2980B9';
+    pill.style.background = 'var(--blue-light)'; pill.style.color = 'var(--blue)';
   }
 }
 
