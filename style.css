@@ -616,6 +616,10 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .prep-item {
   display: flex; align-items: center; gap: 10px; padding: 7px 4px;
   font-size: 13px; cursor: pointer; border-radius: 6px; transition: background .1s;
+  /* 固定項目沒有刪除鈕、自訂項目有——刪除鈕之前為了觸控熱區加大 padding，
+     沒有那顆按鈕的固定項目就矮了一截，同一份清單裡高度看起來不一致。
+     用 min-height 統一撐到跟「有刪除鈕」那個高度一樣，不管有沒有刪除鈕都固定 */
+  min-height: 48px;
 }
 .prep-item:hover { background: var(--bg); }
 .prep-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; }
@@ -673,6 +677,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .shop-item {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 14px; border-bottom: 1px solid #f0ebe0; transition: background .1s;
+  min-height: 53px; /* 鎖定高度，避免以後子元素尺寸調整時各列高度又跑掉不一致 */
 }
 .shop-item:hover { background: var(--bg); }
 .shop-item:last-child { border-bottom: none; }
