@@ -450,6 +450,20 @@ async function cacheOfflineMap() {
 
 document.getElementById('btn-cache-map')?.addEventListener('click', cacheOfflineMap);
 
+// 8 秒逾時保護的 fetch 包裝：手機在存檔當下訊號卡住、請求整個吊住不回應時，
+// 依賴這次請求 resolve 才會解鎖的 mutex（expSaving/diarySaving 等）會永久卡住，
+// 之後整趟旅程那個功能都存不進去，且使用者不會有任何提示。比照 saveItinerary
+// 既有的 AbortController 8 秒逾時作法，抽成共用函式給 saveExpenses/saveDiaryText 用。
+async function fetchWithTimeout(url, options = {}, ms = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function escHtml(str) {
   return String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -915,9 +929,17 @@ function reconcileItineraryCoords() {
 }
 
 async function loadItinerary() {
-  // 立刻用靜態檔渲染，不等 sync
-  const res = await fetch('/itinerary.json');
-  itinerary = await res.json();
+  // 立刻用靜態檔渲染，不等 sync；原本沒包 try/catch，且這是初始化序列裡一連串 await 的
+  // 其中一步（見檔案尾端 IIFE），行動網路收訊不穩時這裡一失敗，後面記帳/購物清單/待辦
+  // 清單/倒數天數全部不會渲染，整個 App 變白畫面且沒有任何錯誤提示。
+  // itinerary 已在宣告時給預設值 {}（見全域變數宣告），失敗時保持空物件，
+  // 下面 ensureDays() 會自動把 7 天都補上空白骨架，至少畫面看得到、能繼續用
+  try {
+    const res = await fetch('/itinerary.json');
+    itinerary = await res.json();
+  } catch (e) {
+    console.error('載入行程失敗，改用空白行程骨架', e);
+  }
   ensureDays();
   ensureFlights();
   reconcileItineraryCoords();
@@ -988,6 +1010,7 @@ function renderItinerary() {
           evt.item.remove();
           if (place && itinerary[date] && !itinerary[date].places.some(p => p.name === place.name)) {
             itinerary[date].places.push({ ...place });
+            itinerary[date].updatedAt = Date.now();
           }
           renderDayPlaces(placesList, date);
           drawRouteLines();
@@ -1011,6 +1034,7 @@ function renderItinerary() {
       const txt = col.querySelector(`.day-notes[data-date="${date}"]`).value;
       if (itinerary[date] && itinerary[date].notes !== txt) {
         itinerary[date].notes = txt;
+        itinerary[date].updatedAt = Date.now();
         markItineraryDirty();
       }
     });
@@ -1198,6 +1222,9 @@ function syncItineraryFromDOM() {
   Object.keys(itinerary).forEach(date => {
     const container = document.getElementById(`day-${date}`);
     if (!container) return;
+    // 記錄異動前的內容，重建完後比對是否真的有變化，只有實際變動的那一天才蓋時間戳，
+    // 之後跟雲端合併時用來判斷「這一天到底誰改的比較新」（見 mergeItinerary）
+    const before = JSON.stringify(itinerary[date].places || []);
     const cards = container.querySelectorAll('.itinerary-place');
     itinerary[date].places = Array.from(cards).map(card => {
       const base = {
@@ -1218,6 +1245,9 @@ function syncItineraryFromDOM() {
       }
       return base;
     });
+    if (JSON.stringify(itinerary[date].places) !== before) {
+      itinerary[date].updatedAt = Date.now();
+    }
     if (cards.length === 0) {
       container.innerHTML = '<div class="day-empty">從左側拖入地點</div>';
     } else {
@@ -1241,6 +1271,7 @@ function addToDay(placeIdx, date) {
     return;
   }
   itinerary[date].places.push({ ...place });
+  itinerary[date].updatedAt = Date.now();
   const container = document.getElementById(`day-${date}`);
   if (container) {
     container.querySelector('.day-empty')?.remove();
@@ -1262,6 +1293,7 @@ function showDayPicker(idx) {
 
 function removeFromDay(date, pIdx) {
   itinerary[date].places.splice(pIdx, 1);
+  itinerary[date].updatedAt = Date.now();
   const container = document.getElementById(`day-${date}`);
   if (container) renderDayPlaces(container, date);
   drawRouteLines();
@@ -1293,9 +1325,11 @@ function optimizeDay(date) {
   const places = itinerary[date]?.places || [];
   if (places.length < 2) { showToast('至少需要 2 個地點才能最佳化'); return; }
   itinerary[date].places = nearestNeighbor(HOTEL, places);
+  itinerary[date].updatedAt = Date.now(); // 原本這裡漏掉，最佳化排序後不會觸發自動存檔，改完就白做
   const container = document.getElementById(`day-${date}`);
   if (container) renderDayPlaces(container, date);
   showToast(`${itinerary[date].label} 路線已最佳化 ✓`);
+  markItineraryDirty();
 }
 
 // ════════════════════════════════════════════
@@ -1374,24 +1408,62 @@ function markItineraryDirty() {
   _autoSaveTimer = setTimeout(() => saveItinerary(true), AUTO_SAVE_MS);
 }
 
+// 逐日合併雲端版與本機版行程：以「日期」為合併單位，每天各自比較 updatedAt 取新者整天覆蓋。
+// 原本 saveItinerary 是把整個 itinerary 字串化後整包送到 /api/sync，後端 sync.js 的
+// Object.assign 只在最外層 key（itinerary/shopItems/prep_*）合併，itinerary 這個字串值
+// 本身完全是原子覆蓋——兩人幾乎同時各自編輯不同天，後存的會把先存的整趟行程全部蓋掉、
+// 無感無提示。改成跟記帳/購物清單一樣送出前先合併，只是這裡的合併單位是「天」不是單筆項目
+// （行程內的地點沒有穩定 id，用逐項合併成本過高，逐日取新已能大幅降低资料遺失風險）。
+function mergeItinerary(cloud, local) {
+  const merged = {};
+  const allDates = new Set([...Object.keys(cloud || {}), ...Object.keys(local || {})]);
+  allDates.forEach(date => {
+    const c = cloud?.[date], l = local?.[date];
+    if (!c) { merged[date] = l; return; }
+    if (!l) { merged[date] = c; return; }
+    merged[date] = (c.updatedAt || 0) >= (l.updatedAt || 0) ? c : l;
+  });
+  return merged;
+}
+
 async function saveItinerary(silent = false) {
   clearTimeout(_autoSaveTimer);
   syncItineraryFromDOM();
   Object.keys(itinerary).forEach(date => {
     const notesEl = document.querySelector(`.day-notes[data-date="${date}"]`);
-    if (notesEl) itinerary[date].notes = notesEl.value;
+    if (notesEl && itinerary[date].notes !== notesEl.value) {
+      itinerary[date].notes = notesEl.value;
+      itinerary[date].updatedAt = Date.now();
+    }
   });
   setSaveState('saving');
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
+    // 送出前先抓雲端最新版本逐日合併，避免整包覆蓋掉對方剛存的其他天修改
+    // （比照記帳 mergeTombstoned／購物清單 mergeShopItems 的既有作法）
+    let toSend = itinerary;
+    try {
+      const cloudRes = await fetch('/api/sync');
+      const cloudData = await cloudRes.json();
+      if (cloudData.itinerary) {
+        const cloudItin = JSON.parse(cloudData.itinerary);
+        toSend = mergeItinerary(cloudItin, itinerary);
+      }
+    } catch (_) { /* 抓不到雲端版本就退回直接送本機版，至少不會比現在更差 */ }
     const res = await fetch('/api/sync', {
       method: 'POST', headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ itinerary: JSON.stringify(itinerary) }),
+      body: JSON.stringify({ itinerary: JSON.stringify(toSend) }),
       signal: controller.signal,
     });
     clearTimeout(timer);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // 只有合併結果真的跟本機不同（代表對方有其他天的修改被併進來）才重繪：
+    // 每次自動存檔都無條件整個重繪 DOM 的話，使用者正在備注欄打字時遊標會被打斷，
+    // 沒有衝突的正常情況（絕大多數）應該完全不影響畫面
+    const changed = JSON.stringify(toSend) !== JSON.stringify(itinerary);
+    itinerary = toSend;
+    if (changed) renderItinerary();
     setSaveState('saved');
     if (!silent) showToast('行程已儲存 ✓');
     setTimeout(() => { if (_saveState === 'saved') setSaveState('idle'); }, 2000);
@@ -1952,16 +2024,21 @@ async function saveExpenses() {
   if (expSaving) { expSaveQueued = true; return; }
   expSaving = true;
   setExpSyncStatus('syncing');
+  // 逾時抓 15 秒（比 saveItinerary 的 8 秒寬鬆）：後端 POST /api/expenses 內部本身可能要跑
+  // GET→PATCH→延遲驗證（重試）＋呼叫 Google Apps Script 同步試算表，Apps Script 冷啟動
+  // 常見 3-10 秒，伺服器端最壞情況本來就可能拖到 8 秒以上。逾時設太緊會在伺服器還在
+  // 正常處理中就提前判定失敗，反而增加假性失敗率——這裡的逾時是為了防「訊號真的卡住、
+  // mutex 永久鎖死」，不是要壓伺服器回應時間。
   // token 每次呼叫時讀 localStorage，401 輸入新通行碼後重試才拿得到新值
-  const post = async (payload) => fetch('/api/expenses', {
+  const post = async (payload) => fetchWithTimeout('/api/expenses', {
     method: 'POST',
     headers: { 'Content-Type':'application/json', 'x-app-token': localStorage.getItem('exp-token') || '' },
     body: JSON.stringify(payload),
-  });
+  }, 15000);
   try {
     let merged = expenses;
     try {
-      const cloud = await (await fetch('/api/expenses')).json();
+      const cloud = await (await fetchWithTimeout('/api/expenses', {}, 15000)).json();
       merged = mergeExpenses(cloud, expenses);
     } catch (_) { /* GET 失敗（離線）時退回直接送本機版，讓下面的 POST 走離線暫存流程 */ }
     let resp = await post(merged);
@@ -3123,15 +3200,17 @@ async function saveDiaryText(date, side) {
   diaryText[date][side] = { text, updatedAt: Date.now() };
   localStorage.setItem('diaryText', JSON.stringify(diaryText));
   // token 每次呼叫時讀 localStorage，401 輸入新通行碼後重試才拿得到新值
-  const post = async (payload) => fetch('/api/diary', {
+  // 逾時抓 8 秒（比照 saveItinerary）：api/diary.js 沒有像記帳那樣呼叫外部 Google Apps Script，
+  // 純 GET→PATCH，8 秒足夠涵蓋正常情況，同時避免訊號卡住時這裡的 mutex 永久鎖死
+  const post = async (payload) => fetchWithTimeout('/api/diary', {
     method: 'POST',
     headers: { 'Content-Type':'application/json', 'x-app-token': localStorage.getItem('exp-token') || '' },
     body: JSON.stringify(payload),
-  });
+  }, 8000);
   try {
     let merged = diaryText;
     try {
-      const cloud = await (await fetch('/api/diary')).json();
+      const cloud = await (await fetchWithTimeout('/api/diary', {}, 8000)).json();
       merged = mergeDiaryText(cloud, diaryText);
     } catch (_) { /* GET 失敗只是少一次合併，仍嘗試 POST 本機版，別把整次儲存當失敗 */ }
     let resp = await post(merged);
@@ -3144,12 +3223,16 @@ async function saveDiaryText(date, side) {
     }
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     // 成功後套用合併結果並刷新兩個 textarea（對方有新內容會即時出現）
-    localStorage.setItem('diaryText', JSON.stringify(merged));
+    // 優先採用後端回傳的 result.diary：後端偵測到有別的裝置同時寫入（status:'conflict'）時
+    // 會自動重新合併過，這份才是真正含有雙方資料的權威版本；舊版後端沒回這個欄位時才退回本機的 merged
+    const result = await resp.json().catch(() => ({}));
+    const finalDiary = result.diary || merged;
+    localStorage.setItem('diaryText', JSON.stringify(finalDiary));
     if (date === activeDiaryDay) {
       ['a', 'b'].forEach(s => {
         const el = document.getElementById(`diaryText-${s}`);
         if (el && document.activeElement !== el) {
-          el.value = (merged[date] && merged[date][s] && merged[date][s].text) || '';
+          el.value = (finalDiary[date] && finalDiary[date][s] && finalDiary[date][s].text) || '';
         }
       });
     }
@@ -3255,13 +3338,24 @@ async function loadWeatherCardPreview() {
   } catch(e) { /* keep default */ }
 }
 
+// Open-Meteo 用 timezone=Asia/Tokyo 回傳的是東京當地時間字串，拿裝置本地時間去比對
+// 在東京清晨（UTC 換算過去的日期還是前一天）會整個對不上、天氣列直接顯示錯誤——
+// 這裡改用 Intl.DateTimeFormat 明確算出「東京當地」的日期與小時，不要混用 toISOString()（UTC）
+function tokyoNowParts() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date());
+  const get = type => parts.find(p => p.type === type)?.value;
+  return { dateStr: `${get('year')}-${get('month')}-${get('day')}`, hour: parseInt(get('hour'), 10) };
+}
+
 async function loadHourlyWeather() {
   const strip = document.getElementById('hourlyStrip');
   if (!strip) return;
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}&hourly=temperature_2m,precipitation_probability,weathercode&timezone=Asia%2FTokyo&forecast_days=2`;
     const h = (await (await fetch(url)).json()).hourly;
-    const now = new Date(), nowH = now.getHours(), todayStr = now.toISOString().slice(0,10);
+    const { dateStr: todayStr, hour: nowH } = tokyoNowParts();
     const si = h.time.findIndex(t => t.startsWith(todayStr) && parseInt(t.slice(11,13)) >= nowH);
     if (si === -1) { strip.innerHTML = '<div class="weather-loading">資料暫時無法取得</div>'; return; }
     strip.innerHTML = h.time.slice(si, si+24).map((t, i) => {
