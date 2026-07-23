@@ -59,6 +59,7 @@ body {
   align-items: flex-end;
   justify-content: center;
   pointer-events: all;
+  background-color: #080f24;
 }
 
 .sh {
@@ -78,6 +79,7 @@ body {
   position: absolute;
   inset: 0;
   background: url('splash-bg.jpg') center/cover no-repeat;
+  background-color: #080f24;
 }
 .splash-overlay-text {
   position: absolute;
