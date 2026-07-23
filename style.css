@@ -36,6 +36,11 @@
   --resizer-h: 5px;
 }
 
+html {
+  /* iOS 待機/回彈捲動時會露出 html 的背景（不是 body），深色避免開場動畫/選單頁底部safe-area露出米色 */
+  background: #02030a;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
   background: var(--bg);
