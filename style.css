@@ -180,8 +180,10 @@ body {
    HEADER
 ════════════════════════════════════════════ */
 header {
-  /* 原本這裡加過 safe-area-inset-top 讓內容避開動態島，但使用者實機測過後不喜歡這個效果，
-     寧可內容直接頂到螢幕最上緣、不留動態島的空間，改回原本樣子 */
+  /* 一般瀏覽器（含 Safari 分頁）不留動態島空間，維持貼齊螢幕頂緣的外觀——
+     使用者實機測過偏好這樣。但「加到主畫面」後的 standalone 模式會整個內容區貼齊螢幕，
+     此時 header 裡的 homeBtn/SOS/AI助理 按鈕會被 iPhone 動態島實際擋住無法點擊，
+     故只在 standalone 模式（見下方 @media (display-mode: standalone)）額外加安全區高度 */
   height: var(--header-h);
   background: var(--black);
   color: #fff;
@@ -191,6 +193,13 @@ header {
   padding: 0 16px;
   flex-shrink: 0;
   border-bottom: 3px solid var(--primary);
+}
+
+@media (display-mode: standalone) {
+  header {
+    height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+  }
 }
 .header-title { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; margin-right: auto; }
 .header-title:active { opacity: 0.7; }
