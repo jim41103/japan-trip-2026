@@ -902,7 +902,8 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 ════════════════════════════════════════════ */
 @media (max-width: 767px) {
   /* ─── Header ─── */
-  header { padding: 0 10px; gap: 6px; }
+  /* 故意用 padding-left/right 而非簡寫 padding，避免蓋掉 standalone 模式規則設的 padding-top（動態島安全區） */
+  header { padding-left: 10px; padding-right: 10px; gap: 6px; }
   /* header-title 本身不裁切——Home/SOS/AI 這組按鈕放在最後面，
      若容器 overflow:hidden 而內容總寬超出，會直接把它們裁到看不見，只讓標題文字自己 ellipsis */
   .header-title { gap: 4px; min-width: 0; }
