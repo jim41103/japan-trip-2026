@@ -2275,7 +2275,7 @@ function loadPrepCustomItems() {
 }
 // 只寫本機（不觸發雲端 push），供 syncPull 合併結果落地、或內部呼叫使用
 function savePrepCustomItemsLocal(items) {
-  _origSetItem('prep_custom_items', JSON.stringify(items));
+  localStorage.setItem('prep_custom_items', JSON.stringify(items)); // 純本機寫入；要推雲端請走 savePrepCustomItems
 }
 // 寫本機並推上雲端（GET→按 key 墓碑合併→POST），供使用者主動新增時呼叫
 function savePrepCustomItems(items) {
@@ -2361,7 +2361,7 @@ function renderPrepCustomItem(listId, key, name) {
   cb.checked = localStorage.getItem(`prep_${key}`) === '1';
   label.classList.toggle('checked', cb.checked);
   cb.addEventListener('change', e => {
-    localStorage.setItem(`prep_${key}`, e.target.checked ? '1' : '0');
+    setSynced(`prep_${key}`, e.target.checked ? '1' : '0');
     label.classList.toggle('checked', e.target.checked);
   });
   label.querySelector('.prep-item-del').addEventListener('click', () => {
@@ -2448,7 +2448,7 @@ function makeEditableFixedPrepName(nameEl, key, defaultName) {
       if (committed) return; // Escape 已經 finish 過，擋掉隨後補觸發的原生 blur，不要又存一次
       const newName = input.value.trim();
       if (newName && newName !== originalName) {
-        localStorage.setItem(`prep_label_${key}`, newName); // 走攔截器，prep_ 前綴自動觸發雲端同步
+        setSynced(`prep_label_${key}`, newName); // prep_ 前綴，setSynced 會一併推送到雲端
       }
       finish(newName || originalName);
     });
@@ -2493,7 +2493,7 @@ function initPrepChecklists() {
     if (cb.dataset.bound) return;
     cb.dataset.bound = '1';
     cb.addEventListener('change', () => {
-      localStorage.setItem(`prep_${key}`, cb.checked ? '1' : '0');
+      setSynced(`prep_${key}`, cb.checked ? '1' : '0');
       cb.closest('.prep-item').classList.toggle('checked', cb.checked);
     });
   });
@@ -2824,7 +2824,7 @@ async function syncPull() {
         const pushedAt = recentPush.get(k);
         if (pushedAt && Date.now() - pushedAt < PUSH_GRACE_MS) continue; // 推送剛結束的寬限期內：不信任這次拉回的值
         if (local !== remote) {
-          _origSetItem(k, remote); // 用原生 setItem 寫入，避免觸發攔截器把剛拉回的值又 push 回去
+          localStorage.setItem(k, remote); // 只寫本機、不呼叫 setSynced，避免把剛拉回的值又推回雲端
           changed = true;
         }
       }
@@ -2877,19 +2877,28 @@ function updateSyncIndicator(text) {
   if (el) { el.textContent = text === '已同步' ? '☁ 已同步' : '⚡ 離線'; el.dataset.state = text === '已同步' ? 'ok' : 'offline'; }
 }
 
-// 攔截 localStorage.setItem 以在儲存時自動同步到 server
-const _origSetItem = localStorage.setItem.bind(localStorage);
-localStorage.setItem = function(key, value) {
-  _origSetItem(key, value);
+// 寫入本機並（若屬同步範圍）推送到雲端。
+//
+// 這裡原本的作法是覆寫 localStorage.setItem 做隱式攔截，讓所有寫入自動觸發同步。
+// 該作法在 Chrome 可行，但 **Safari（含 macOS Safari 與 iOS）完全不生效**——
+// localStorage 是 WebKit 的 legacy platform object，對它的方法賦值不會如預期產生
+// own property 遮蔽原型方法，覆寫等於沒發生（實測：localStorage.setItem.toString()
+// 仍是原生函式，勾選 checkbox 後雲端讀回 undefined，從頭到尾沒有發出任何 POST）。
+// 症狀是 Safari 端「看起來有打勾、其實從來沒同步過」，且完全無錯誤訊息。
+//
+// 改成明確呼叫，不再依賴任何瀏覽器對 Storage 物件覆寫的實作差異。
+// 凡是「寫入後需要同步到另一台裝置」的鍵，一律走這個函式，不要直接用 localStorage.setItem。
+function setSynced(key, value) {
+  localStorage.setItem(key, value);
   if (shouldSyncKey(key)) syncPush(key, value);
-};
+}
 
 // 成員名稱變更時同步
 ['member-a', 'member-b'].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
   el.addEventListener('change', () => {
-    localStorage.setItem(`${id}-name`, el.value);
+    setSynced(`${id}-name`, el.value); // member-a-name / member-b-name 在 SYNC_KEYS 內
   });
 });
 
