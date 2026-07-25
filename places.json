@@ -1,5 +1,109 @@
 [
   {
+    "name": "串燒居酒屋 鳥貴族",
+    "description": "",
+    "lat": 35.7135768,
+    "lng": 139.7926779,
+    "type": "restaurant",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E4%B8%B2%E7%87%92%E5%B1%85%E9%85%92%E5%B1%8B+%E9%B3%A5%E8%B2%B4%E6%97%8F/data=!4m2!3m1!1s0x60188ebf9201b391:0xabad3cd3e270fe39"
+  },
+  {
+    "name": "YAKITORI Torikizoku Asakusa Store",
+    "description": "",
+    "lat": 35.7111826,
+    "lng": 139.7972915,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/YAKITORI+Torikizoku+Asakusa+Store/data=!4m2!3m1!1s0x60188ec6bfc83633:0x9b81cf42d0b57de6"
+  },
+  {
+    "name": "愛電王 秋葉原AKIBA店",
+    "description": "",
+    "lat": 35.6980166,
+    "lng": 139.770944,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%84%9B%E9%9B%BB%E7%8E%8B+%E7%A7%8B%E8%91%89%E5%8E%9FAKIBA%E5%BA%97/data=!4m2!3m1!1s0x60188c1d234db8b7:0x9b8bc75401014bd2"
+  },
+  {
+    "name": "Super Sports Xebio Main Shop",
+    "description": "",
+    "lat": 35.6952473,
+    "lng": 139.7621696,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Super+Sports+Xebio+Main+Shop/data=!4m2!3m1!1s0x60188c107060094b:0x32ffca00f4677817"
+  },
+  {
+    "name": "Kotobuki Seian Chashitsu",
+    "description": "",
+    "lat": 35.7323006,
+    "lng": 139.7102849,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Kotobuki+Seian+Chashitsu/data=!4m2!3m1!1s0x60188d5de07881f1:0x670025054a518037"
+  },
+  {
+    "name": "寿清庵 鎌倉 小町通り",
+    "description": "",
+    "lat": 35.2980253,
+    "lng": 139.5306623,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E5%AF%BF%E6%B8%85%E5%BA%B5+%E9%8E%8C%E5%80%89+%E5%B0%8F%E7%94%BA%E9%80%9A%E3%82%8A/data=!4m2!3m1!1s0x601845fe331ad05f:0x2a287ac4d2bc5204"
+  },
+  {
+    "name": "キデイランド オモカド店",
+    "description": "",
+    "lat": 35.710863,
+    "lng": 139.7309252,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E3%82%AD%E3%83%87%E3%82%A4%E3%83%A9%E3%83%B3%E3%83%89+%E3%82%AA%E3%83%A2%E3%82%AB%E3%83%89%E5%BA%97/data=!4m2!3m1!1s0x60188d0061db02f5:0x3570aa1a5dc5e17d"
+  },
+  {
+    "name": "Onitsuka Tiger Omotesando Store",
+    "description": "",
+    "lat": 35.6683017,
+    "lng": 139.7079584,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Onitsuka+Tiger+Omotesando+Store/data=!4m2!3m1!1s0x60188ca3c0e90351:0xb2265ecf2a9177ec"
+  },
+  {
+    "name": "渋谷げんかつ",
+    "description": "",
+    "lat": 35.6344566,
+    "lng": 139.6942223,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B8%8B%E8%B0%B7%E3%81%92%E3%82%93%E3%81%8B%E3%81%A4/data=!4m2!3m1!1s0x60188b34798eec2b:0xb57ef22053e86e4d"
+  },
+  {
+    "name": "Takashimaya Times Square",
+    "description": "",
+    "lat": 35.6863091,
+    "lng": 139.7022725,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Takashimaya+Times+Square/data=!4m2!3m1!1s0x60188cc56e7b1c33:0x5cb1741f721fb576"
+  },
+  {
+    "name": "東京都廳 北展望室",
+    "description": "",
+    "lat": 35.6894875,
+    "lng": 139.6917064,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%BB%B3+%E5%8C%97%E5%B1%95%E6%9C%9B%E5%AE%A4/data=!4m2!3m1!1s0x60188cd4c86bcb9d:0xe5b1c573920cfe2e"
+  },
+  {
+    "name": "Gyu Star",
+    "description": "",
+    "lat": 35.7413487,
+    "lng": 139.8163314,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Gyu+Star/data=!4m2!3m1!1s0x60188f0058a1160d:0x1720b5acff59bd47"
+  },
+  {
+    "name": "Paddlers Coffee",
+    "description": "",
+    "lat": 35.6745834,
+    "lng": 139.6785719,
+    "type": "restaurant",
+    "googleMapsUrl": "https://www.google.com/maps/place/Paddlers+Coffee/data=!4m2!3m1!1s0x6018f33a33a2b93f:0x760ec007cbca14ea"
+  },
+  {
     "name": "燒肉 鶯谷園",
     "description": "",
     "lat": 35.7223422,
@@ -144,28 +248,12 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Gateway+Fujiyama+%E6%B2%B3%E5%8F%A3%E6%B9%96%E7%AB%99%E5%BA%97/data=!4m2!3m1!1s0x60196082b73235c3:0x3d4b4e715d0730b0"
   },
   {
-    "name": "清水港 海山 富士山静岡空港",
-    "description": "",
-    "lat": 34.7522359,
-    "lng": 138.1709158,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%B8%85%E6%B0%B4%E6%B8%AF+%E6%B5%B7%E5%B1%B1+%E5%AF%8C%E5%A3%AB%E5%B1%B1%E9%9D%99%E5%B2%A1%E7%A9%BA%E6%B8%AF/data=!4m2!3m1!1s0x601a5bef49f5d3fb:0x561a48e9c8e093b3"
-  },
-  {
     "name": "あさぎりフードパーク インフォメーション&ショッピング",
     "description": "",
     "lat": 35.42137,
     "lng": 138.6129889,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E3%81%82%E3%81%95%E3%81%8E%E3%82%8A%E3%83%95%E3%83%BC%E3%83%89%E3%83%91%E3%83%BC%E3%82%AF+%E3%82%A4%E3%83%B3%E3%83%95%E3%82%A9%E3%83%A1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%26%E3%82%B7%E3%83%A7%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0/data=!4m2!3m1!1s0x601bdd9145be98ef:0x289268336ee26ad8"
-  },
-  {
-    "name": "文具の蔵Rihei",
-    "description": "",
-    "lat": 35.2250787,
-    "lng": 138.6082112,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/%E6%96%87%E5%85%B7%E3%81%AE%E8%94%B5Rihei/data=!4m2!3m1!1s0x601bd171d2813d1b:0x9a66b9936997b08f"
   },
   {
     "name": "河口湖自然生活館",
@@ -306,8 +394,8 @@
   {
     "name": "無印良品 銀座旗艦店",
     "description": "",
-    "lat": 35.6741,
-    "lng": 139.7659,
+    "lat": 35.6396951,
+    "lng": 139.7336157,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/%E7%84%A1%E5%8D%B0%E8%89%AF%E5%93%81+%E9%8A%80%E5%BA%A7%E6%97%97%E8%89%A6%E5%BA%97/data=!4m2!3m1!1s0x60188baa38aecf7d:0xab5a3452172b5f9"
   },
@@ -570,8 +658,8 @@
   {
     "name": "HOTEL FUJiTORiiGATE -ホテル富士トリイゲート-",
     "description": "",
-    "lat": 35.4828938,
-    "lng": 138.7967342,
+    "lat": 35.4425725,
+    "lng": 138.7951951,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/HOTEL+FUJiTORiiGATE+-%E3%83%9B%E3%83%86%E3%83%AB%E5%AF%8C%E5%A3%AB%E3%83%88%E3%83%AA%E3%82%A4%E3%82%B2%E3%83%BC%E3%83%88-/data=!4m2!3m1!1s0x60196153e8ecd82d:0x6430cb81f7c21d92"
   },
@@ -1024,14 +1112,6 @@
     "googleMapsUrl": "https://www.google.com/maps/place/Shinpachi+Shokud%C5%8D+Shibuya+Meijid%C5%8Dri/data=!4m2!3m1!1s0x60188b8af708b567:0x152bbb64dc11c46e"
   },
   {
-    "name": "Pelican CAFE",
-    "description": "11點前有烤吐司+飲料特價830円，厚切火腿吐司1100円",
-    "lat": 35.7069782,
-    "lng": 139.7911622,
-    "type": "restaurant",
-    "googleMapsUrl": "https://www.google.com/maps/place/Pelican+CAFE/data=!4m2!3m1!1s0x60188eb84fd2bad1:0x3afa8133eeae4229"
-  },
-  {
     "name": "淺草牛光",
     "description": "午間套餐牛排飯和茶泡飯套餐都是1408円",
     "lat": 35.7114837,
@@ -1054,22 +1134,6 @@
     "lng": 139.510141,
     "type": "attraction",
     "googleMapsUrl": "https://www.google.com/maps/place/bills+(Shichirigahama)/data=!4m2!3m1!1s0x60184f6aeaa0078b:0x86d5ad8cf86b28"
-  },
-  {
-    "name": "Hakuba Mountain Harbor- The City… Temporarily closed",
-    "description": "",
-    "lat": 36.7285113,
-    "lng": 137.8880875,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Hakuba+Mountain+Harbor-+The+City%E2%80%A6+Temporarily+closed/data=!4m2!3m1!1s0x5ff7cd6cfc053745:0x9baa10d2ecc90a9d"
-  },
-  {
-    "name": "Enoura Observatory",
-    "description": "",
-    "lat": 35.1883228,
-    "lng": 139.1345852,
-    "type": "attraction",
-    "googleMapsUrl": "https://www.google.com/maps/place/Enoura+Observatory/data=!4m2!3m1!1s0x6019bb68ded284b3:0xd235503de908e439"
   },
   {
     "name": "Pokémon Center Tokyo DX",
@@ -1578,8 +1642,8 @@
   {
     "name": "Hatoya Asakusa",
     "description": "抹茶",
-    "lat": 35.7145,
-    "lng": 139.8015,
+    "lat": 35.7183137,
+    "lng": 139.6921819,
     "type": "restaurant",
     "googleMapsUrl": "https://www.google.com/maps/place/Hatoya+Asakusa/data=!4m2!3m1!1s0x60188d4d2096709d:0xa3f29d92f6ae1181"
   },
