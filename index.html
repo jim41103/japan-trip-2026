@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=104" />
+  <link rel="stylesheet" href="style.css?v=105" />
 </head>
 <body>
 
@@ -121,7 +121,6 @@
     <span id="countdown-pill" class="countdown-pill">⏳ 計算中</span>
     <div class="header-icon-actions" onclick="event.stopPropagation()">
       <button id="homeBtn" title="返回主選單" style="display:none">🏠</button>
-      <button id="floatEmergencyBtn" title="急難聯絡" aria-label="急難聯絡" onclick="showEmergencyPanel()">🆘</button>
       <button id="floatAIBtn" title="AI 旅遊助手" style="display:none">✨</button>
     </div>
   </div>
@@ -441,6 +440,14 @@
       <p class="notices-hint">依 2026/8/3–8/9 東京行程整理，第一次去日本必看</p>
     </div>
 
+    <!-- 急難聯絡：原本是 header 的 🆘 浮動按鈕＋彈窗，改成注意事項頁的第一個區塊，
+         內容由 app.js renderEmergencyInline() 用同一份 EMERGENCY 資料渲染，不另外維護一份 -->
+    <div class="notices-cat notices-cat-emg">
+      <h3>🆘 急難聯絡</h3>
+      <div id="emergency-inline-list" class="emg-inline-list"></div>
+      <p class="emg-inline-note">點擊任一列可直接撥號。日本境內撥打 110／119 免費，手機無 SIM 卡亦可撥打緊急號碼。</p>
+    </div>
+
     <div class="notices-cat">
       <h3>🚃 交通</h3>
       <ul>
@@ -668,6 +675,6 @@
   </div>
 </div>
 
-<script src="app.js?v=104"></script>
+<script src="app.js?v=105"></script>
 </body>
 </html>

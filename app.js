@@ -149,7 +149,6 @@ function showLanding() {
   // iOS 獨立模式安全區底色跟著換，避免跟選單頁底部照片顏色兜不起來（見 style.css body 註解）
   document.body.style.background = '#0E1530';
   showFloatingButtons(false);
-  document.getElementById('floatEmergencyBtn').style.display = 'flex';
   const cd = document.getElementById('landingCountdown');
   const daysLeft = Math.ceil((new Date('2026-08-03') - new Date()) / 86400000);
   if (cd) cd.textContent = daysLeft > 0 ? `✈ 還有 ${daysLeft} 天出發！` : '🎉 旅程進行中！';
@@ -210,8 +209,8 @@ function switchTab(tabName) {
 function showFloatingButtons(show) {
   document.getElementById('floatAIBtn').style.display  = show ? 'flex' : 'none';
   document.getElementById('homeBtn').style.display     = show ? 'flex' : 'none';
-  // 緊急按鈕始終可見（splash 結束後顯示）
-  document.getElementById('floatEmergencyBtn').style.display = 'flex';
+  // 急難聯絡已從 header 移到「注意事項」頁首區塊（見 index.html #emergency-inline-list），
+  // header 不再有 🆘 按鈕
 }
 
 // Home button → back to landing
@@ -846,6 +845,24 @@ function showEmergencyPanel() {
   panel.style.display = 'flex';
   requestAnimationFrame(() => panel.classList.add('emg-open'));
 }
+// 注意事項頁的內嵌急難聯絡清單：跟彈窗共用同一份 EMERGENCY 常數，
+// 避免兩處資料各自維護日後不同步（彈窗仍保留，常用日語頁的紅色橫幅還在用）
+function renderEmergencyInline() {
+  const el = document.getElementById('emergency-inline-list');
+  if (!el) return;
+  el.innerHTML = EMERGENCY.map(e =>
+    `<a class="emg-item" href="tel:${e.tel}">
+      <span class="emg-emoji">${e.emoji}</span>
+      <div class="emg-info">
+        <div class="emg-label">${escHtml(e.label)}</div>
+        <div class="emg-desc">${escHtml(e.desc)}</div>
+      </div>
+      <span class="emg-tel">${escHtml(e.tel)}</span>
+    </a>`
+  ).join('');
+}
+renderEmergencyInline();
+
 function closeEmergencyPanel() {
   const panel = document.getElementById('emergencyPanel');
   panel.classList.remove('emg-open');
@@ -3442,7 +3459,8 @@ async function loadWeeklyWeather() {
 (async () => {
   await loadPlaces();      // 先載入 places.json（權威座標來源），行程座標校正才有東西可比對
   await loadItinerary();
-  loadTripForecast();
+  // loadTripForecast() 已停用：.forecast-bar 全尺寸隱藏（見 style.css），再打 Open-Meteo 只是白費一次請求。
+  // 函式本體保留，日後要把預報條開回來只要把這行還原
   await loadExpenses();
   // 有離線暫存時自動重送——必須在 loadExpenses 之後，expenses 才是本機暫存版，太早跑會送出空陣列丟資料
   if (localStorage.getItem('exp-pending')) saveExpenses();

@@ -947,9 +947,6 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .day-column { min-width: 100%; width: 100%; display: none; }
   .day-column.itin-active { display: flex; }
   #itinerary-days { padding: 8px; gap: 8px; overflow-x: hidden; }
-  /* 7 日天氣預報條在手機版佔掉一整列高度、把行程可視區壓縮，天氣改由 header 天氣鈕／天氣 modal 查看 */
-  .forecast-bar { display: none; }
-
   /* 標題與所有操作鈕併成同一列（原本 wrap 成兩列，多吃一列高度）；
      內容總寬超出時整列橫向捲動，不換行 */
   #itinerary-header { flex-wrap: nowrap; gap: 6px; padding: 8px 10px; }
@@ -1271,7 +1268,7 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 .header-icon-actions button:hover { transform: scale(1.08); }
 #homeBtn { background: linear-gradient(135deg, #C97B5F, #8B4513); }
 #floatAIBtn { background: linear-gradient(135deg, var(--wa-purple), var(--wa-pink)); display: none; }
-#floatEmergencyBtn { background: #D32F2F; display: none; }
+/* #floatEmergencyBtn 已移除（急難聯絡改在注意事項頁內嵌，見 .notices-cat-emg） */
 
 /* 手機版縮小尺寸/間距——故意放在這裡（.header-icon-actions button base 規則之後），
    因為 CSS cascade 是比「原始碼順序」不是比「哪個 media query 寫在檔案前面」，
@@ -1375,12 +1372,9 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
 /* ════════════════════════════════════════════
    FORECAST BAR
 ════════════════════════════════════════════ */
-.forecast-bar {
-  display: flex; gap: 0.5rem; padding: 0.6rem 14px;
-  background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--border);
-  overflow-x: auto; flex-shrink: 0;
-}
-.forecast-bar:empty { display: none; }
+/* 7 日天氣預報條全面停用（手機版與桌面版都不顯示），把整列高度還給行程；
+   天氣改由 header 的天氣鈕／天氣 modal 查看。保留樣式規則以便日後要開回來 */
+.forecast-bar { display: none; }
 .forecast-day {
   display: flex; flex-direction: column; align-items: center;
   min-width: 62px; gap: 1px; padding: 0.4rem 0.5rem;
@@ -1955,14 +1949,26 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .notices-header, .notices-source { column-span: all; }
   .notices-cat { break-inside: avoid; }
 }
-.notices-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-.notices-header h2 { font-size: 16px; font-weight: 800; }
-.notices-hint { font-size: 11px; color: var(--text-muted); }
+/* 標題區留白加大：原本 h2 與說明文字貼在一起、離下方第一張卡片也只有 14px，整片看起來很擠 */
+.notices-header {
+  display: flex; align-items: baseline; gap: 12px;
+  margin: 4px 0 22px; padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--border);
+}
+.notices-header h2 { font-size: 18px; font-weight: 800; letter-spacing: 0.02em; }
+.notices-hint { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
 .notices-cat {
   background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 12px 16px; margin-bottom: 12px;
+  padding: 14px 16px; margin-bottom: 14px;
 }
-.notices-cat h3 { font-size: 13px; font-weight: 800; margin-bottom: 8px; color: var(--primary); }
+.notices-cat h3 { font-size: 13px; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
+
+/* ── 急難聯絡（注意事項頁內嵌版；彈窗版樣式見 .emg-item 區塊，此處只調整內嵌情境的邊框/留白） ── */
+.notices-cat-emg { border-color: #F5C6C6; background: #FFF8F7; }
+.emg-inline-list { border: 1px solid #F0DDDD; border-radius: 10px; overflow: hidden; background: var(--bg-card); }
+.emg-inline-list .emg-item { padding: 11px 14px; }
+.emg-inline-list .emg-item:last-child { border-bottom: none; }
+.emg-inline-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-top: 10px; }
 .notices-cat ul { margin: 0; padding-left: 18px; }
 .notices-cat li { font-size: 12.5px; line-height: 1.6; color: var(--text); margin-bottom: 5px; }
 .notices-source { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 6px; }
