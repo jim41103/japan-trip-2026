@@ -36,6 +36,9 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // 沒有明確快取指示時 iOS Safari 會用啟發式快取自行決定存多久，
+  // GET /api/sync 一旦被回舊快照，剛推上去的勾選狀態就會被 syncPull 拉回舊值覆蓋
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {

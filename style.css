@@ -947,9 +947,21 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   .day-column { min-width: 100%; width: 100%; display: none; }
   .day-column.itin-active { display: flex; }
   #itinerary-days { padding: 8px; gap: 8px; overflow-x: hidden; }
-  .itinerary-actions { flex-wrap: wrap; gap: 6px; }
-  #itinerary-header { flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
-  #itinerary-header h2 { font-size: 13px; }
+  /* 7 日天氣預報條在手機版佔掉一整列高度、把行程可視區壓縮，天氣改由 header 天氣鈕／天氣 modal 查看 */
+  .forecast-bar { display: none; }
+
+  /* 標題與所有操作鈕併成同一列（原本 wrap 成兩列，多吃一列高度）；
+     內容總寬超出時整列橫向捲動，不換行 */
+  #itinerary-header { flex-wrap: nowrap; gap: 6px; padding: 8px 10px; }
+  #itinerary-header h2 { font-size: 13px; flex-shrink: 0; }
+  .itinerary-actions {
+    flex-wrap: nowrap; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 1px;
+  }
+  .itinerary-actions::-webkit-scrollbar { display: none; }
+  .itinerary-actions > * { flex-shrink: 0; white-space: nowrap; }
+  /* 只縮按鈕；.sync-indicator 的尺寸沿用本 media query 上方第 921 行既有的 10px/3px 7px，不重複覆寫 */
+  .itinerary-actions > .btn { font-size: 11px; padding: 4px 7px; }
   .itinerary-day-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px; }
   .itin-day-tab {
     flex-shrink: 0; padding: 6px 12px; border-radius: 16px; border: 1.5px solid var(--border);
@@ -1181,9 +1193,14 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* 不能用 justify-content: center：內容比視窗高時（8 張卡片 + 標題），置中會讓內容同時往上下溢出，
+     往上溢出的部分在捲動容器裡是抓不到的（捲動位置 0 就是內容中段），標題被動態島蓋住且捲不回來。
+     改成 flex-start + 子元素 auto margin：有多餘空間時 auto 撐開＝視覺置中，
+     空間不足時 auto 收斂為 0＝內容從頂端排起，不會有捲不到的上溢出。 */
+  justify-content: flex-start;
   gap: 2rem;
   padding: 2rem;
+  padding-top: calc(2rem + env(safe-area-inset-top, 0px)); /* 動態島／瀏海高度，避免標題被蓋住 */
   padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
   animation: landingFadeIn 0.6s ease forwards;
 }
@@ -1196,7 +1213,9 @@ header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; }
   position: relative;
   z-index: 1;
 }
-.landing-header { text-align: center; }
+/* 配合 #landing 的 justify-content: flex-start，用 auto margin 做「空間夠才置中」 */
+.landing-header { text-align: center; margin-top: auto; }
+.landing-cards { margin-bottom: auto; }
 .landing-logo { font-size: 2.4rem; font-weight: 900; color: #ffe082; letter-spacing: 0.05em; text-shadow: 0 2px 8px rgba(0,0,0,.9), 0 4px 24px rgba(0,0,0,.7); }
 .landing-subtitle { font-size: 1rem; color: #ffe082; margin-top: 0.25rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,.9), 0 4px 18px rgba(0,0,0,.6); }
 .landing-countdown { font-size: 1.1rem; color: #ffb347; margin-top: 0.5rem; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,.85), 0 4px 16px rgba(0,0,0,.55); }

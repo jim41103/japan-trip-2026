@@ -1448,7 +1448,7 @@ async function saveItinerary(silent = false) {
     // （比照記帳 mergeTombstoned／購物清單 mergeShopItems 的既有作法）
     let toSend = itinerary;
     try {
-      const cloudRes = await fetch('/api/sync');
+      const cloudRes = await fetch(`/api/sync?t=${Date.now()}`, { cache: 'no-store' });
       const cloudData = await cloudRes.json();
       if (cloudData.itinerary) {
         const cloudItin = JSON.parse(cloudData.itinerary);
@@ -2733,36 +2733,59 @@ function shouldSyncKey(key) {
 const pushPending = new Set();
 const recentPush = new Map();
 const PUSH_GRACE_MS = 8000;
-async function syncPush(key, value, _retried) {
-  pushPending.add(key);
+// 舊值 8000 太緊：後端最壞情況（GET→PATCH→延遲驗證，含重試）本身就要約 5.8 秒，
+// 手機走行動網路／弱 Wi-Fi 時再加上來回延遲很容易超過 8 秒被 AbortController 砍掉，
+// 而舊版一旦砍掉就不重試、也不給寬限期，下一輪 10 秒輪詢立刻把雲端舊值（未勾選）拉回來覆蓋
+// ——這正是「手機勾選行前準備、過幾秒自己取消勾選，電腦卻正常」的成因。
+// 15 秒 > Vercel Hobby 的 10 秒 function 硬上限，代表逾時一定是網路層問題，不是後端還在跑。
+const PUSH_TIMEOUT_MS = 15000;
+const PUSH_MAX_ATTEMPTS = 3;    // 含首次，共試 3 次
+const PUSH_RETRY_DELAY_MS = 2000;
+async function syncPush(key, value) {
+  pushPending.add(key); // 整段重試期間都留在 pushPending，syncPull 一律不覆蓋這個鍵
   try {
-    // 後端最壞情況（GET→PATCH→驗證，含重試）約需 5.8 秒，比照同檔案 saveItinerary（約1319行）
-    // 既有的 8 秒 timeout 慣例，避免網路異常時這個 fetch 無限期掛著
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [key]: value }),
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    const data = await res.json().catch(() => ({}));
-    // 後端在偵測到「另一裝置同時寫入、被蓋掉」時會回 status:'conflict'（GET→merge→PATCH 後
-    // 延遲驗證仍失敗，重試一次仍不行）。fetch 本身沒有拋錯（HTTP 200），若不檢查 body 就會
-    // 誤判這次推送成功——這裡補一次前端重試，只重試一次避免無限迴圈；再失敗就放棄，
-    // 等下次使用者操作或排程輪詢時的補推邏輯自然修正。
-    if (data.status === 'conflict' && !_retried) {
-      // 注意：一定要 await，不能直接 return 那個 promise——如果不 await，這裡的 finally 會在
-      // 內層重試「發起的當下」就先執行，pushPending 提早被清掉，重試那幾秒又暴露在競態窗口裡
-      await syncPush(key, value, true);
+    for (let attempt = 1; attempt <= PUSH_MAX_ATTEMPTS; attempt++) {
+      let ok = false;
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), PUSH_TIMEOUT_MS);
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [key]: value }),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        const data = await res.json().catch(() => ({}));
+        // 後端在偵測到「另一裝置同時寫入、被蓋掉」時會回 status:'conflict'（HTTP 仍是 200，
+        // fetch 不會拋錯），不檢查 body 就會誤判推送成功
+        ok = res.ok && data.status !== 'conflict';
+      } catch (_) {
+        ok = false; // 逾時／斷線／伺服器沒回應
+      }
+      if (ok) return;
+      if (attempt < PUSH_MAX_ATTEMPTS) await new Promise(r => setTimeout(r, PUSH_RETRY_DELAY_MS));
     }
-  } catch (_) {
-    // 推送失敗：不給寬限期（沒有真的成功過，沒東西好保護），讓 syncPull 可以立刻用雲端現況修正本機
   } finally {
     pushPending.delete(key);
-    recentPush.set(key, Date.now()); // push 結束（不論成功失敗）這一刻才開始倒數寬限期
+    recentPush.set(key, Date.now()); // 重試全部結束（不論成敗）這一刻才開始倒數寬限期
   }
+}
+
+// 補推缺鍵：內部序列化、外部不 await（見 syncPull 內呼叫處的理由）。
+// backfillRunning 擋住重疊執行——輪詢每 10 秒一輪，上一輪的補推鏈可能還在跑，
+// 兩條鏈同時送出就破壞了序列化本來要防的互蓋。
+let backfillRunning = false;
+async function backfillMissingPrepKeys(cloudData) {
+  if (backfillRunning) return;
+  backfillRunning = true;
+  try {
+    for (const cb of document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]')) {
+      const k = `prep_${cb.dataset.key}`;
+      const local = localStorage.getItem(k);
+      if (local && cloudData[k] === undefined) await syncPush(k, local);
+    }
+  } finally { backfillRunning = false; }
 }
 
 // in-flight 旗標：visibilitychange 立即拉一次與 30 秒排程輪詢可能同時觸發，避免同時打兩發
@@ -2771,7 +2794,7 @@ async function syncPull() {
   if (syncPullInFlight) return;
   syncPullInFlight = true;
   try {
-    const res = await fetch('/api/sync');
+    const res = await fetch(`/api/sync?t=${Date.now()}`, { cache: 'no-store' }); // 雙保險：URL 帶時戳＋no-store，杜絕 iOS 拿到舊快照
     const data = await res.json();
     let changed = false;
     // prep_ 前綴鍵數量不固定（含使用者自訂項目），改成掃描雲端回傳的所有鍵，不能再逐一列舉比對
@@ -2794,12 +2817,13 @@ async function syncPull() {
     // 不覆蓋雲端已有值，避免和其他裝置的資料互相蓋掉。
     // 刻意序列化（for...of + await）而非平行 forEach：/api/sync 後端是無鎖的 GET→merge→PATCH，
     // 若一次有多筆缺鍵同時平行送出，後完成的 PATCH 會蓋掉先完成、但還沒反映在自己那份 GET 快照裡的鍵，
-    // 序列化讓下一筆的 GET 一定能讀到前一筆剛寫入的結果，避免互蓋遺失
-    for (const cb of document.querySelectorAll('#section-prep .prep-item input[type="checkbox"]')) {
-      const k = `prep_${cb.dataset.key}`;
-      const local = localStorage.getItem(k);
-      if (local && data[k] === undefined) await syncPush(k, local);
-    }
+    // 序列化讓下一筆的 GET 一定能讀到前一筆剛寫入的結果，避免互蓋遺失。
+    //
+    // 但這條鏈「不能」被 syncPull 本身 await：syncPush 現在最壞會重試 3 次（約 49 秒），
+    // 多筆缺鍵串起來會讓 syncPullInFlight 長時間掛住，期間所有排程輪詢與切回前景的
+    // syncPull 都會在開頭 return，整個 app 看起來像斷線。
+    // 改成丟到背景跑：內部仍然序列化（保住上面的防互蓋理由），外面不等它。
+    backfillMissingPrepKeys(data);
     if (changed) {
       initPrepChecklists();
       const a = localStorage.getItem('member-a-name');
