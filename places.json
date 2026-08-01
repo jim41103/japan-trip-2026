@@ -1,5 +1,53 @@
 [
   {
+    "name": "友都八喜 秋葉原",
+    "description": "",
+    "lat": 35.6987917,
+    "lng": 139.7747409,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/%E5%8F%8B%E9%83%BD%E5%85%AB%E5%96%9C+%E7%A7%8B%E8%91%89%E5%8E%9F/data=!4m2!3m1!1s0x60188ea7d9cc4f19:0x7bb917c6708b7376"
+  },
+  {
+    "name": "ASICS FLAGSHIP HARAJUKU",
+    "description": "",
+    "lat": 35.6686592,
+    "lng": 139.7044205,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/ASICS+FLAGSHIP+HARAJUKU/data=!4m2!3m1!1s0x60188ca4fac54abd:0xdac77910b1a5d314"
+  },
+  {
+    "name": "BIC CAMERA 秋葉原店",
+    "description": "",
+    "lat": 35.6996708,
+    "lng": 139.7713756,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/BIC+CAMERA+%E7%A7%8B%E8%91%89%E5%8E%9F%E5%BA%97/data=!4m2!3m1!1s0x60188c1da0ebfb33:0x2349c4e64f78e704"
+  },
+  {
+    "name": "SELVA supermarket",
+    "description": "",
+    "lat": 35.4886466,
+    "lng": 138.8048405,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/SELVA+supermarket/data=!4m2!3m1!1s0x6019673186ab171b:0x5a71836d4b028bf2"
+  },
+  {
+    "name": "The Big Fujiyoshida",
+    "description": "",
+    "lat": 35.4776839,
+    "lng": 138.8097901,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/The+Big+Fujiyoshida/data=!4m2!3m1!1s0x601966d82916f1e9:0x3ed97b8b2f6ae31c"
+  },
+  {
+    "name": "Victoria Shinjuku Store",
+    "description": "",
+    "lat": 35.6891934,
+    "lng": 139.7025747,
+    "type": "attraction",
+    "googleMapsUrl": "https://www.google.com/maps/place/Victoria+Shinjuku+Store/data=!4m2!3m1!1s0x60188cda95590987:0xc33a0587a446508"
+  },
+  {
     "name": "串燒居酒屋 鳥貴族",
     "description": "",
     "lat": 35.7135768,
